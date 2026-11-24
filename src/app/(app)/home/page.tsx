@@ -204,8 +204,9 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
 function BalanceCard({ title, b, t }: { title?: string; b: ReturnType<typeof balanceOf>; t: T }) {
   const n = (v: number) => `$${v.toLocaleString("en-US")}`;
   return (
-    // A quiet summary tile: plain card surface and ink numbers, so it never reads as a button
-    <section className="card px-[18px] pb-4 pt-5">
+    // No tile at all: the summary sits right on the page, so it can't be mistaken for the cards and buttons below.
+    // Label lines up with the name above; right padding matches the cards so the amount lines up with the list amounts.
+    <section className="pb-1 pl-0 pr-[18px] pt-1">
       {title && <p className="mb-2 text-lg font-bold">{title}</p>}
       {/* "NTD $5,765 remaining" on one line; wraps only for very large amounts */}
       <p className="flex items-baseline justify-between gap-3 leading-none">

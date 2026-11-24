@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { requireCtx } from "@/lib/ctx";
 import { BottomNav } from "@/components/ui";
 import { DemoBanner } from "@/components/settings";
+import { PushOpen } from "@/components/notify";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { me } = await requireCtx();
@@ -14,6 +15,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {!!me.demo && <DemoBanner />}
       <main className="mx-auto max-w-xl px-4 pb-32 pt-[max(1rem,env(safe-area-inset-top))]">{children}</main>
       <BottomNav showMore={showMore} />
+      <PushOpen />
     </>
   );
 }

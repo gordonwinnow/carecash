@@ -26,7 +26,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ name: s
              and (m.role = 'admin' or (r.shared = 1 and (r.caretaker_id is null or r.caretaker_id = m.id)))`,
         )
         .get(name, user.id);
-  if (!viaExpense && !viaRecord) return new Response("Not found", { status: 404 });
+  // Photos replaced or deleted stay visible in the change history to whoever may see that history
+  const viaHistory =
+    viaExpense || viaRecord
+      ? null
+      : db
+          .prepare(
+            `select 1 from audit a join member m on m.family_id = a.family_id
+             where (a.before like @pat or a.after like @pat) and m.user_id = @user and m.active = 1
+               and (m.role = 'admin' or a.subject_id = m.id)`,
+          )
+          .get({ pat: `%"${name}"%`, user: user.id });
+  if (!viaExpense && !viaRecord && !viaHistory) return new Response("Not found", { status: 404 });
 
   try {
     const buf = await fs.promises.readFile(path.join(UPLOAD_DIR, name));

@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
+import { Camera, ChevronLeft, House, Lock, ReceiptText, RotateCcw, Settings, X } from "lucide-react";
 import { useT } from "./i18n";
 
 export function Submit({ children, className = "btn-primary", disabled }: { children: React.ReactNode; className?: string; disabled?: boolean }) {
@@ -46,28 +47,63 @@ export function ActionButton({
   );
 }
 
+const TEXT_INPUT = /^(text|email|tel|number|password|search|url|date)$/;
+function isTyping(el: Element | null) {
+  if (!el) return false;
+  if (el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) return true;
+  return el instanceof HTMLInputElement && TEXT_INPUT.test(el.type);
+}
+
+/**
+ * The tab bar, as on iOS: it stays at the bottom of the screen and never rides up on the keyboard.
+ * It hides while a text field is focused, and on full-screen "add" pages.
+ */
 export function BottomNav({ showMore }: { showMore: boolean }) {
   const t = useT();
   const path = usePathname();
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const sync = () => {
+      // focusout fires before focus lands on the next field, so check on the next frame
+      requestAnimationFrame(() => {
+        if (isTyping(document.activeElement)) root.dataset.typing = "";
+        else delete root.dataset.typing;
+      });
+    };
+    sync();
+    document.addEventListener("focusin", sync);
+    document.addEventListener("focusout", sync);
+    return () => {
+      document.removeEventListener("focusin", sync);
+      document.removeEventListener("focusout", sync);
+      delete root.dataset.typing;
+    };
+  }, [path]);
+
+  if (path.endsWith("/new")) return null;
+
   const items = [
-    { href: "/home", icon: "🏠", label: t("navHome") },
-    { href: "/history", icon: "🧾", label: t("navHistory") },
-    ...(showMore ? [{ href: "/more", icon: "🔒", label: t("navMore") }] : []),
-    { href: "/settings", icon: "⚙️", label: t("navSettings") },
+    { href: "/home", Icon: House, label: t("navHome") },
+    { href: "/history", Icon: ReceiptText, label: t("navHistory") },
+    ...(showMore ? [{ href: "/more", Icon: Lock, label: t("navMore") }] : []),
+    { href: "/settings", Icon: Settings, label: t("navSettings") },
   ];
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-card pb-[env(safe-area-inset-bottom)]">
+    <nav className="tabbar fixed inset-x-0 bottom-0 z-20 bg-card/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl transition-transform duration-200 [box-shadow:0_-1px_0_var(--line)]">
       <div className="mx-auto flex max-w-xl">
-        {items.map((i) => {
-          const active = path.startsWith(i.href);
+        {items.map(({ href, Icon, label }) => {
+          const active = path.startsWith(href);
           return (
             <Link
-              key={i.href}
-              href={i.href}
-              className={`flex flex-1 flex-col items-center gap-0.5 py-2.5 text-sm font-semibold ${active ? "text-accent" : "text-muted"}`}
+              key={href}
+              href={href}
+              className={`flex flex-1 flex-col items-center gap-1 pb-2 pt-2.5 text-[13px] font-semibold ${active ? "text-accent" : "text-muted"}`}
             >
-              <span className={`text-2xl ${active ? "" : "opacity-70 grayscale"}`}>{i.icon}</span>
-              <span className="leading-tight text-center">{i.label}</span>
+              <span className={`flex h-8 w-14 items-center justify-center rounded-full transition ${active ? "bg-accent-soft" : ""}`}>
+                <Icon size={22} strokeWidth={active ? 2.4 : 2} />
+              </span>
+              <span className="text-center leading-tight">{label}</span>
             </Link>
           );
         })}
@@ -80,7 +116,7 @@ export function PhotoThumb({ name, size = 56 }: { name: string; size?: number })
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className="shrink-0 overflow-hidden rounded-xl border border-line" style={{ width: size, height: size }}>
+      <button type="button" onClick={() => setOpen(true)} className="shrink-0 overflow-hidden rounded-2xl bg-sunk" style={{ width: size, height: size }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={`/api/photo/${name}`} alt="" loading="lazy" className="h-full w-full object-cover" />
       </button>
@@ -88,7 +124,9 @@ export function PhotoThumb({ name, size = 56 }: { name: string; size?: number })
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-3" onClick={() => setOpen(false)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={`/api/photo/${name}`} alt="" className="max-h-full max-w-full rounded-xl" />
-          <button className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] rounded-full bg-white/90 px-5 py-3 text-xl font-bold text-black">✕</button>
+          <button className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black" aria-label="Close">
+            <X size={24} />
+          </button>
         </div>
       )}
     </>
@@ -110,11 +148,11 @@ async function compress(file: File): Promise<Blob> {
   }
 }
 
-export function PhotoInput({ big = true, label }: { big?: boolean; label: string }) {
+export function PhotoInput({ big = true, label, existing }: { big?: boolean; label: string; existing?: string | null }) {
   const t = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const hiddenRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(existing ? `/api/photo/${existing}` : null);
 
   async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -131,20 +169,27 @@ export function PhotoInput({ big = true, label }: { big?: boolean; label: string
       <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={onPick} />
       <input ref={hiddenRef} type="file" name="photo" className="hidden" />
       {preview ? (
-        <div className="relative">
+        // The whole photo is shown, letterboxed, so nothing on the receipt is cut off
+        <div className="relative overflow-hidden rounded-3xl bg-sunk">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={preview} alt="" className="max-h-72 w-full rounded-2xl object-cover" />
-          <button type="button" onClick={() => fileRef.current?.click()} className="absolute bottom-3 right-3 rounded-xl bg-black/70 px-4 py-2 font-bold text-white">
-            📷 {t("retake")}
+          <img src={preview} alt="" className="mx-auto max-h-[60vh] w-full object-contain" />
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full bg-black/60 px-4 py-2.5 text-base font-bold text-white backdrop-blur"
+          >
+            <RotateCcw size={18} /> {t("retake")}
           </button>
         </div>
       ) : (
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          className={`flex w-full flex-col items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-accent bg-accent-soft font-bold text-ink ${big ? "h-44 text-2xl" : "h-24 text-lg"}`}
+          className={`flex w-full items-center justify-center gap-3 rounded-3xl bg-accent-soft font-bold text-accent-ink transition active:scale-[0.98] ${big ? "h-28 text-xl" : "h-20 text-lg"}`}
         >
-          <span className={big ? "text-5xl" : "text-3xl"}>📷</span>
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-on-accent">
+            <Camera size={24} />
+          </span>
           {label}
         </button>
       )}
@@ -152,32 +197,38 @@ export function PhotoInput({ big = true, label }: { big?: boolean; label: string
   );
 }
 
-export function AmountInput({ quick, autoFocus }: { quick?: number[]; autoFocus?: boolean }) {
+export function AmountInput({ quick, autoFocus, initial }: { quick?: number[]; autoFocus?: boolean; initial?: number }) {
   const t = useT();
-  const [v, setV] = useState("");
+  const [v, setV] = useState(initial ? String(initial) : "");
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (autoFocus) ref.current?.focus();
+  }, [autoFocus]);
   return (
     <div>
-      <label className="label">{t("amount")}</label>
-      <div className="flex items-center rounded-2xl border-2 border-line bg-card px-4 focus-within:border-accent">
+      <label className="label" htmlFor="amount">{t("amount")}</label>
+      <div className="flex items-baseline rounded-3xl bg-card px-5 py-3 ring-2 ring-transparent transition [box-shadow:var(--shadow)] focus-within:ring-accent">
         <span className="text-2xl font-bold text-muted">NT$</span>
         <input
+          ref={ref}
+          id="amount"
           name="amount"
           required
           inputMode="numeric"
           pattern="[0-9,]*"
           autoComplete="off"
           autoFocus={autoFocus}
+          enterKeyHint="done"
           value={v}
           onChange={(e) => setV(e.target.value.replace(/[^\d]/g, ""))}
           placeholder="0"
-          className="w-full bg-transparent px-3 py-4 text-4xl font-bold outline-none"
-          aria-label={t("amount")}
+          className="tabular w-full min-w-0 bg-transparent px-3 py-2 text-5xl font-extrabold tracking-tight outline-none placeholder:text-muted/40"
         />
       </div>
       {quick && (
         <div className="mt-3 grid grid-cols-3 gap-2">
           {quick.map((q) => (
-            <button key={q} type="button" className="chip" aria-pressed={v === String(q)} onClick={() => setV(String(q))}>
+            <button key={q} type="button" className="chip tabular" aria-pressed={v === String(q)} onClick={() => setV(String(q))}>
               {q.toLocaleString("en-US")}
             </button>
           ))}
@@ -194,7 +245,7 @@ export function ChipGroup({
   cols = 3,
 }: {
   name: string;
-  options: { value: string; label: string; icon?: string }[];
+  options: { value: string; label: string; icon?: React.ReactNode }[];
   initial?: string;
   cols?: number;
 }) {
@@ -203,8 +254,8 @@ export function ChipGroup({
     <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
       <input type="hidden" name={name} value={v} />
       {options.map((o) => (
-        <button key={o.value} type="button" className="chip flex-col !gap-0 py-2 text-base" aria-pressed={v === o.value} onClick={() => setV(o.value)}>
-          {o.icon && <span className="text-2xl">{o.icon}</span>}
+        <button key={o.value} type="button" className="chip min-h-16 flex-col !gap-1 py-2.5 text-base" aria-pressed={v === o.value} onClick={() => setV(o.value)}>
+          {o.icon}
           <span className="leading-tight">{o.label}</span>
         </button>
       ))}
@@ -214,11 +265,21 @@ export function ChipGroup({
 
 export function BackHeader({ title, href = "/home" }: { title: string; href?: string }) {
   return (
-    <header className="mb-4 flex items-center gap-3">
-      <Link href={href} className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-line bg-card text-2xl" aria-label="Back">
-        ←
+    <header className="mb-2 flex items-center gap-3">
+      <Link href={href} className="-ml-1 flex h-12 w-12 items-center justify-center rounded-full bg-card text-ink [box-shadow:var(--shadow)]" aria-label="Back">
+        <ChevronLeft size={26} />
       </Link>
-      <h1 className="text-2xl font-extrabold">{title}</h1>
+      <h1 className="text-2xl font-extrabold tracking-tight">{title}</h1>
+    </header>
+  );
+}
+
+/** Page title with a small tinted icon, used on the tab pages. */
+export function PageTitle({ children, sub }: { children: React.ReactNode; sub?: React.ReactNode }) {
+  return (
+    <header className="pt-2">
+      <h1 className="text-3xl font-extrabold tracking-tight">{children}</h1>
+      {sub && <p className="mt-1 text-base text-muted">{sub}</p>}
     </header>
   );
 }

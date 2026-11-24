@@ -9,7 +9,7 @@ function cleanup() {
   const old = db.prepare("select id from family where demo = 1 and created_at < ?").all(Date.now() - 3 * DAY) as { id: string }[];
   const tx = db.transaction((ids: string[]) => {
     for (const id of ids) {
-      for (const t of ["cash", "expense", "record", "invite", "member"]) db.prepare(`delete from ${t} where family_id = ?`).run(id);
+      for (const t of ["audit", "cash", "expense", "record", "invite", "member"]) db.prepare(`delete from ${t} where family_id = ?`).run(id);
       db.prepare("delete from family where id = ?").run(id);
     }
   });
@@ -50,7 +50,7 @@ export function seedDemo(userId: string, role: "admin" | "caretaker") {
     ins.cash.run(newId(), fid, caretaker, 5000, "Groceries", master, master, now - 38 * DAY, now - 38 * DAY + 3600e3, null);
     ins.cash.run(newId(), fid, caretaker, 5000, "Groceries", master, master, now - 8 * DAY, now - 8 * DAY + 600e3, null);
     ins.cash.run(newId(), fid, caretaker, 1000, "For medicine", master, caretaker, now - 3 * DAY, now - 3 * DAY, null);
-    ins.cash.run(newId(), fid, caretaker, 3000, "Next week", master, master, now - 2 * 3600e3, null, null);
+    ins.cash.run(newId(), fid, caretaker, 3000, "Groceries", master, master, now - 2 * 3600e3, null, null);
 
     const exps: [number, number, string, string][] = [
       [36, 820, "food", "全聯 vegetables & fruit"],

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Crown, Mail, UserRound, Wallet } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useT } from "@/components/i18n";
 import { LanguagePicker } from "@/components/settings";
@@ -44,8 +45,8 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
         <LanguagePicker compact />
       </div>
       <div className="mb-8 mt-8 text-center">
-        <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-3xl bg-accent text-5xl">👛</div>
-        <h1 className="text-4xl font-extrabold">{t("appName")}</h1>
+        <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-[28px] bg-accent text-white" style={{ boxShadow: "0 14px 30px -12px color-mix(in srgb, var(--accent) 70%, transparent)" }}><Wallet size={46} strokeWidth={2} /></div>
+        <h1 className="text-4xl font-extrabold tracking-tight">{t("appName")}</h1>
         <p className="mt-2 text-xl text-muted">{t("tagline")}</p>
       </div>
 
@@ -72,15 +73,15 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
             </button>
           )}
           <button className="btn-soft" onClick={() => setMode("email")}>
-            ✉️ {t("continueWith", { p: t("email") })}
+            <Mail size={22} /> {t("continueWith", { p: t("email") })}
           </button>
           <div className="pt-6">
-            <p className="mb-2 text-center text-lg font-semibold text-muted">👀 {t("tryDemo")}</p>
+            <p className="mb-3 text-center text-base font-semibold text-muted">{t("tryDemo")}</p>
             <div className="grid grid-cols-2 gap-2">
               {(["admin", "caretaker"] as const).map((role) => (
                 <button
                   key={role}
-                  className="chip min-h-16 border-dashed text-base"
+                  className="chip min-h-16 text-base"
                   disabled={busy}
                   onClick={() =>
                     run(async () => {
@@ -90,6 +91,7 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
                     })
                   }
                 >
+                  {role === "admin" ? <Crown size={20} /> : <UserRound size={20} />}
                   {t("tryAs", { role: role === "admin" ? t("roleAdmin") : t("roleCaretaker") })}
                 </button>
               ))}
@@ -197,7 +199,7 @@ function EmailForm({ next, run, busy, back }: FormProps) {
       <button className="btn-primary" disabled={busy}>
         {busy ? "…" : signUp ? t("signUp") : t("signIn")}
       </button>
-      <button type="button" className="w-full py-3 text-lg font-semibold text-accent underline" onClick={() => setSignUp(!signUp)}>
+      <button type="button" className="w-full py-3 text-lg font-semibold text-accent" onClick={() => setSignUp(!signUp)}>
         {signUp ? t("haveAccount") : t("noAccount")}
       </button>
       <button type="button" className="btn-soft" onClick={back}>

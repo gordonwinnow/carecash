@@ -1,5 +1,6 @@
 "use client";
 import { useState, useTransition } from "react";
+import { Copy, Plus } from "lucide-react";
 import { createInvite } from "../../actions";
 import { useT } from "@/components/i18n";
 
@@ -22,14 +23,14 @@ export function InvitePanel() {
     <div id="invite" className="space-y-3">
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <button type="button" className="btn-primary" disabled={pending} onClick={() => make("caretaker")}>
-          ➕ {t("inviteCaretaker")}
+          <Plus size={22} /> {t("inviteCaretaker")}
         </button>
-        <button type="button" className="btn-soft" disabled={pending} onClick={() => make("admin")}>
-          ➕ {t("inviteAdmin")}
+        <button type="button" className="btn-tint" disabled={pending} onClick={() => make("admin")}>
+          <Plus size={22} /> {t("inviteAdmin")}
         </button>
       </div>
       {link && (
-        <div className="space-y-3 rounded-2xl border-2 border-accent bg-accent-soft p-4">
+        <div className="space-y-3 rounded-3xl bg-accent-soft p-4">
           <p className="text-base font-semibold">
             {link.role === "caretaker" ? t("roleCaretaker") : t("roleAdmin")} · {t("inviteHint")}
           </p>
@@ -55,7 +56,7 @@ export function InvitePanel() {
               }
             }}
           >
-            {copied ? t("copied") : `📋 ${t("copyLink")}`}
+            {copied ? t("copied") : <><Copy size={20} /> {t("copyLink")}</>}
           </button>
         </div>
       )}

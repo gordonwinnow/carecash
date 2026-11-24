@@ -68,6 +68,32 @@ create table if not exists record (
   created_at integer not null
 );
 create index if not exists record_family on record(family_id);
+-- Every change to cash, expenses, records and members: who did what, with the row before and after (JSON)
+create table if not exists audit (
+  id text primary key,
+  family_id text not null,
+  member_id text not null,
+  subject_id text, -- the caretaker this row is about (cash, expenses); she may see it
+  entity text not null,
+  entity_id text not null,
+  action text not null,
+  before text,
+  after text,
+  at integer not null
+);
+create index if not exists audit_family on audit(family_id, at);
+create index if not exists audit_entity on audit(entity_id, at);
+-- Devices that get notifications: a browser (web push) or the iOS app (APNs token)
+create table if not exists push_sub (
+  id text primary key,
+  user_id text not null,
+  kind text not null check (kind in ('web','apns')),
+  endpoint text not null unique,
+  keys text,
+  lang text not null default 'en',
+  created_at integer not null
+);
+create index if not exists push_sub_user on push_sub(user_id);
 `;
 
 function addColumn(d: Database.Database, table: string, col: string, def: string) {
@@ -86,6 +112,11 @@ function open() {
   // Who typed the cash row in: a master (caretaker must ack) or the caretaker herself (a master confirms).
   addColumn(d, "cash", "created_by", "text");
   addColumn(d, "cash", "confirmed_at", "integer");
+  // Notification choices, per person per family
+  addColumn(d, "member", "notify_low", "integer not null default 1");
+  addColumn(d, "member", "low_threshold", "integer not null default 1000");
+  addColumn(d, "member", "notify_expense", "integer not null default 0");
+  addColumn(d, "member", "notify_cash", "integer not null default 0");
   return d;
 }
 

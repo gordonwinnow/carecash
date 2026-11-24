@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { ChevronLeft, House } from "lucide-react";
 import { getCtx, getT } from "@/lib/ctx";
 import { createFamily } from "../actions";
 import { Submit } from "@/components/ui";
@@ -11,11 +12,11 @@ export default async function Start() {
   return (
     <main className="mx-auto max-w-md space-y-6 px-5 pb-10 pt-[max(1.25rem,env(safe-area-inset-top))]">
       <div className="flex items-center justify-between">
-        {me ? <a href="/home" className="text-3xl">←</a> : <span />}
+        {me ? <a href="/home" className="flex h-12 w-12 items-center justify-center rounded-full bg-card [box-shadow:var(--shadow)]" aria-label="Back"><ChevronLeft size={26} /></a> : <span />}
         <LanguagePicker compact />
       </div>
       <div className="text-center">
-        <div className="text-6xl">🏡</div>
+        <span className="badge mx-auto h-20 w-20 rounded-3xl"><House size={40} /></span>
         <h1 className="mt-3 text-3xl font-extrabold">{t("startTitle")}</h1>
         <p className="mt-3 text-lg text-muted">{t("startHint")}</p>
       </div>

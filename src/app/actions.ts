@@ -5,9 +5,11 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, newId, UPLOAD_DIR } from "@/lib/db";
-import { getUser, requireAdmin, requireCtx, membershipsOf } from "@/lib/ctx";
+import { getLang, getUser, requireAdmin, requireCtx, membershipsOf } from "@/lib/ctx";
 import { CATEGORIES, KINDS } from "@/lib/format";
 import { seedDemo } from "@/lib/demo";
+import { logChange } from "@/lib/audit";
+import { watchBalance } from "@/lib/notify";
 
 const COOKIE = { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" as const };
 
@@ -28,13 +30,19 @@ async function savePhoto(fd: FormData) {
   await fs.promises.writeFile(path.join(UPLOAD_DIR, name), Buffer.from(await f.arrayBuffer()));
   return name;
 }
-function removePhoto(name: string | null | undefined) {
-  if (name) fs.promises.unlink(path.join(UPLOAD_DIR, name)).catch(() => {});
-}
 function done(to?: string) {
   revalidatePath("/", "layout");
   if (to) redirect(to);
 }
+
+// Row shapes kept in the change history (photos are recorded by name only)
+type CashRow = { id: string; family_id: string; caretaker_id: string; amount: number; note: string | null; created_by: string | null; ack_at: number | null; confirmed_at: number | null };
+type ExpenseRow = { id: string; family_id: string; member_id: string; amount: number; category: string; note: string | null; photo: string | null };
+type RecordRow = { id: string; family_id: string; caretaker_id: string | null; kind: string; amount: number; note: string | null; photo: string | null; date: string; shared: number };
+
+const cashView = (r: CashRow) => ({ amount: r.amount, note: r.note });
+const expenseView = (r: ExpenseRow) => ({ amount: r.amount, category: r.category, note: r.note, photo: r.photo });
+const recordView = (r: RecordRow) => ({ kind: r.kind, amount: r.amount, note: r.note, date: r.date, shared: r.shared, caretaker_id: r.caretaker_id, photo: r.photo });
 
 // ---------- Family ----------
 
@@ -43,12 +51,14 @@ export async function createFamily(fd: FormData) {
   if (!user) redirect("/sign-in");
   const name = text(fd, "name", 60) ?? "My family";
   const fid = newId();
+  const mid = newId();
   const now = Date.now();
   db.transaction(() => {
     db.prepare("insert into family (id, name, created_at) values (?, ?, ?)").run(fid, name, now);
     db.prepare("insert into member (id, family_id, user_id, role, name, created_at) values (?, ?, ?, 'admin', ?, ?)").run(
-      newId(), fid, user.id, user.name || "Employer", now,
+      mid, fid, user.id, user.name || "Employer", now,
     );
+    logChange(fid, mid, "member", mid, "create", null, { name: user.name || "Employer", role: "admin" });
   })();
   (await cookies()).set("fid", fid, COOKIE);
   done("/home");
@@ -78,13 +88,15 @@ export async function joinFamily(code: string, fd: FormData) {
     | { id: string }
     | undefined;
   db.transaction(() => {
+    const mid = existing?.id ?? newId();
     if (existing) {
-      db.prepare("update member set active = 1, role = ?, name = ? where id = ?").run(inv.role, name, existing.id);
+      db.prepare("update member set active = 1, role = ?, name = ? where id = ?").run(inv.role, name, mid);
     } else {
       db.prepare("insert into member (id, family_id, user_id, role, name, created_at) values (?, ?, ?, ?, ?, ?)").run(
-        newId(), inv.family_id, user.id, inv.role, name, Date.now(),
+        mid, inv.family_id, user.id, inv.role, name, Date.now(),
       );
     }
+    logChange(inv.family_id, mid, "member", mid, "join", null, { name, role: inv.role });
     db.prepare("delete from invite where code = ?").run(code);
   })();
   (await cookies()).set("fid", inv.family_id, COOKIE);
@@ -101,14 +113,21 @@ export async function switchFamily(fid: string) {
 export async function renameMe(fd: FormData) {
   const { me } = await requireCtx();
   const name = text(fd, "name", 40);
-  if (name) db.prepare("update member set name = ? where id = ?").run(name, me.id);
+  if (!name || name === me.name) return done();
+  db.prepare("update member set name = ? where id = ?").run(name, me.id);
+  logChange(me.family_id, me.id, "member", me.id, "update", { name: me.name }, { name });
   done();
 }
 
 export async function removeMember(memberId: string) {
   const { me } = await requireAdmin();
   if (memberId === me.id) return;
-  db.prepare("update member set active = 0 where id = ? and family_id = ?").run(memberId, me.family_id);
+  const m = db.prepare("select name, role from member where id = ? and family_id = ? and active = 1").get(memberId, me.family_id) as
+    | { name: string; role: string }
+    | undefined;
+  if (!m) return;
+  db.prepare("update member set active = 0 where id = ?").run(memberId);
+  logChange(me.family_id, me.id, "member", memberId, "remove", m, null);
   done();
 }
 
@@ -116,8 +135,8 @@ export async function removeMember(memberId: string) {
 
 /**
  * Money goes both ways:
- * - a master adds it for a caretaker, and the caretaker acknowledges it (ack_at);
- * - a caretaker records money a master handed her. It counts at once, and a master confirms it (confirmed_at).
+ * - an employer adds it for a caretaker, and the caretaker acknowledges it (ack_at);
+ * - a caretaker records money an employer handed her. It counts at once, and an employer confirms it (confirmed_at).
  */
 export async function giveCash(fd: FormData) {
   const { me } = await requireCtx();
@@ -127,30 +146,80 @@ export async function giveCash(fd: FormData) {
   const ok = db.prepare("select 1 from member where id = ? and family_id = ? and role = ? and active = 1").get(other, me.family_id, wantRole);
   if (!ok) throw new Error("Unknown member");
   const [caretaker, giver, ack] = me.role === "admin" ? [other, me.id, null] : [me.id, other, now];
-  db.prepare(
-    "insert into cash (id, family_id, caretaker_id, amount, note, given_by, created_by, created_at, ack_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-  ).run(newId(), me.family_id, caretaker, amountOf(fd), text(fd, "note"), giver, me.id, now, ack);
+  const id = newId();
+  const amount = amountOf(fd);
+  const note = text(fd, "note");
+  await watchBalance(
+    me.family_id,
+    caretaker,
+    () => {
+      db.prepare(
+        "insert into cash (id, family_id, caretaker_id, amount, note, given_by, created_by, created_at, ack_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      ).run(id, me.family_id, caretaker, amount, note, giver, me.id, now, ack);
+      logChange(me.family_id, me.id, "cash", id, "create", null, { amount, note }, caretaker);
+    },
+    { actorId: me.id, actorName: me.name, kind: "cash", amount },
+  );
   done("/home");
+}
+
+function getCash(id: string, familyId: string) {
+  return db.prepare("select * from cash where id = ? and family_id = ?").get(id, familyId) as CashRow | undefined;
+}
+
+/** Who may change a cash row: employers always; a caretaker only the money she recorded herself. */
+function canEditCash(me: { id: string; role: string }, c: CashRow) {
+  return me.role === "admin" || (c.created_by === me.id && c.caretaker_id === me.id);
+}
+
+export async function updateCash(cashId: string, fd: FormData) {
+  const { me } = await requireCtx();
+  const c = getCash(cashId, me.family_id);
+  if (!c || !canEditCash(me, c)) redirect("/history");
+  const amount = amountOf(fd);
+  const note = text(fd, "note");
+  const selfAdded = c.created_by === c.caretaker_id;
+  let { ack_at, confirmed_at } = c;
+  if (amount !== c.amount) {
+    // A changed amount has to be agreed again by the other side
+    if (!selfAdded) ack_at = null;
+    else confirmed_at = me.role === "admin" ? Date.now() : null;
+  }
+  await watchBalance(me.family_id, c.caretaker_id, () => {
+    db.prepare("update cash set amount = ?, note = ?, ack_at = ?, confirmed_at = ? where id = ?").run(amount, note, ack_at, confirmed_at, c.id);
+    logChange(me.family_id, me.id, "cash", c.id, "update", cashView(c), { amount, note }, c.caretaker_id);
+  });
+  done("/history");
 }
 
 export async function ackCash(cashId: string) {
   const { me } = await requireCtx();
-  db.prepare("update cash set ack_at = ? where id = ? and caretaker_id = ? and ack_at is null").run(Date.now(), cashId, me.id);
+  await watchBalance(me.family_id, me.id, () => {
+    const r = db.prepare("update cash set ack_at = ? where id = ? and caretaker_id = ? and ack_at is null").run(Date.now(), cashId, me.id);
+    if (r.changes) logChange(me.family_id, me.id, "cash", cashId, "ack", null, null, me.id);
+  });
   done();
 }
 
 export async function confirmCash(cashId: string) {
   const { me } = await requireAdmin();
-  db.prepare("update cash set confirmed_at = ? where id = ? and family_id = ? and confirmed_at is null").run(Date.now(), cashId, me.family_id);
+  const c = getCash(cashId, me.family_id);
+  const r = db.prepare("update cash set confirmed_at = ? where id = ? and family_id = ? and confirmed_at is null").run(Date.now(), cashId, me.family_id);
+  if (c && r.changes) logChange(me.family_id, me.id, "cash", cashId, "confirm", null, null, c.caretaker_id);
   done();
 }
 
-export async function deleteCash(cashId: string) {
+export async function deleteCash(cashId: string, to?: string) {
   const { me } = await requireCtx();
-  if (me.role === "admin") db.prepare("delete from cash where id = ? and family_id = ?").run(cashId, me.family_id);
-  // A caretaker may remove her own entry until a master has confirmed it
-  else db.prepare("delete from cash where id = ? and created_by = ? and confirmed_at is null").run(cashId, me.id);
-  done();
+  const c = getCash(cashId, me.family_id);
+  // A caretaker may remove her own entry until an employer has confirmed it
+  const ok = c && (me.role === "admin" || (canEditCash(me, c) && !c.confirmed_at));
+  if (ok)
+    await watchBalance(me.family_id, c.caretaker_id, () => {
+      db.prepare("delete from cash where id = ?").run(c.id);
+      logChange(me.family_id, me.id, "cash", c.id, "delete", cashView(c), null, c.caretaker_id);
+    });
+  done(to);
 }
 
 // ---------- Guest demo ----------
@@ -163,60 +232,150 @@ export async function startDemo(role: "admin" | "caretaker") {
   done("/home");
 }
 
+function categoryOf(fd: FormData) {
+  return CATEGORIES.some((c) => c.id === fd.get("category")) ? String(fd.get("category")) : "other";
+}
+
 export async function addExpense(fd: FormData) {
   const { me } = await requireCtx();
-  const category = CATEGORIES.some((c) => c.id === fd.get("category")) ? String(fd.get("category")) : "other";
+  const category = categoryOf(fd);
   const amount = amountOf(fd);
+  const note = text(fd, "note");
   const photo = await savePhoto(fd);
   const now = Date.now();
-  db.prepare(
-    "insert into expense (id, family_id, member_id, amount, category, note, photo, spent_at, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-  ).run(newId(), me.family_id, me.id, amount, category, text(fd, "note"), photo, now, now);
+  const id = newId();
+  await watchBalance(
+    me.family_id,
+    me.id,
+    () => {
+      db.prepare(
+        "insert into expense (id, family_id, member_id, amount, category, note, photo, spent_at, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      ).run(id, me.family_id, me.id, amount, category, note, photo, now, now);
+      logChange(me.family_id, me.id, "expense", id, "create", null, { amount, category, note, photo }, me.id);
+    },
+    { actorId: me.id, actorName: me.name, kind: "expense", amount, category },
+  );
   done("/home");
 }
 
-export async function deleteExpense(expenseId: string) {
-  const { me } = await requireCtx();
-  const row = db.prepare("select member_id, photo from expense where id = ? and family_id = ?").get(expenseId, me.family_id) as
-    | { member_id: string; photo: string | null }
-    | undefined;
-  if (!row || (me.role !== "admin" && row.member_id !== me.id)) return;
-  db.prepare("delete from expense where id = ?").run(expenseId);
-  removePhoto(row.photo);
-  done();
+function getExpense(id: string, familyId: string) {
+  return db.prepare("select * from expense where id = ? and family_id = ?").get(id, familyId) as ExpenseRow | undefined;
 }
 
-// ---------- Phase 2: salary, healthcare, other (masters only) ----------
+export async function updateExpense(expenseId: string, fd: FormData) {
+  const { me } = await requireCtx();
+  const e = getExpense(expenseId, me.family_id);
+  if (!e || (me.role !== "admin" && e.member_id !== me.id)) redirect("/history");
+  const amount = amountOf(fd);
+  const category = categoryOf(fd);
+  const note = text(fd, "note");
+  // The old photo file is kept: the change history still points at it
+  const photo = (await savePhoto(fd)) ?? e.photo;
+  await watchBalance(me.family_id, e.member_id, () => {
+    db.prepare("update expense set amount = ?, category = ?, note = ?, photo = ? where id = ?").run(amount, category, note, photo, e.id);
+    logChange(me.family_id, me.id, "expense", e.id, "update", expenseView(e), { amount, category, note, photo }, e.member_id);
+  });
+  done("/history");
+}
 
-export async function addRecord(fd: FormData) {
-  const { me } = await requireAdmin();
+export async function deleteExpense(expenseId: string, to?: string) {
+  const { me } = await requireCtx();
+  const e = getExpense(expenseId, me.family_id);
+  if (e && (me.role === "admin" || e.member_id === me.id))
+    await watchBalance(me.family_id, e.member_id, () => {
+      db.prepare("delete from expense where id = ?").run(e.id);
+      logChange(me.family_id, me.id, "expense", e.id, "delete", expenseView(e), null, e.member_id);
+    });
+  done(to);
+}
+
+// ---------- Phase 2: salary, healthcare, other (employers only) ----------
+
+function recordFields(fd: FormData, familyId: string) {
   const kind = KINDS.some((k) => k.id === fd.get("kind")) ? String(fd.get("kind")) : "other";
   const who = String(fd.get("caretaker") ?? "");
   const caretaker = who
-    ? ((db.prepare("select id from member where id = ? and family_id = ? and role = 'caretaker'").get(who, me.family_id) as { id: string } | undefined)?.id ?? null)
+    ? ((db.prepare("select id from member where id = ? and family_id = ? and role = 'caretaker'").get(who, familyId) as { id: string } | undefined)?.id ?? null)
     : null;
   const date = /^\d{4}-\d{2}-\d{2}$/.test(String(fd.get("date"))) ? String(fd.get("date")) : new Date().toISOString().slice(0, 10);
-  const amount = amountOf(fd);
+  return { kind, caretaker_id: caretaker, date, amount: amountOf(fd), note: text(fd, "note"), shared: fd.get("shared") ? 1 : 0 };
+}
+
+export async function addRecord(fd: FormData) {
+  const { me } = await requireAdmin();
+  const f = recordFields(fd, me.family_id);
   const photo = await savePhoto(fd);
+  const id = newId();
   db.prepare(
     "insert into record (id, family_id, caretaker_id, kind, amount, note, photo, date, shared, created_by, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-  ).run(newId(), me.family_id, caretaker, kind, amount, text(fd, "note"), photo, date, fd.get("shared") ? 1 : 0, me.id, Date.now());
+  ).run(id, me.family_id, f.caretaker_id, f.kind, f.amount, f.note, photo, f.date, f.shared, me.id, Date.now());
+  logChange(me.family_id, me.id, "record", id, "create", null, { ...f, photo });
+  done("/more");
+}
+
+function getRecord(id: string, familyId: string) {
+  return db.prepare("select * from record where id = ? and family_id = ?").get(id, familyId) as RecordRow | undefined;
+}
+
+export async function updateRecord(recordId: string, fd: FormData) {
+  const { me } = await requireAdmin();
+  const r = getRecord(recordId, me.family_id);
+  if (!r) redirect("/more");
+  const f = recordFields(fd, me.family_id);
+  const photo = (await savePhoto(fd)) ?? r.photo;
+  db.prepare("update record set kind = ?, amount = ?, note = ?, date = ?, shared = ?, caretaker_id = ?, photo = ? where id = ?").run(
+    f.kind, f.amount, f.note, f.date, f.shared, f.caretaker_id, photo, r.id,
+  );
+  logChange(me.family_id, me.id, "record", r.id, "update", recordView(r), { ...f, photo });
   done("/more");
 }
 
 export async function toggleShare(recordId: string) {
   const { me } = await requireAdmin();
-  db.prepare("update record set shared = 1 - shared where id = ? and family_id = ?").run(recordId, me.family_id);
+  const r = getRecord(recordId, me.family_id);
+  if (!r) return;
+  db.prepare("update record set shared = ? where id = ?").run(r.shared ? 0 : 1, r.id);
+  logChange(me.family_id, me.id, "record", r.id, r.shared ? "unshare" : "share", null, null);
   done();
 }
 
-export async function deleteRecord(recordId: string) {
+export async function deleteRecord(recordId: string, to?: string) {
   const { me } = await requireAdmin();
-  const row = db.prepare("select photo from record where id = ? and family_id = ?").get(recordId, me.family_id) as
-    | { photo: string | null }
-    | undefined;
-  if (!row) return;
-  db.prepare("delete from record where id = ?").run(recordId);
-  removePhoto(row.photo);
-  done();
+  const r = getRecord(recordId, me.family_id);
+  if (r) {
+    db.prepare("delete from record where id = ?").run(r.id);
+    logChange(me.family_id, me.id, "record", r.id, "delete", recordView(r), null);
+  }
+  done(to);
 }
+
+// ---------- Notifications ----------
+
+export async function saveNotify(settings: { notify_low: boolean; low_threshold: number; notify_expense: boolean; notify_cash: boolean }) {
+  const { me } = await requireCtx();
+  const threshold = Math.min(10_000_000, Math.max(0, Math.round(Number(settings.low_threshold) || 0)));
+  db.prepare("update member set notify_low = ?, low_threshold = ?, notify_expense = ?, notify_cash = ? where id = ?").run(
+    settings.notify_low ? 1 : 0, threshold, settings.notify_expense ? 1 : 0, settings.notify_cash ? 1 : 0, me.id,
+  );
+  revalidatePath("/settings");
+}
+
+/** Remembers this device: a browser's Web Push subscription, or the iOS app's APNs token. */
+export async function addDevice(device: { kind: "web"; endpoint: string; keys: { p256dh: string; auth: string } } | { kind: "apns"; token: string }) {
+  const user = await getUser();
+  if (!user) return;
+  const lang = await getLang();
+  const endpoint = device.kind === "web" ? device.endpoint : device.token;
+  if (device.kind === "web" ? !/^https:\/\//.test(endpoint) : !/^[0-9a-f]{32,200}$/i.test(endpoint)) throw new Error("Bad device");
+  const keys = device.kind === "web" ? JSON.stringify({ p256dh: device.keys.p256dh, auth: device.keys.auth }) : null;
+  db.prepare(
+    `insert into push_sub (id, user_id, kind, endpoint, keys, lang, created_at) values (?, ?, ?, ?, ?, ?, ?)
+     on conflict(endpoint) do update set user_id = excluded.user_id, keys = excluded.keys, lang = excluded.lang`,
+  ).run(newId(), user.id, device.kind, endpoint, keys, lang, Date.now());
+}
+
+export async function removeDevice(endpoint: string) {
+  const user = await getUser();
+  if (user) db.prepare("delete from push_sub where endpoint = ? and user_id = ?").run(endpoint, user.id);
+}
+

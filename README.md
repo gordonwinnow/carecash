@@ -13,6 +13,14 @@ A very simple app for a Taiwanese family (雇主) and their household caretaker 
 2. The caretaker taps **Add expense**, takes a photo of the receipt, enters the amount and picks a category.
 3. Both see **money left**, shown monthly: last month's leftover + received this month − spent this month. Money left itself is cumulative, because it is real cash in hand. The full history is grouped by month, with receipt photos.
 
+**Edit and history:** tap any entry to change or delete it. Every add, edit, delete, receive and confirm is kept in a change history: shown on the entry itself, and for the whole family under History → the clock button. Caretakers see the history of their own cash and expenses; salary and health history is employers only. Changing an amount asks the other side to confirm again.
+
+**Notifications** (Settings, per person per family):
+- When money left drops below a number: on by default, $1,000.
+- Every expense, and every deposit: two separate switches, off by default.
+
+They go to every device the person turned them on for: browsers and the iPhone home-screen app use Web Push (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, set on Fly); the App Store app uses Apple Push and needs `APNS_KEY_P8` (the .p8 contents), `APNS_KEY_ID`, `APNS_TEAM_ID` as Fly secrets.
+
 **Family:** an employer creates a family and invites more employers or caretakers by a one-time link (sent by WhatsApp, LINE or copy). Each caretaker has their own balance.
 
 **Phase 2: Pay & health tab** (🔒)
@@ -69,4 +77,5 @@ Data goes to `.data/`. The local test accounts used during development are `mast
 ## iPhone
 
 - **Today:** open the site in Safari → Share → **Add to Home Screen**. It opens full screen with its own icon, and the receipt button opens the camera.
+- **TestFlight from GitHub:** the `iOS` workflow (Actions → iOS → Run workflow) builds, signs and uploads to TestFlight on a GitHub Mac runner. It needs repository secrets `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID` and `ASC_KEY_P8` (an App Store Connect API key with Admin role), and an app record for `app.carecash.ios` in App Store Connect. Build numbers come from the run number.
 - **App Store shell:** `mobile/` is a Capacitor 8 iOS project (`app.carecash.ios`) that opens the live site, the same pattern as TwoClass. Camera and photo permission texts are set, and icons are generated. Building it needs a Mac with Xcode and an Apple Developer account: `cd mobile; npx cap sync ios`, then open `mobile/ios/App/App.xcodeproj` in Xcode, set your Team, and Archive. A web deploy updates the app instantly. No store build is needed for changes.

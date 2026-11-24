@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Eye, Lock, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { getLang, getT, requireCtx } from "@/lib/ctx";
-import { KINDS, kindIcon, money, TZ } from "@/lib/format";
-import { deleteRecord, toggleShare } from "../../actions";
-import { ActionButton, PhotoThumb } from "@/components/ui";
+import { KINDS, kindIconId, money, TZ } from "@/lib/format";
+import { toggleShare } from "../../actions";
+import { ActionButton, PageTitle } from "@/components/ui";
+import { Badge } from "@/components/icons";
+import { EntryRow, RowList, Empty } from "@/components/rows";
 
 type Rec = {
   id: string;
@@ -17,7 +20,7 @@ type Rec = {
   who: string | null;
 };
 
-/** Phase 2: salary, healthcare and other costs. Masters see everything; caretakers only what is shared with them. */
+/** Phase 2: salary, healthcare and other costs. Employers see everything; caretakers only what is shared with them. */
 export default async function More() {
   const { me } = await requireCtx();
   const t = await getT();
@@ -42,67 +45,58 @@ export default async function More() {
   }));
 
   return (
-    <div className="space-y-5">
-      <header>
-        <h1 className="text-3xl font-extrabold">🔒 {isAdmin ? t("more") : t("myRecords")}</h1>
-        {isAdmin && <p className="mt-1 text-base text-muted">{t("moreHint")}</p>}
-      </header>
+    <div className="space-y-6">
+      <PageTitle sub={isAdmin ? t("moreHint") : undefined}>{isAdmin ? t("more") : t("myRecords")}</PageTitle>
 
       <section className="card">
-        <p className="mb-3 text-lg font-semibold text-muted">{t("thisYear")} · {year}</p>
+        <p className="mb-3 text-base font-semibold text-muted">{t("thisYear")} · {year}</p>
         <div className="grid grid-cols-3 gap-2">
           {totals.map((k) => (
-            <div key={k.id} className="rounded-2xl bg-bg p-3 text-center">
-              <div className="text-3xl">{k.icon}</div>
-              <div className="text-sm font-semibold text-muted">{t(`kind_${k.id}`)}</div>
-              <div className="text-lg font-bold">{money(k.sum, me.currency)}</div>
+            <div key={k.id} className="flex flex-col items-center gap-1.5 text-center">
+              <Badge id={kindIconId(k.id)} size={44} />
+              <div className="text-[13px] font-semibold leading-tight text-muted">{t(`kind_${k.id}`)}</div>
+              <div className="tabular text-lg font-bold">{money(k.sum, me.currency)}</div>
             </div>
           ))}
         </div>
       </section>
 
       {isAdmin && (
-        <Link href="/more/new" className="btn-primary min-h-20 text-2xl">➕ {t("addRecord")}</Link>
+        <Link href="/more/new" className="btn-primary">
+          <Plus size={24} /> {t("addRecord")}
+        </Link>
       )}
 
       {rows.length === 0 ? (
-        <p className="card text-center text-lg text-muted">{t("nothingYet")}</p>
+        <Empty>{t("nothingYet")}</Empty>
       ) : (
-        <ul className="card divide-y divide-line !p-0">
+        <RowList>
           {rows.map((r) => (
-            <li key={r.id} className="flex items-start gap-3 p-4">
-              {r.photo ? (
-                <PhotoThumb name={r.photo} />
-              ) : (
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-bg text-3xl">{kindIcon(r.kind)}</span>
+            <div key={r.id}>
+              <EntryRow
+                href={isAdmin ? `/more/${r.id}` : undefined}
+                icon={kindIconId(r.kind)}
+                photo={r.photo}
+                title={`${t(`kind_${r.kind}` as never)}${r.who ? ` · ${r.who}` : ""}`}
+                sub={[r.note, new Date(`${r.date}T12:00:00Z`).toLocaleDateString(lang, { year: "numeric", month: "short", day: "numeric" })]
+                  .filter(Boolean)
+                  .join(" · ")}
+                amount={money(r.amount, me.currency)}
+              />
+              {isAdmin && (
+                <div className="-mt-1 pb-2 pl-[72px]">
+                  <ActionButton
+                    action={toggleShare.bind(null, r.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-bold ${r.shared ? "bg-good-soft text-good" : "bg-sunk text-muted"}`}
+                  >
+                    {r.shared ? <Eye size={14} /> : <Lock size={14} />}
+                    {r.shared ? t("sharedBadge") : t("privateBadge")}
+                  </ActionButton>
+                </div>
               )}
-              <div className="min-w-0 flex-1">
-                <div className="text-lg font-semibold">
-                  {t(`kind_${r.kind}` as never)}
-                  {r.who ? ` · ${r.who}` : ""}
-                </div>
-                {r.note && <div className="text-base">{r.note}</div>}
-                <div className="text-sm text-muted">
-                  {new Date(`${r.date}T12:00:00Z`).toLocaleDateString(lang, { year: "numeric", month: "short", day: "numeric" })}
-                </div>
-                {isAdmin && (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <ActionButton
-                      action={toggleShare.bind(null, r.id)}
-                      className={`rounded-full px-3 py-1.5 text-sm font-bold ${r.shared ? "bg-good-soft text-good" : "bg-bg text-muted"}`}
-                    >
-                      {r.shared ? `👁 ${t("sharedBadge")}` : `🔒 ${t("privateBadge")}`}
-                    </ActionButton>
-                    <ActionButton action={deleteRecord.bind(null, r.id)} confirm={t("confirmDelete")} className="px-2 text-sm font-semibold text-muted underline">
-                      {t("delete")}
-                    </ActionButton>
-                  </div>
-                )}
-              </div>
-              <div className="text-xl font-bold">{money(r.amount, me.currency)}</div>
-            </li>
+            </div>
           ))}
-        </ul>
+        </RowList>
       )}
     </div>
   );

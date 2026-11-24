@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Hourglass, HeartHandshake, Users } from "lucide-react";
 import { db } from "@/lib/db";
 import { getUser, getT } from "@/lib/ctx";
 import { joinFamily } from "../../actions";
@@ -15,7 +16,7 @@ export default async function Join({ params }: { params: Promise<{ code: string 
   if (!inv)
     return (
       <main className="mx-auto max-w-md px-5 pt-16 text-center">
-        <div className="text-6xl">⌛</div>
+        <span className="badge tone-other mx-auto h-20 w-20 rounded-3xl"><Hourglass size={38} /></span>
         <p className="mt-4 text-xl">{t("inviteInvalid")}</p>
         <a href="/" className="btn-soft mt-8">{t("navHome")}</a>
       </main>
@@ -31,7 +32,7 @@ export default async function Join({ params }: { params: Promise<{ code: string 
         <LanguagePicker compact />
       </div>
       <div className="text-center">
-        <div className="text-6xl">{inv.role === "caretaker" ? "🤝" : "👨‍👩‍👧"}</div>
+        <span className="badge mx-auto h-20 w-20 rounded-3xl">{inv.role === "caretaker" ? <HeartHandshake size={40} /> : <Users size={40} />}</span>
         <h1 className="mt-3 text-3xl font-extrabold">{t("joinTitle", { family: inv.family })}</h1>
         <p className="mt-3 text-xl text-muted">
           {t("joinAs", { role: inv.role === "caretaker" ? t("roleCaretaker") : t("roleAdmin") })}

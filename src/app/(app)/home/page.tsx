@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { Banknote, Camera, Check, HandCoins, HeartHandshake, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { balanceOf, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
-import { catIcon, money, when } from "@/lib/format";
+import { day, money } from "@/lib/format";
 import type { T } from "@/lib/i18n";
 import { ackCash, confirmCash, deleteCash } from "../../actions";
-import { ActionButton, PhotoThumb } from "@/components/ui";
+import { ActionButton } from "@/components/ui";
+import { EntryRow, RowList, SectionHead, Empty } from "@/components/rows";
 
 type Cash = { id: string; amount: number; note: string | null; created_at: number; ack_at: number | null; giver: string; caretaker_id: string };
 type Expense = { id: string; amount: number; category: string; note: string | null; photo: string | null; spent_at: number; who: string };
@@ -15,18 +17,39 @@ export default async function Home() {
   const lang = await getLang();
 
   return (
-    <div className="space-y-5">
-      <header className="flex items-center justify-between">
-        <div>
-          <p className="text-base text-muted">{me.family_name}</p>
-          <h1 className="text-2xl font-extrabold">👋 {me.name}</h1>
-        </div>
-        <span className="rounded-full bg-accent-soft px-4 py-2 text-base font-bold">
+    <div className="space-y-6">
+      {/* One line: family · name · role */}
+      <header className="flex items-center gap-2 pt-2">
+        <h1 className="flex min-w-0 items-baseline gap-2">
+          <span className="truncate text-base font-medium text-muted">{me.family_name}</span>
+          <span className="truncate text-2xl font-extrabold tracking-tight">{me.name}</span>
+        </h1>
+        <span className="shrink-0 rounded-full bg-accent-soft px-3 py-1 text-sm font-bold text-accent-ink">
           {me.role === "admin" ? t("roleAdmin") : t("roleCaretaker")}
         </span>
       </header>
-      {me.role === "caretaker" ? <CaretakerHome me={me} t={t} lang={lang} /> : <MasterHome me={me} t={t} lang={lang} />}
+      {me.role === "caretaker" ? <CaretakerHome me={me} t={t} lang={lang} /> : <EmployerHome me={me} t={t} lang={lang} />}
     </div>
+  );
+}
+
+/** A money card that needs a tap from this person: receive it, or confirm it was given. */
+function PendingCard({ icon, title, amount, note, at, children }: { icon: React.ReactNode; title: string; amount: string; note: string | null; at: string; children: React.ReactNode }) {
+  return (
+    // Two lines, laid out like the balance card so the amounts line up
+    <section className="space-y-4 rounded-[28px] bg-warn-soft px-6 pb-5 pt-5">
+      <p className="flex items-center gap-2 text-base font-semibold">
+        <span className="shrink-0 text-warn">{icon}</span>
+        <span className="truncate">{title}</span>
+        <span className="shrink-0 font-medium text-muted">· {at}</span>
+      </p>
+      <p className="tabular flex flex-wrap items-baseline gap-x-2 leading-none">
+        <span className="text-lg font-bold text-muted">NTD</span>
+        <span className="text-[48px] font-extrabold tracking-tight">{amount}</span>
+        {note && <span className="text-lg font-semibold text-muted">{note}</span>}
+      </p>
+      {children}
+    </section>
   );
 }
 
@@ -45,32 +68,31 @@ function CaretakerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
   return (
     <>
       {pending.map((c) => (
-        <section key={c.id} className="card border-2 !border-warn bg-warn-soft">
-          <p className="text-lg font-semibold">💵 {t("gaveYou", { name: c.giver })}</p>
-          <p className="my-1 text-5xl font-extrabold">{money(c.amount, me.currency)}</p>
-          {c.note && <p className="text-lg text-muted">{c.note}</p>}
-          <p className="mb-4 text-base text-muted">{when(c.created_at, lang)}</p>
-          <ActionButton action={ackCash.bind(null, c.id)} className="btn-good text-2xl">
-            ✅ {t("iReceived")}
+        <PendingCard key={c.id} icon={<HandCoins size={20} />} title={t("gaveYou", { name: c.giver })} amount={money(c.amount, me.currency)} note={c.note} at={day(c.created_at, lang)}>
+          <ActionButton action={ackCash.bind(null, c.id)} className="btn-good">
+            <Check size={26} strokeWidth={2.6} /> {t("iReceived")}
           </ActionButton>
-        </section>
+        </PendingCard>
       ))}
 
-      <BalanceCard title={t("moneyLeft")} b={b} t={t} currency={me.currency} />
+      <BalanceCard b={b} t={t} />
 
-      <Link href="/expense/new" className="btn-primary min-h-24 text-2xl">
-        📷 {t("addExpense")}
-      </Link>
-      <Link href="/cash/new" className="btn-soft">
-        💵 {t("iGotMoney")}
-      </Link>
+      {/* One row: the main action wide, "got money" as a short side button */}
+      <div className="grid grid-cols-[1fr_auto] gap-3">
+        <Link href="/expense/new" className="btn-primary min-h-20 px-4 text-xl leading-tight">
+          <Camera size={26} className="shrink-0" /> {t("addExpense")}
+        </Link>
+        <Link href="/cash/new" className="btn-tint min-h-20 w-auto flex-col !gap-1 px-4 text-[15px] leading-tight">
+          <Banknote size={24} /> {t("gotMoneyShort")}
+        </Link>
+      </div>
 
       <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} />
     </>
   );
 }
 
-function MasterHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
+function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
   const caretakers = db
     .prepare("select * from member where family_id = ? and role = 'caretaker' and active = 1 order by created_at")
     .all(me.family_id) as Member[];
@@ -83,15 +105,19 @@ function MasterHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
 
   if (caretakers.length === 0)
     return (
-      <section className="card space-y-4 text-center">
-        <div className="text-6xl">🤝</div>
+      <section className="card space-y-4 py-8 text-center">
+        <span className="badge mx-auto h-20 w-20 rounded-3xl">
+          <HeartHandshake size={40} />
+        </span>
         <h2 className="text-2xl font-extrabold">{t("noCaretaker")}</h2>
         <p className="text-lg text-muted">{t("noCaretakerHint")}</p>
-        <Link href="/settings#invite" className="btn-primary">➕ {t("inviteCaretaker")}</Link>
+        <Link href="/settings#invite" className="btn-primary">
+          <Plus size={24} /> {t("inviteCaretaker")}
+        </Link>
       </section>
     );
 
-  // Money a caretaker recorded herself, waiting for a master to confirm
+  // Money a caretaker recorded herself, waiting for an employer to confirm
   const toConfirm = db
     .prepare(
       `select c.*, m.name as giver from cash c join member m on m.id = c.caretaker_id
@@ -102,28 +128,23 @@ function MasterHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
   return (
     <>
       {toConfirm.map((c) => (
-        <section key={c.id} className="card border-2 !border-warn bg-warn-soft">
-          <p className="text-lg font-semibold">💵 {t("selfAdded", { name: c.giver })}</p>
-          <p className="my-1 text-5xl font-extrabold">{money(c.amount, me.currency)}</p>
-          {c.note && <p className="text-lg text-muted">{c.note}</p>}
-          <p className="mb-4 text-base text-muted">{when(c.created_at, lang)}</p>
-          <ActionButton action={confirmCash.bind(null, c.id)} className="btn-good text-2xl">
-            ✅ {t("confirmGave")}
+        <PendingCard key={c.id} icon={<HandCoins size={20} />} title={t("selfAdded", { name: c.giver })} amount={money(c.amount, me.currency)} note={c.note} at={day(c.created_at, lang)}>
+          <ActionButton action={confirmCash.bind(null, c.id)} className="btn-good">
+            <Check size={26} strokeWidth={2.6} /> {t("confirmGave")}
           </ActionButton>
-          <ActionButton action={deleteCash.bind(null, c.id)} confirm={t("confirmDelete")} className="mt-2 w-full py-2 text-base font-semibold text-muted underline">
+          <ActionButton action={deleteCash.bind(null, c.id, undefined)} confirm={t("confirmDelete")} className="w-full py-1 text-base font-semibold text-muted">
             {t("delete")}
           </ActionButton>
-        </section>
+        </PendingCard>
       ))}
       {caretakers.map((c) => {
         const b = balanceOf(c.id);
         return (
           <section key={c.id} className="space-y-3">
-            <BalanceCard title={t("moneyLeftOf", { name: c.name })} b={b} t={t} currency={me.currency} />
-            <div className="grid grid-cols-2 gap-3">
-              <Link href={`/cash/new?to=${c.id}`} className="btn-primary">💵 {t("giveCash")}</Link>
-              <Link href={`/history?who=${c.id}`} className="btn-soft">🧾 {t("navHistory")}</Link>
-            </div>
+            <BalanceCard title={c.name} b={b} t={t} />
+            <Link href={`/cash/new?to=${c.id}`} className="btn-primary">
+              <Plus size={24} /> {t("giveCash")}
+            </Link>
           </section>
         );
       })}
@@ -132,29 +153,28 @@ function MasterHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
   );
 }
 
-function BalanceCard({ title, b, t, currency }: { title: string; b: ReturnType<typeof balanceOf>; t: T; currency: string }) {
-  const low = b.left < 0;
+/** The hero number, kept to three figures: money left now, and this month's spent and received. */
+function BalanceCard({ title, b, t }: { title?: string; b: ReturnType<typeof balanceOf>; t: T }) {
+  const n = (v: number) => `$${v.toLocaleString("en-US")}`;
   return (
-    <section className="card text-center">
-      <p className="text-xl font-semibold text-muted">{title}</p>
-      <p className={`my-2 text-6xl font-extrabold tracking-tight ${low ? "text-bad" : "text-ink"}`}>{money(b.left, currency)}</p>
-      <div className="mt-3 grid grid-cols-3 gap-2 text-lg">
-        <div className="rounded-2xl bg-bg p-2.5">
-          <div className="text-sm font-semibold leading-tight text-muted">{t("carry")}</div>
-          <div className="font-bold">{money(b.carry, currency)}</div>
-        </div>
-        <div className="rounded-2xl bg-good-soft p-2.5">
-          <div className="text-sm font-semibold leading-tight text-muted">+ {t("thisMonthReceived")}</div>
-          <div className="font-bold">{money(b.received, currency)}</div>
-        </div>
-        <div className="rounded-2xl bg-bad-soft p-2.5">
-          <div className="text-sm font-semibold leading-tight text-muted">− {t("thisMonthSpent")}</div>
-          <div className="font-bold">{money(b.spent, currency)}</div>
-        </div>
+    <section
+      className="relative overflow-hidden rounded-[28px] px-6 pb-5 pt-6 text-white"
+      style={{
+        background: "linear-gradient(145deg, color-mix(in srgb, var(--accent) 85%, white) 0%, var(--accent) 45%, color-mix(in srgb, var(--accent) 72%, black) 100%)",
+        boxShadow: "0 14px 32px -14px color-mix(in srgb, var(--accent) 70%, transparent)",
+      }}
+    >
+      {title && <p className="relative mb-2 text-lg font-bold text-white/90">{title}</p>}
+      {/* "NTD $5,765 remaining" on one line; wraps only for very large amounts */}
+      <p className={`tabular relative flex flex-wrap items-baseline gap-x-2 leading-none ${b.left < 0 ? "text-[#ffd7dc]" : ""}`}>
+        <span className="text-lg font-bold text-white/75">NTD</span>
+        <span className="text-[48px] font-extrabold tracking-tight">{b.left < 0 ? "−" : ""}{n(Math.abs(b.left))}</span>
+        <span className="text-lg font-semibold text-white/80">{t("remaining")}</span>
+      </p>
+      <div className="relative mt-4 flex flex-wrap gap-2 text-base font-semibold">
+        <span className="tabular rounded-full bg-white/15 px-3.5 py-1.5">{n(b.spent)} {t("spentShort")}</span>
+        <span className="tabular rounded-full bg-white/15 px-3.5 py-1.5">{n(b.received)} {t("receivedShort")}</span>
       </div>
-      {b.pending > 0 && (
-        <p className="mt-3 rounded-2xl bg-warn-soft p-3 text-lg font-semibold">⏳ {t("waiting", { amount: money(b.pending, currency) })}</p>
-      )}
     </section>
   );
 }
@@ -162,31 +182,30 @@ function BalanceCard({ title, b, t, currency }: { title: string; b: ReturnType<t
 function ExpenseList({ title, rows, t, lang, currency, showWho }: { title: string; rows: Expense[]; t: T; lang: string; currency: string; showWho?: boolean }) {
   return (
     <section>
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="text-xl font-extrabold">{title}</h2>
-        <Link href="/history" className="text-lg font-semibold text-accent">{t("seeAll")} →</Link>
-      </div>
+      <SectionHead
+        title={title}
+        right={
+          <Link href="/history" className="text-base font-semibold text-accent">
+            {t("seeAll")}
+          </Link>
+        }
+      />
       {rows.length === 0 ? (
-        <p className="card text-center text-lg text-muted">{t("nothingYet")}</p>
+        <Empty>{t("nothingYet")}</Empty>
       ) : (
-        <ul className="card divide-y divide-line !p-0">
+        <RowList>
           {rows.map((e) => (
-            <li key={e.id} className="flex items-center gap-3 p-4">
-              {e.photo ? <PhotoThumb name={e.photo} /> : <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-bg text-3xl">{catIcon(e.category)}</span>}
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-lg font-semibold">
-                  {t(`cat_${e.category}` as never)}
-                  {e.note ? ` · ${e.note}` : ""}
-                </div>
-                <div className="text-base text-muted">
-                  {showWho && e.who ? `${e.who} · ` : ""}
-                  {when(e.spent_at, lang)}
-                </div>
-              </div>
-              <div className="text-xl font-bold">−{money(e.amount, currency)}</div>
-            </li>
+            <EntryRow
+              key={e.id}
+              href={`/expense/${e.id}`}
+              icon={e.category}
+              photo={e.photo}
+              title={e.note || t(`cat_${e.category}` as never)}
+              sub={`${showWho && e.who ? `${e.who} · ` : ""}${day(e.spent_at, lang)}`}
+              amount={money(e.amount, currency)}
+            />
           ))}
-        </ul>
+        </RowList>
       )}
     </section>
   );

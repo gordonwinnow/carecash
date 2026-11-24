@@ -1,9 +1,12 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { cookies } from "next/headers";
 import { I18nProvider } from "@/components/i18n";
 import { getLang } from "@/lib/ctx";
 import { ACCENTS, THEMES } from "@/lib/i18n";
+
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin", "latin-ext", "vietnamese"], variable: "--font-jakarta", display: "swap" });
 
 export const metadata: Metadata = {
   title: "CareCash",
@@ -16,7 +19,10 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#15803d",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f3ef" },
+    { media: "(prefers-color-scheme: dark)", color: "#111110" },
+  ],
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -25,8 +31,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const theme = THEMES.find((x) => x === c.get("theme")?.value) ?? "system";
   const accent = ACCENTS.find((x) => x === c.get("accent")?.value) ?? "green";
   return (
-    <html lang={lang} data-theme={theme} data-accent={accent}>
-      <body className="min-h-dvh">
+    <html lang={lang} data-theme={theme} data-accent={accent} className={jakarta.variable}>
+      <body className="min-h-dvh font-sans">
         <I18nProvider lang={lang}>{children}</I18nProvider>
       </body>
     </html>

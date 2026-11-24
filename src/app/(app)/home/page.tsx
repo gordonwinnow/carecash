@@ -116,9 +116,15 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
         <Link href="/settings?invite=admin#invite" className="btn-tint">
           <Users size={22} /> {t("inviteAdmin")}
         </Link>
-        <Link href="/expense/new" className="btn-soft">
-          <Camera size={22} /> {t("addExpense")}
-        </Link>
+        {/* Add expense wide, add cash as a short side button */}
+        <div className="grid grid-cols-[1fr_auto] gap-3">
+          <Link href="/expense/new" className="btn-soft">
+            <Camera size={22} className="shrink-0" /> {t("addExpense")}
+          </Link>
+          <Link href="/cash/new" className="btn-soft w-auto px-5">
+            <Banknote size={22} className="shrink-0" /> {t("cashShort")}
+          </Link>
+        </div>
       </section>
     );
 

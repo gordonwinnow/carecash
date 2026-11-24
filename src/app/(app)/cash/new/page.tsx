@@ -1,4 +1,5 @@
-import { Check, Crown, UserRound } from "lucide-react";
+import Link from "next/link";
+import { Check, Crown, Plus, UserRound } from "lucide-react";
 import { db } from "@/lib/db";
 import { getT, requireCtx } from "@/lib/ctx";
 import { giveCash } from "../../../actions";
@@ -15,6 +16,19 @@ export default async function NewCash({ searchParams }: { searchParams: Promise<
     .all(me.family_id, isAdmin ? "caretaker" : "admin") as { id: string; name: string }[];
   const title = isAdmin ? t("giveCash") : t("iGotMoney");
   const PersonIcon = isAdmin ? UserRound : Crown;
+  // Household cash is always handed to a caretaker: with none yet, point to the invite instead of a form that can't be sent
+  if (isAdmin && others.length === 0)
+    return (
+      <div className="space-y-6">
+        <BackHeader title={title} />
+        <section className="card space-y-4 py-8 text-center">
+          <p className="text-lg text-muted">{t("cashNeedsCaretaker")}</p>
+          <Link href="/settings?invite=caretaker#invite" className="btn-primary">
+            <Plus size={24} /> {t("inviteCaretaker")}
+          </Link>
+        </section>
+      </div>
+    );
   return (
     <form action={giveCash} className="space-y-6">
       <BackHeader title={title} />

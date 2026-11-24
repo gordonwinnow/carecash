@@ -305,6 +305,8 @@ const ADD_PAGE = /^\/(expense|cash|more)\/new(\?|$)/;
  * field right away (the number pad opens), and AmountInput takes the focus over when it mounts.
  */
 export function NumpadPrimer() {
+  const path = usePathname();
+
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
@@ -313,19 +315,26 @@ export function NumpadPrimer() {
       if (!el) {
         el = document.createElement("input");
         el.id = PRIMER_ID;
+        el.type = "text";
         el.inputMode = "numeric";
+        el.autocomplete = "off";
         el.setAttribute("aria-hidden", "true");
         el.tabIndex = -1;
-        // 16px avoids iOS zooming in; kept on screen but invisible so iOS agrees to focus it
-        el.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px;border:0;padding:0";
         document.body.appendChild(el);
       }
+      // Placed at the top of what is on screen (16px font so iOS doesn't zoom); invisible but focusable
+      el.style.cssText = `position:absolute;top:${window.scrollY + 8}px;left:8px;width:40px;height:20px;opacity:0;font-size:16px;border:0;padding:0;background:transparent;color:transparent;caret-color:transparent`;
       el.focus();
-      // In case the next screen has no amount field, don't leave it around
-      setTimeout(() => document.getElementById(PRIMER_ID)?.remove(), 4000);
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
   }, []);
+
+  // It waits as long as the next screen takes (a slow connection or a server waking up). If we end up on a
+  // screen without an amount field, it goes away there; AmountInput removes it once it has taken the focus.
+  useEffect(() => {
+    if (!ADD_PAGE.test(path)) document.getElementById(PRIMER_ID)?.remove();
+  }, [path]);
+
   return null;
 }

@@ -39,15 +39,14 @@ export function ExpenseFields({ t, initial, payers }: { t: T; initial?: Initial;
         />
       </div>
       <PhotoInput label={initial?.photo ? t("replacePhoto") : t("takePhoto")} existing={initial?.photo} />
-      {initial?.spent_at && (
-        <div>
-          <label className="label" htmlFor="date">{t("date")}</label>
-          <input id="date" name="date" type="date" className="field" defaultValue={dayKey(initial.spent_at)} max={today()} required />
-        </div>
-      )}
       <div>
         <label className="label" htmlFor="note">{t("note")}</label>
         <input id="note" name="note" className="field" maxLength={200} defaultValue={initial?.note ?? ""} />
+      </div>
+      {/* Low on the form: usually left as today */}
+      <div>
+        <label className="label" htmlFor="date">{t("date")}</label>
+        <input id="date" name="date" type="date" className="field" defaultValue={initial?.spent_at ? dayKey(initial.spent_at) : today()} max={today()} required />
       </div>
       <Submit className="btn-primary min-h-18 text-2xl">
         <Check size={26} strokeWidth={2.6} /> {initial ? t("saveChanges") : t("save")}

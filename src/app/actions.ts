@@ -131,7 +131,8 @@ export async function removeMember(memberId: string) {
  */
 export async function giveCash(fd: FormData) {
   const { me } = await requireCtx();
-  const now = Date.now();
+  // The chosen day (today keeps the current moment)
+  const now = movedDate(fd.get("date"), Date.now());
   const other = String(fd.get("who") ?? "");
   // An employer may also put cash into their own pot (no caretaker involved): it counts and is confirmed at once
   const toSelf = me.role === "admin" && other === me.id;
@@ -253,7 +254,7 @@ export async function addExpense(fd: FormData) {
   const amount = amountOf(fd);
   const note = text(fd, "note");
   const photo = await savePhoto(fd);
-  const now = Date.now();
+  const now = movedDate(fd.get("date"), Date.now());
   const id = newId();
   await watchBalance(
     me.family_id,

@@ -1,6 +1,7 @@
 import { Check, Crown, UserRound } from "lucide-react";
 import { db } from "@/lib/db";
 import { getT, requireCtx } from "@/lib/ctx";
+import { today } from "@/lib/format";
 import { giveCash } from "../../../actions";
 import { AmountInput, BackHeader, ChipGroup, Submit } from "@/components/ui";
 
@@ -36,6 +37,10 @@ export default async function NewCash({ searchParams }: { searchParams: Promise<
       <div>
         <label className="label" htmlFor="note">{t("note")}</label>
         <input id="note" name="note" className="field" maxLength={200} />
+      </div>
+      <div>
+        <label className="label" htmlFor="date">{t("date")}</label>
+        <input id="date" name="date" type="date" className="field" defaultValue={today()} max={today()} required />
       </div>
       <Submit className="btn-primary min-h-18 text-2xl" disabled={others.length === 0}>
         <Check size={26} strokeWidth={2.6} /> {title}

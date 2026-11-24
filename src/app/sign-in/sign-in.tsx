@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Mail, Wallet } from "lucide-react";
+import { Mail } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useT } from "@/components/i18n";
 import { LanguagePicker } from "@/components/settings";
@@ -77,7 +77,7 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
         <LanguagePicker compact />
       </div>
       <div className="mb-8 mt-8 text-center">
-        <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-[28px] bg-accent text-white" style={{ boxShadow: "0 14px 30px -12px color-mix(in srgb, var(--accent) 70%, transparent)" }}><Wallet size={46} strokeWidth={2} /></div>
+        <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center rounded-[28px] bg-accent text-white" style={{ boxShadow: "0 14px 30px -12px color-mix(in srgb, var(--accent) 70%, transparent)" }}><span className="text-5xl" aria-hidden>👛</span></div>
         <h1 className="text-4xl font-extrabold tracking-tight">{t("appName")}</h1>
         <p className="mt-2 text-xl text-muted">{t("tagline")}</p>
       </div>

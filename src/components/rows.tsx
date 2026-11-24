@@ -58,7 +58,8 @@ export function EntryRow({
         )}
       </div>
       <div className={`tabular ml-2 shrink-0 text-right text-[17px] font-bold ${pending ? "text-muted" : income ? "text-good" : ""}`}>
-        {income ? "+" : ""}
+        {/* Money in: green with +. Spending: − in the normal text color */}
+        {income ? "+" : "−"}
         {amount}
       </div>
     </>

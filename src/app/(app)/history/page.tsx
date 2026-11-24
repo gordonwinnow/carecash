@@ -89,7 +89,10 @@ export default async function History({ searchParams }: { searchParams: Promise<
         <section key={m.label}>
           <div className="mb-2 flex items-baseline justify-between px-4">
             <h2 className="text-lg font-bold tracking-tight">{m.label}</h2>
-            <p className="tabular text-[15px] font-semibold text-muted">{money(m.spent, me.currency)}</p>
+            <p className="tabular text-[15px] font-semibold">
+              <span className="text-muted">−{money(m.spent, me.currency)}</span>
+              {m.cash > 0 && <span className="text-good"> · +{money(m.cash, me.currency)}</span>}
+            </p>
           </div>
           <RowList>
             {m.rows.map((r) => {

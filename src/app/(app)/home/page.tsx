@@ -73,6 +73,9 @@ function CaretakerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
 
   return (
     <>
+      {/* Summary first; things to confirm and actions below it */}
+      <BalanceCard b={b} t={t} />
+
       {pending.map((c) => (
         <PendingCard key={c.id} icon={<HandCoins size={20} />} title={t("gaveYou", { name: c.giver })} amount={money(c.amount, me.currency)} note={c.note} at={day(c.created_at, lang)}>
           <ActionButton action={ackCash.bind(null, c.id)} className="btn-good">
@@ -94,8 +97,6 @@ function CaretakerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
           </ActionButton>
         </PendingCard>
       ))}
-
-      <BalanceCard b={b} t={t} />
 
       {/* One row: the main action wide, "got money" as a short side button */}
       <div className="grid grid-cols-[1fr_auto] gap-3">
@@ -146,16 +147,6 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
 
   return (
     <>
-      {toConfirm.map((c) => (
-        <PendingCard key={c.id} icon={<HandCoins size={20} />} title={t("selfAdded", { name: c.giver })} amount={money(c.amount, me.currency)} note={c.note} at={day(c.created_at, lang)}>
-          <ActionButton action={confirmCash.bind(null, c.id)} className="btn-good">
-            <Check size={26} strokeWidth={2.6} /> {t("confirmGave")}
-          </ActionButton>
-          <ActionButton action={deleteCash.bind(null, c.id, undefined)} confirm={t("confirmDelete")} className="w-full py-1 text-base font-semibold text-muted">
-            {t("delete")}
-          </ActionButton>
-        </PendingCard>
-      ))}
       {holders.map((h) => (
         <section key={h.id} className="space-y-3">
           <BalanceCard title={h.title} b={h.b} t={t} />
@@ -174,6 +165,16 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
             )}
           </div>
         </section>
+      ))}
+      {toConfirm.map((c) => (
+        <PendingCard key={c.id} icon={<HandCoins size={20} />} title={t("selfAdded", { name: c.giver })} amount={money(c.amount, me.currency)} note={c.note} at={day(c.created_at, lang)}>
+          <ActionButton action={confirmCash.bind(null, c.id)} className="btn-good">
+            <Check size={26} strokeWidth={2.6} /> {t("confirmGave")}
+          </ActionButton>
+          <ActionButton action={deleteCash.bind(null, c.id, undefined)} confirm={t("confirmDelete")} className="w-full py-1 text-base font-semibold text-muted">
+            {t("delete")}
+          </ActionButton>
+        </PendingCard>
       ))}
       {caretakers.length === 0 ? (
         <section className="card space-y-4 py-6 text-center">
@@ -203,23 +204,18 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
 function BalanceCard({ title, b, t }: { title?: string; b: ReturnType<typeof balanceOf>; t: T }) {
   const n = (v: number) => `$${v.toLocaleString("en-US")}`;
   return (
-    <section
-      className="relative overflow-hidden rounded-[28px] px-[18px] pb-[18px] pt-5 text-white"
-      style={{
-        background: "linear-gradient(145deg, color-mix(in srgb, var(--accent) 85%, white) 0%, var(--accent) 45%, color-mix(in srgb, var(--accent) 72%, black) 100%)",
-        boxShadow: "0 14px 32px -14px color-mix(in srgb, var(--accent) 70%, transparent)",
-      }}
-    >
-      {title && <p className="relative mb-2 text-lg font-bold text-white/90">{title}</p>}
+    // A quiet summary tile: plain card surface and ink numbers, so it never reads as a button
+    <section className="card px-[18px] pb-4 pt-5">
+      {title && <p className="mb-2 text-lg font-bold">{title}</p>}
       {/* "NTD $5,765 remaining" on one line; wraps only for very large amounts */}
-      <p className="relative flex items-baseline justify-between gap-3 leading-none">
-        <span className="text-lg font-semibold text-white/85">{t("remaining")}</span>
-        <span className={`tabular flex shrink-0 items-baseline gap-2 ${b.left < 0 ? "text-[#ffd7dc]" : ""}`}>
-          <span className="text-lg font-bold text-white/75">NTD</span>
+      <p className="flex items-baseline justify-between gap-3 leading-none">
+        <span className="text-lg font-semibold text-muted">{t("remaining")}</span>
+        <span className={`tabular flex shrink-0 items-baseline gap-2 ${b.left < 0 ? "text-bad" : ""}`}>
+          <span className="text-lg font-bold text-muted">NTD</span>
           <span className="text-[44px] font-extrabold tracking-tight">{b.left < 0 ? "−" : ""}{n(Math.abs(b.left))}</span>
         </span>
       </p>
-      <p className="tabular relative mt-2 text-right text-base font-semibold text-white/80">{t("spentLine", { amount: n(b.spent) })}</p>
+      <p className="tabular mt-2 text-right text-base font-semibold text-muted">{t("spentLine", { amount: n(b.spent) })}</p>
     </section>
   );
 }

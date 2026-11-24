@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Clock } from "lucide-react";
+import { Clock, Pencil } from "lucide-react";
 import { Badge } from "./icons";
 
 /**
@@ -15,6 +15,7 @@ export function EntryRow({
   amount,
   income,
   pending,
+  edited,
 }: {
   href?: string;
   icon: string;
@@ -24,6 +25,8 @@ export function EntryRow({
   amount: string;
   income?: boolean;
   pending?: boolean;
+  /** Name of whoever last edited this entry, if anyone did */
+  edited?: string | null;
 }) {
   const body = (
     <>
@@ -42,7 +45,17 @@ export function EntryRow({
       </span>
       <div className="min-w-0 flex-1">
         <div className="truncate text-[17px] font-semibold leading-snug">{title}</div>
-        {sub && <div className="truncate text-sm text-muted">{sub}</div>}
+        {(sub || edited) && (
+          <div className="flex items-center gap-1 truncate text-sm text-muted">
+            {sub}
+            {edited && (
+              <span className="inline-flex shrink-0 items-center gap-0.5">
+                {sub ? " · " : ""}
+                <Pencil size={12} /> {edited}
+              </span>
+            )}
+          </div>
+        )}
       </div>
       <div className={`tabular ml-2 shrink-0 text-right text-[17px] font-bold ${pending ? "text-muted" : income ? "text-good" : ""}`}>
         {income ? "+" : ""}

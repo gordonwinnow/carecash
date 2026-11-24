@@ -1,10 +1,11 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { Copy, Plus } from "lucide-react";
 import { createInvite } from "../../actions";
 import { useT } from "@/components/i18n";
 
-export function InvitePanel() {
+/** With `auto`, a link for that role is made as soon as the page opens (from the home screen's invite buttons). */
+export function InvitePanel({ auto }: { auto?: "admin" | "caretaker" }) {
   const t = useT();
   const [link, setLink] = useState<{ url: string; role: string } | null>(null);
   const [copied, setCopied] = useState(false);
@@ -16,6 +17,16 @@ export function InvitePanel() {
       setLink({ url: `${window.location.origin}/join/${code}`, role });
       setCopied(false);
     });
+
+  const started = useRef(false);
+  useEffect(() => {
+    if (auto && !started.current) {
+      started.current = true;
+      make(auto);
+      document.getElementById("invite")?.scrollIntoView({ block: "center" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auto]);
 
   const msg = link ? `${t("inviteMessage")} ${link.url}` : "";
 

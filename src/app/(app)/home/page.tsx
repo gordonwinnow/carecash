@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, Camera, Check, HandCoins, Wallet, HeartHandshake, Plus } from "lucide-react";
+import { Banknote, Camera, Check, HandCoins, Users, Wallet, HeartHandshake, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { balanceOf, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
 import { day, money } from "@/lib/format";
@@ -9,7 +9,7 @@ import { ActionButton } from "@/components/ui";
 import { EntryRow, RowList, SectionHead, Empty } from "@/components/rows";
 
 type Cash = { id: string; amount: number; note: string | null; created_at: number; ack_at: number | null; giver: string; caretaker_id: string };
-type Expense = { id: string; amount: number; category: string; note: string | null; photo: string | null; spent_at: number; who: string };
+type Expense = { id: string; amount: number; category: string; note: string | null; photo: string | null; spent_at: number; who: string; edited_by: string | null };
 
 export default async function Home() {
   const { me } = await requireCtx();
@@ -61,7 +61,7 @@ function CaretakerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
     .all(me.id) as Cash[];
   const b = balanceOf(me.id);
   const recent = db
-    .prepare("select e.*, '' as who from expense e where member_id = ? order by spent_at desc limit 5")
+    .prepare("select e.*, '' as who, (select em.name from audit a join member em on em.id = a.member_id where a.entity_id = e.id and a.action = 'update' order by a.at desc limit 1) as edited_by from expense e where member_id = ? order by spent_at desc limit 5")
     .all(me.id) as Expense[];
 
   return (
@@ -97,7 +97,7 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
     .all(me.family_id) as Member[];
   const recent = db
     .prepare(
-      `select e.*, m.name as who from expense e join member m on m.id = e.member_id
+      `select e.*, m.name as who, (select em.name from audit a join member em on em.id = a.member_id where a.entity_id = e.id and a.action = 'update' order by a.at desc limit 1) as edited_by from expense e join member m on m.id = e.member_id
        where e.family_id = ? order by spent_at desc limit 6`,
     )
     .all(me.family_id) as Expense[];
@@ -110,8 +110,14 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
         </span>
         <h2 className="text-2xl font-extrabold">{t("noCaretaker")}</h2>
         <p className="text-lg text-muted">{t("noCaretakerHint")}</p>
-        <Link href="/settings#invite" className="btn-primary">
+        <Link href="/settings?invite=caretaker#invite" className="btn-primary">
           <Plus size={24} /> {t("inviteCaretaker")}
+        </Link>
+        <Link href="/settings?invite=admin#invite" className="btn-tint">
+          <Users size={22} /> {t("inviteAdmin")}
+        </Link>
+        <Link href="/expense/new" className="btn-soft">
+          <Camera size={22} /> {t("addExpense")}
         </Link>
       </section>
     );
@@ -142,17 +148,23 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
           <section key={c.id} className="space-y-3">
             <BalanceCard title={c.name} b={b} t={t} />
             {/* One row: add household cash wide, other costs (salary, health…) as a short side button */}
-            <div className="grid grid-cols-[1fr_auto] gap-3">
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2">
               <Link href={`/cash/new?to=${c.id}`} className="btn-primary min-h-20 px-4 text-xl leading-tight">
                 <Plus size={26} className="shrink-0" /> {t("giveCash")}
               </Link>
-              <Link href={`/more/new?for=${c.id}`} className="btn-tint min-h-20 w-auto flex-col !gap-1 px-4 text-[15px] leading-tight">
+              <Link href={`/expense/new?for=${c.id}`} className="btn-tint min-h-20 w-auto flex-col !gap-1 px-3 text-[15px] leading-tight">
+                <Camera size={24} /> {t("expenseShort")}
+              </Link>
+              <Link href={`/more/new?for=${c.id}`} className="btn-tint min-h-20 w-auto flex-col !gap-1 px-3 text-[15px] leading-tight">
                 <Wallet size={24} /> {t("otherShort")}
               </Link>
             </div>
           </section>
         );
       })}
+      <Link href="/settings?invite=caretaker#invite" className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">
+        <Plus size={18} /> {t("inviteAnother")}
+      </Link>
       <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} showWho />
     </>
   );
@@ -207,6 +219,7 @@ function ExpenseList({ title, rows, t, lang, currency, showWho }: { title: strin
               title={e.note || t(`cat_${e.category}` as never)}
               sub={`${showWho && e.who ? `${e.who} · ` : ""}${day(e.spent_at, lang)}`}
               amount={money(e.amount, currency)}
+              edited={e.edited_by}
             />
           ))}
         </RowList>

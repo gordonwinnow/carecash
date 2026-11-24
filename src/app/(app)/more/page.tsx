@@ -18,6 +18,7 @@ type Rec = {
   date: string;
   shared: number;
   who: string | null;
+  edited_by: string | null;
 };
 
 /** Phase 2: salary, healthcare and other costs. Employers see everything; caretakers only what is shared with them. */
@@ -29,7 +30,7 @@ export default async function More() {
 
   const rows = db
     .prepare(
-      `select r.*, m.name as who from record r left join member m on m.id = r.caretaker_id
+      `select r.*, m.name as who, (select em.name from audit a join member em on em.id = a.member_id where a.entity_id = r.id and a.action = 'update' order by a.at desc limit 1) as edited_by from record r left join member m on m.id = r.caretaker_id
        where r.family_id = @fid
          and (@admin = 1 or (r.shared = 1 and (r.caretaker_id is null or r.caretaker_id = @me)))
        order by r.date desc, r.created_at desc limit 500`,
@@ -82,6 +83,7 @@ export default async function More() {
                   .filter(Boolean)
                   .join(" · ")}
                 amount={money(r.amount, me.currency)}
+                edited={isAdmin ? r.edited_by : null}
               />
               {isAdmin && (
                 <div className="-mt-1 pb-2 pl-[72px]">

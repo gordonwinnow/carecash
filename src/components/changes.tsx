@@ -1,6 +1,6 @@
 import { Check, Eye, EyeOff, Pencil, Plus, Trash2, UserMinus, UserPlus, type LucideIcon } from "lucide-react";
 import { diff, snapshot, type AuditRow } from "@/lib/audit";
-import { money, when } from "@/lib/format";
+import { day, money, when } from "@/lib/format";
 import type { T } from "@/lib/i18n";
 
 const ACTION_ICON: Record<string, LucideIcon> = {
@@ -26,6 +26,7 @@ const FIELD_KEY: Record<string, string> = {
   date: "date",
   shared: "shareWithCaretaker",
   caretaker_id: "forWho",
+  payer: "paidBy",
   name: "yourName",
 };
 
@@ -35,7 +36,7 @@ function show(field: string, v: unknown, t: T, currency: string, names: Record<s
   if (field === "category") return t(`cat_${v}` as never);
   if (field === "kind") return t(`kind_${v}` as never);
   if (field === "shared") return v ? t("sharedBadge") : t("privateBadge");
-  if (field === "caretaker_id") return names[String(v)] ?? "—";
+  if (field === "caretaker_id" || field === "payer") return names[String(v)] ?? "—";
   return String(v);
 }
 
@@ -100,4 +101,16 @@ export function ChangeList({
       })}
     </ol>
   );
+}
+
+/** "Added by Siti · Nov 17 · Edited by Gordon · today", from an entry's change history (newest first). */
+export function ByLine({ rows, t, lang }: { rows: AuditRow[]; t: T; lang: string }) {
+  const created = [...rows].reverse().find((r) => r.action === "create");
+  const edited = rows.find((r) => r.action === "update");
+  const parts = [
+    created && `${t("addedBy", { name: created.actor ?? "—" })} · ${day(created.at, lang)}`,
+    edited && `${t("editedBy", { name: edited.actor ?? "—" })} · ${day(edited.at, lang)}`,
+  ].filter(Boolean);
+  if (parts.length === 0) return null;
+  return <p className="-mt-3 px-1 text-[15px] text-muted">{parts.join("  ·  ")}</p>;
 }

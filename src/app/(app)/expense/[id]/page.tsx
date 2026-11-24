@@ -5,7 +5,7 @@ import { getLang, getT, requireCtx } from "@/lib/ctx";
 import { historyOf } from "@/lib/audit";
 import { deleteExpense, updateExpense } from "../../../actions";
 import { ActionButton, BackHeader } from "@/components/ui";
-import { ChangeList } from "@/components/changes";
+import { ByLine, ChangeList } from "@/components/changes";
 import { SectionHead } from "@/components/rows";
 import { ExpenseFields } from "../form";
 
@@ -19,12 +19,20 @@ export default async function EditExpense({ params }: { params: Promise<{ id: st
     | undefined;
   if (!e || (me.role !== "admin" && e.member_id !== me.id)) redirect("/history");
   const changes = historyOf(e.id, me);
+  const caretakers =
+    me.role === "admin"
+      ? (db.prepare("select id, name from member where family_id = ? and role = 'caretaker' and active = 1 order by created_at").all(me.family_id) as { id: string; name: string }[])
+      : [];
+  const names = Object.fromEntries(
+    (db.prepare("select id, name from member where family_id = ?").all(me.family_id) as { id: string; name: string }[]).map((m) => [m.id, m.name]),
+  );
 
   return (
     <div className="space-y-8">
       <form action={updateExpense.bind(null, e.id)} className="space-y-6">
         <BackHeader title={t("editExpense")} href="/history" />
-        <ExpenseFields t={t} initial={e} />
+        <ByLine rows={changes} t={t} lang={lang} />
+        <ExpenseFields t={t} initial={e} payers={me.role === "admin" ? { me: me.id, caretakers, initial: e.member_id } : undefined} />
       </form>
       <ActionButton action={deleteExpense.bind(null, e.id, "/history")} confirm={t("confirmDelete")} className="btn bg-bad-soft text-bad">
         <Trash2 size={22} /> {t("delete")}
@@ -33,7 +41,7 @@ export default async function EditExpense({ params }: { params: Promise<{ id: st
         <section>
           <SectionHead title={t("changeHistory")} />
           <div className="card !p-2">
-            <ChangeList rows={changes} t={t} lang={lang} currency={me.currency} />
+            <ChangeList rows={changes} t={t} lang={lang} currency={me.currency} names={names} />
           </div>
         </section>
       )}

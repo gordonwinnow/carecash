@@ -41,7 +41,7 @@ type ExpenseRow = { id: string; family_id: string; member_id: string; amount: nu
 type RecordRow = { id: string; family_id: string; caretaker_id: string | null; kind: string; amount: number; note: string | null; photo: string | null; date: string; shared: number };
 
 const cashView = (r: CashRow) => ({ amount: r.amount, note: r.note });
-const expenseView = (r: ExpenseRow) => ({ amount: r.amount, category: r.category, note: r.note, photo: r.photo });
+const expenseView = (r: ExpenseRow) => ({ amount: r.amount, category: r.category, note: r.note, photo: r.photo, payer: r.member_id });
 const recordView = (r: RecordRow) => ({ kind: r.kind, amount: r.amount, note: r.note, date: r.date, shared: r.shared, caretaker_id: r.caretaker_id, photo: r.photo });
 
 // ---------- Family ----------
@@ -236,8 +236,21 @@ function categoryOf(fd: FormData) {
   return CATEGORIES.some((c) => c.id === fd.get("category")) ? String(fd.get("category")) : "other";
 }
 
+/**
+ * Who paid: a caretaker always pays from her own household cash. An employer picks the caretaker whose cash
+ * it came from, or themselves (then no caretaker's balance changes).
+ */
+function payerOf(fd: FormData, me: { id: string; role: string; family_id: string }) {
+  if (me.role !== "admin") return { id: me.id, caretaker: true };
+  const row = db.prepare("select id, role from member where id = ? and family_id = ? and active = 1").get(String(fd.get("payer") ?? ""), me.family_id) as
+    | { id: string; role: string }
+    | undefined;
+  return row ? { id: row.id, caretaker: row.role === "caretaker" } : { id: me.id, caretaker: false };
+}
+
 export async function addExpense(fd: FormData) {
   const { me } = await requireCtx();
+  const payer = payerOf(fd, me);
   const category = categoryOf(fd);
   const amount = amountOf(fd);
   const note = text(fd, "note");
@@ -246,12 +259,12 @@ export async function addExpense(fd: FormData) {
   const id = newId();
   await watchBalance(
     me.family_id,
-    me.id,
+    payer.id,
     () => {
       db.prepare(
-        "insert into expense (id, family_id, member_id, amount, category, note, photo, spent_at, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      ).run(id, me.family_id, me.id, amount, category, note, photo, now, now);
-      logChange(me.family_id, me.id, "expense", id, "create", null, { amount, category, note, photo }, me.id);
+        "insert into expense (id, family_id, member_id, amount, category, note, photo, spent_at, created_at, created_by) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      ).run(id, me.family_id, payer.id, amount, category, note, photo, now, now, me.id);
+      logChange(me.family_id, me.id, "expense", id, "create", null, { amount, category, note, photo, payer: payer.id }, payer.caretaker ? payer.id : null);
     },
     { actorId: me.id, actorName: me.name, kind: "expense", amount, category },
   );
@@ -271,9 +284,12 @@ export async function updateExpense(expenseId: string, fd: FormData) {
   const note = text(fd, "note");
   // The old photo file is kept: the change history still points at it
   const photo = (await savePhoto(fd)) ?? e.photo;
-  await watchBalance(me.family_id, e.member_id, () => {
-    db.prepare("update expense set amount = ?, category = ?, note = ?, photo = ? where id = ?").run(amount, category, note, photo, e.id);
-    logChange(me.family_id, me.id, "expense", e.id, "update", expenseView(e), { amount, category, note, photo }, e.member_id);
+  // Employers may also change who paid
+  const payer = me.role === "admin" ? payerOf(fd, me).id : e.member_id;
+  const isCaretaker = (id: string) => !!db.prepare("select 1 from member where id = ? and role = 'caretaker'").get(id);
+  await watchBalance(me.family_id, payer, () => {
+    db.prepare("update expense set amount = ?, category = ?, note = ?, photo = ?, member_id = ? where id = ?").run(amount, category, note, photo, payer, e.id);
+    logChange(me.family_id, me.id, "expense", e.id, "update", expenseView(e), { amount, category, note, photo, payer }, isCaretaker(payer) ? payer : isCaretaker(e.member_id) ? e.member_id : null);
   });
   done("/history");
 }

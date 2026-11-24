@@ -38,7 +38,7 @@ export async function watchBalance<R>(
   const result = await change();
   try {
     const after = balanceOf(caretakerId).left;
-    const caretaker = db.prepare("select name from member where id = ?").get(caretakerId) as { name: string } | undefined;
+    const caretaker = db.prepare("select name, role from member where id = ?").get(caretakerId) as { name: string; role: string } | undefined;
     const currency = (db.prepare("select currency from family where id = ?").get(familyId) as { currency: string } | undefined)?.currency ?? "TWD";
     for (const w of watchersOf(familyId, caretakerId)) {
       if (news && w.id !== news.actorId && (news.kind === "expense" ? w.notify_expense : w.notify_cash)) {
@@ -48,7 +48,8 @@ export async function watchBalance<R>(
             : translate(lang, "pushCash", { name: news.actorName, amount: money(news.amount, currency) }),
         );
       }
-      if (w.notify_low && after < w.low_threshold && before >= w.low_threshold) {
+      // Only caretakers hold household cash; an employer paying for something has no balance to run low
+      if (caretaker?.role === "caretaker" && w.notify_low && after < w.low_threshold && before >= w.low_threshold) {
         deliver(w.user_id, "/home", (lang) =>
           translate(lang, w.role === "admin" ? "pushLowOf" : "pushLow", { name: caretaker?.name ?? "", amount: money(after, currency) }),
         );

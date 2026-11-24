@@ -5,7 +5,7 @@ import { getLang, getT, requireAdmin } from "@/lib/ctx";
 import { historyOf } from "@/lib/audit";
 import { deleteRecord, updateRecord } from "../../../actions";
 import { ActionButton, BackHeader } from "@/components/ui";
-import { ChangeList } from "@/components/changes";
+import { ByLine, ChangeList } from "@/components/changes";
 import { SectionHead } from "@/components/rows";
 import { RecordFields } from "../form";
 
@@ -28,6 +28,7 @@ export default async function EditRecord({ params }: { params: Promise<{ id: str
     <div className="space-y-8">
       <form action={updateRecord.bind(null, r.id)} className="space-y-6">
         <BackHeader title={t("editRecord")} href="/more" />
+        <ByLine rows={changes} t={t} lang={lang} />
         <RecordFields t={t} caretakers={caretakers} initial={r} />
       </form>
       <ActionButton action={deleteRecord.bind(null, r.id, "/more")} confirm={t("confirmDelete")} className="btn bg-bad-soft text-bad">

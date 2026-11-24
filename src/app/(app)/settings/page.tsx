@@ -9,7 +9,8 @@ import { InvitePanel } from "./invite";
 import { NotifySettings } from "@/components/notify";
 import { InstallLink } from "@/components/install";
 
-export default async function Settings() {
+export default async function Settings({ searchParams }: { searchParams: Promise<{ invite?: string }> }) {
+  const { invite } = await searchParams;
   const { me, memberships } = await requireCtx();
   const t = await getT();
   const isAdmin = me.role === "admin";
@@ -67,7 +68,7 @@ export default async function Settings() {
             ))}
           </ul>
         </div>
-        {isAdmin && (me.demo ? <p className="rounded-2xl bg-warn-soft p-4 text-base font-semibold">{t("demoNoInvite")}</p> : <InvitePanel />)}
+        {isAdmin && (me.demo ? <p className="rounded-2xl bg-warn-soft p-4 text-base font-semibold">{t("demoNoInvite")}</p> : <InvitePanel auto={invite === "caretaker" || invite === "admin" ? invite : undefined} />)}
         <form action={renameMe} className="space-y-2">
           <label className="label" htmlFor="myname">{t("myName")}</label>
           <div className="flex gap-2">

@@ -122,6 +122,8 @@ function open() {
   addColumn(d, "member", "notify_low", "integer not null default 1");
   addColumn(d, "member", "low_threshold", "integer not null default 1000");
   addColumn(d, "member", "notify_expense", "integer not null default 0");
+  // Who typed the expense in (an employer may record one paid by a caretaker, or by themselves)
+  addColumn(d, "expense", "created_by", "text");
   addColumn(d, "member", "notify_cash", "integer not null default 0");
   // Older demo data had sample notes on household cash that read like labels
   d.prepare("update cash set note = null where note in ('Next week', 'Groceries') and family_id in (select id from family where demo = 1)").run();

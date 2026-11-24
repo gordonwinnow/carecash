@@ -5,7 +5,7 @@ import { getLang, getT, requireCtx } from "@/lib/ctx";
 import { historyOf } from "@/lib/audit";
 import { deleteCash, updateCash } from "../../../actions";
 import { ActionButton, AmountInput, BackHeader, Submit } from "@/components/ui";
-import { ChangeList } from "@/components/changes";
+import { ByLine, ChangeList } from "@/components/changes";
 import { SectionHead } from "@/components/rows";
 
 export default async function EditCash({ params }: { params: Promise<{ id: string }> }) {
@@ -28,6 +28,7 @@ export default async function EditCash({ params }: { params: Promise<{ id: strin
     <div className="space-y-8">
       <form action={updateCash.bind(null, c.id)} className="space-y-6">
         <BackHeader title={t("editCash")} href="/history" />
+        <ByLine rows={changes} t={t} lang={lang} />
         {isAdmin && <p className="-mt-3 px-1 text-lg text-muted">{t("cashTo", { name: c.caretaker })}</p>}
         <AmountInput initial={c.amount} />
         <p className="flex items-start gap-2 px-1 text-[15px] text-muted">

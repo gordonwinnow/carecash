@@ -4,7 +4,7 @@ export function PurseIcon({ size = 24, strokeWidth = 2, className }: { size?: nu
     <svg
       width={size}
       height={size}
-      viewBox="2 3 20 19"
+      viewBox="1 2.5 22 19.5"
       fill="none"
       stroke="currentColor"
       strokeWidth={strokeWidth}
@@ -14,12 +14,12 @@ export function PurseIcon({ size = 24, strokeWidth = 2, className }: { size?: nu
       aria-hidden
     >
       {/* clasp beads */}
-      <circle cx="10.85" cy="6.6" r="1.3" fill="currentColor" stroke="none" />
-      <circle cx="13.15" cy="6.6" r="1.3" fill="currentColor" stroke="none" />
-      {/* frame */}
-      <path d="M5 9.2Q12 6.4 19 9.2" />
+      <circle cx="10.9" cy="5" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="13.1" cy="5" r="1.15" fill="currentColor" stroke="none" />
+      {/* metal frame */}
+      <path d="M6.5 11C6.5 7.6 9 6 12 6s5.5 1.6 5.5 5" />
       {/* pouch */}
-      <path d="M5 9.2C2.9 11.5 2.8 15 4.6 17.4 6.3 19.7 9 20.6 12 20.6s5.7-.9 7.4-3.2c1.8-2.4 1.7-5.9-.4-8.2" />
+      <path d="M4 11h16c1.6 1.6 2.1 4.2 1.1 6.4-1.1 2.3-4.3 3.1-9.1 3.1s-8-.8-9.1-3.1C1.9 15.2 2.4 12.6 4 11z" />
     </svg>
   );
 }

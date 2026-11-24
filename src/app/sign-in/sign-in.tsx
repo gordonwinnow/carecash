@@ -112,7 +112,7 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
               {(["admin", "caretaker"] as const).map((role) => (
                 <button
                   key={role}
-                  className="chip min-h-14 flex-[1_1_auto] whitespace-nowrap px-4 text-base"
+                  className="chip min-h-14 flex-[1_1_auto] whitespace-nowrap px-3 text-[15px]"
                   disabled={busy}
                   onClick={() =>
                     run(async () => {

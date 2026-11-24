@@ -1,6 +1,5 @@
-import fs from "node:fs";
-import path from "node:path";
-import { db, UPLOAD_DIR } from "@/lib/db";
+import { db } from "@/lib/db";
+import { imageType, readPhoto } from "@/lib/photos";
 import { getUser } from "@/lib/ctx";
 
 /** Serves a receipt photo only to members allowed to see the row it belongs to. */
@@ -39,12 +38,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ name: s
           .get({ pat: `%"${name}"%`, user: user.id });
   if (!viaExpense && !viaRecord && !viaHistory) return new Response("Not found", { status: 404 });
 
-  try {
-    const buf = await fs.promises.readFile(path.join(UPLOAD_DIR, name));
-    return new Response(new Uint8Array(buf), {
-      headers: { "Content-Type": "image/jpeg", "Cache-Control": "private, max-age=86400" },
-    });
-  } catch {
-    return new Response("Not found", { status: 404 });
-  }
+  const buf = await readPhoto(name);
+  // Only real images are served, with their real type; nosniff and a locked-down CSP stop a browser from running it as anything else
+  const type = buf && imageType(buf);
+  if (!buf || !type) return new Response("Not found", { status: 404 });
+  return new Response(buf, {
+    headers: {
+      "Content-Type": type,
+      "Cache-Control": "private, max-age=86400",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'none'; sandbox",
+    },
+  });
 }

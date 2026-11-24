@@ -8,6 +8,16 @@ import { sendWhatsAppCode } from "./whatsapp";
 
 const env = process.env;
 
+// Without a real secret anyone could forge sign-in sessions, so a running production server refuses to start.
+// (`next build` also runs with NODE_ENV=production but has no secrets, so the build phase is let through.)
+if (
+  env.NODE_ENV === "production" &&
+  env.NEXT_PHASE !== "phase-production-build" &&
+  (!env.BETTER_AUTH_SECRET || env.BETTER_AUTH_SECRET.length < 32)
+) {
+  throw new Error("BETTER_AUTH_SECRET must be set (32+ characters) in production");
+}
+
 /**
  * Apple's client secret is a JWT signed with the Sign in with Apple key, valid at most 6 months.
  * Made here from APPLE_KEY_P8 / APPLE_KEY_ID / APPLE_TEAM_ID at startup, so it never needs renewing by hand.

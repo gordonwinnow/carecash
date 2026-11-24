@@ -1,0 +1,15 @@
+# Streams every change to the SQLite database to the bucket made by `flyctl storage create`
+# (it sets BUCKET_NAME, AWS_ENDPOINT_URL_S3, AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY).
+# Changes reach the bucket within about a second; a full snapshot is taken daily and kept 7 days,
+# so the database can be restored to any moment in the last week.
+dbs:
+  - path: /data/app.db
+    replicas:
+      - type: s3
+        bucket: ${BUCKET_NAME}
+        path: db
+        endpoint: ${AWS_ENDPOINT_URL_S3}
+        region: auto
+        force-path-style: true
+        snapshot-interval: 24h
+        retention: 168h

@@ -1,10 +1,9 @@
 "use server";
-import fs from "node:fs";
-import path from "node:path";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { db, newId, UPLOAD_DIR } from "@/lib/db";
+import { db, newId } from "@/lib/db";
+import { savePhoto } from "@/lib/photos";
 import { getLang, getUser, requireAdmin, requireCtx, membershipsOf } from "@/lib/ctx";
 import { CATEGORIES, KINDS } from "@/lib/format";
 import { seedDemo } from "@/lib/demo";
@@ -21,14 +20,6 @@ function amountOf(fd: FormData) {
 function text(fd: FormData, key: string, max = 200) {
   const v = String(fd.get(key) ?? "").trim();
   return v ? v.slice(0, max) : null;
-}
-async function savePhoto(fd: FormData) {
-  const f = fd.get("photo");
-  if (!(f instanceof File) || f.size === 0) return null;
-  if (f.size > 9 * 1024 * 1024 || !f.type.startsWith("image/")) throw new Error("Bad photo");
-  const name = `${newId()}.jpg`;
-  await fs.promises.writeFile(path.join(UPLOAD_DIR, name), Buffer.from(await f.arrayBuffer()));
-  return name;
 }
 function done(to?: string) {
   revalidatePath("/", "layout");

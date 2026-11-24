@@ -12,6 +12,12 @@ RUN npm run build && npm prune --omit=dev
 FROM node:24-slim
 WORKDIR /app
 ENV NODE_ENV=production PORT=3000 DATA_DIR=/data
+# Litestream streams the SQLite database to the backup bucket (see litestream.yml); it needs system CA certificates for HTTPS
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+ADD https://github.com/benbjohnson/litestream/releases/download/v0.3.13/litestream-v0.3.13-linux-amd64.tar.gz /tmp/litestream.tar.gz
+RUN tar -xzf /tmp/litestream.tar.gz -C /usr/local/bin litestream && rm /tmp/litestream.tar.gz
+COPY litestream.yml /etc/litestream.yml
 COPY --from=build /app ./
+RUN sed -i 's/\r$//' start.sh && chmod +x start.sh
 EXPOSE 3000
-CMD ["node_modules/.bin/next", "start", "-p", "3000"]
+CMD ["./start.sh"]

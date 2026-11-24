@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { betterAuth } from "better-auth";
 import { getMigrations } from "better-auth/db/migration";
 import { nextCookies } from "better-auth/next-js";
@@ -7,9 +8,26 @@ import { sendWhatsAppCode } from "./whatsapp";
 
 const env = process.env;
 
+/**
+ * Apple's client secret is a JWT signed with the Sign in with Apple key, valid at most 6 months.
+ * Made here from APPLE_KEY_P8 / APPLE_KEY_ID / APPLE_TEAM_ID at startup, so it never needs renewing by hand.
+ */
+function appleSecret() {
+  if (env.APPLE_CLIENT_SECRET) return env.APPLE_CLIENT_SECRET;
+  if (!(env.APPLE_CLIENT_ID && env.APPLE_KEY_P8 && env.APPLE_KEY_ID && env.APPLE_TEAM_ID)) return "";
+  const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
+  const now = Math.floor(Date.now() / 1000);
+  const head = b64({ alg: "ES256", kid: env.APPLE_KEY_ID });
+  const body = b64({ iss: env.APPLE_TEAM_ID, iat: now, exp: now + 150 * 86400, aud: "https://appleid.apple.com", sub: env.APPLE_CLIENT_ID });
+  const key = env.APPLE_KEY_P8.replace(/\\n/g, "\n");
+  const sig = crypto.sign("sha256", Buffer.from(`${head}.${body}`), { key, dsaEncoding: "ieee-p1363" }).toString("base64url");
+  return `${head}.${body}.${sig}`;
+}
+const APPLE_SECRET = appleSecret();
+
 export const providers = {
   google: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
-  apple: !!(env.APPLE_CLIENT_ID && env.APPLE_CLIENT_SECRET),
+  apple: !!(env.APPLE_CLIENT_ID && APPLE_SECRET),
   line: !!(env.LINE_CLIENT_ID && env.LINE_CLIENT_SECRET),
 };
 
@@ -27,7 +45,7 @@ export const auth = betterAuth({
     ...(providers.apple && {
       apple: {
         clientId: env.APPLE_CLIENT_ID!,
-        clientSecret: env.APPLE_CLIENT_SECRET!,
+        clientSecret: APPLE_SECRET,
         appBundleIdentifier: env.APPLE_APP_BUNDLE_IDENTIFIER,
       },
     }),

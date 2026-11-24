@@ -41,7 +41,7 @@ Next.js 16 + React 19, Tailwind 4, Better Auth, SQLite (better-sqlite3), one Fly
 | Email + password | **On** | — |
 | WhatsApp code | Off until keys are set | `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, and an approved **Authentication** template (`WHATSAPP_TEMPLATE`, default `login_code`; `WHATSAPP_TEMPLATE_LANG`, default `en`) from Meta WhatsApp Cloud API |
 | Google | Off until keys are set | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. Redirect URI: `https://carecash.fly.dev/api/auth/callback/google` |
-| Apple | Off until keys are set | `APPLE_CLIENT_ID` (Services ID), `APPLE_CLIENT_SECRET` (JWT signed with your .p8 key), `APPLE_APP_BUNDLE_IDENTIFIER=app.carecash.ios`. Return URL: `https://carecash.fly.dev/api/auth/callback/apple` |
+| Apple | Off until keys are set; shown on iPhone, iPad and Mac only | `APPLE_CLIENT_ID` (a Services ID), `APPLE_TEAM_ID`, `APPLE_KEY_ID` and `APPLE_KEY_P8` (a Sign in with Apple key's .p8 contents). The server makes the client secret JWT from the key at startup. `APPLE_APP_BUNDLE_IDENTIFIER=app.carecash.ios`. Return URL: `https://carecash.fly.dev/api/auth/callback/apple` |
 | LINE | Off until keys are set | `LINE_CLIENT_ID`, `LINE_CLIENT_SECRET` from a LINE Login channel. Callback: `https://carecash.fly.dev/api/auth/callback/line` |
 
 A button only appears once its keys are set. Set them like this; it restarts the app:
@@ -50,7 +50,7 @@ A button only appears once its keys are set. Set them like this; it restarts the
 flyctl secrets set GOOGLE_CLIENT_ID=... GOOGLE_CLIENT_SECRET=... -a carecash
 ```
 
-Google blocks its sign-in inside app web views, so in the iOS shell, Google sign-in needs extra work (open it in the system browser). Email, WhatsApp, LINE and Apple work in the web view.
+Google blocks its sign-in inside app web views, so the iOS app opens Google sign-in in Safari (`/native-login`), and `/api/native/finish` sends the session back to the app through a one-time code on the `carecash://` link. Email, WhatsApp, LINE and Apple work in the web view directly.
 
 ## Deploy
 

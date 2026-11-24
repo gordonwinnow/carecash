@@ -7,6 +7,7 @@ import { ActionButton, PageTitle, Submit } from "@/components/ui";
 import { ColorPicker, LanguagePicker, SignOutButton } from "@/components/settings";
 import { InvitePanel } from "./invite";
 import { NotifySettings } from "@/components/notify";
+import { InstallLink } from "@/components/install";
 
 export default async function Settings() {
   const { me, memberships } = await requireCtx();
@@ -91,6 +92,9 @@ export default async function Settings() {
         </section>
       )}
 
+      <div className="flex justify-center">
+        <InstallLink />
+      </div>
       <SignOutButton />
     </div>
   );

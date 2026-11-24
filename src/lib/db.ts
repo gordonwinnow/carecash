@@ -94,6 +94,12 @@ create table if not exists push_sub (
   created_at integer not null
 );
 create index if not exists push_sub_user on push_sub(user_id);
+-- One-time codes that hand a sign-in made in Safari over to the iOS app (Google blocks sign-in inside app web views)
+create table if not exists native_code (
+  code text primary key,
+  cookies text not null,
+  expires_at integer not null
+);
 `;
 
 function addColumn(d: Database.Database, table: string, col: string, def: string) {

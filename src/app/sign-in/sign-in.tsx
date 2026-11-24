@@ -1,12 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Crown, Mail, UserRound, Wallet } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useT } from "@/components/i18n";
 import { LanguagePicker } from "@/components/settings";
+import { InstallLink } from "@/components/install";
 import { startDemo } from "../actions";
 
 type Enabled = { google: boolean; apple: boolean; line: boolean; whatsapp: boolean };
+
+type NativePlugins = {
+  Browser?: { open(o: { url: string }): Promise<void>; close(): Promise<void> };
+  App?: { addListener(e: "appUrlOpen", cb: (d: { url: string }) => void): Promise<{ remove(): void }> };
+};
+/** The iOS app (Capacitor) exposes its native plugins on window. */
+function native() {
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean; Plugins?: NativePlugins } }).Capacitor;
+  return cap?.isNativePlatform?.() ? (cap.Plugins ?? {}) : null;
+}
 type Mode = "menu" | "whatsapp" | "email";
 
 function toE164(raw: string) {
@@ -36,8 +47,29 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
     }
   }
 
-  const social = (provider: "google" | "apple" | "line") =>
-    run(() => authClient.signIn.social({ provider, callbackURL: next }));
+  // Apple sign-in is offered on iPhone, iPad and Mac
+  const [appleDevice, setAppleDevice] = useState(false);
+  useEffect(() => {
+    setAppleDevice(/iPhone|iPad|Macintosh/.test(navigator.userAgent) || !!native());
+    // Back from Safari with a one-time code: trade it for the session inside the app
+    const n = native();
+    const sub = n?.App?.addListener("appUrlOpen", ({ url }) => {
+      const code = new URL(url).searchParams.get("code");
+      if (!url.startsWith("carecash://auth") || !code) return;
+      void n.Browser?.close().catch(() => {});
+      const to = new URL(url).searchParams.get("next") ?? "/home";
+      window.location.href = `/api/native/redeem?code=${encodeURIComponent(code)}&next=${encodeURIComponent(to)}`;
+    });
+    return () => void sub?.then((h) => h.remove());
+  }, []);
+
+  const social = (provider: "google" | "apple" | "line") => {
+    const n = native();
+    // Google refuses sign-in inside app web views, so the iOS app does it in Safari and comes back
+    if (n?.Browser && provider === "google")
+      return run(() => n.Browser!.open({ url: `${window.location.origin}/native-login?provider=google&next=${encodeURIComponent(next)}` }));
+    return run(() => authClient.signIn.social({ provider, callbackURL: next }));
+  };
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col px-5 pb-10 pt-[max(1.25rem,env(safe-area-inset-top))]">
@@ -67,7 +99,7 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
               <GoogleIcon /> {t("continueWith", { p: "Google" })}
             </button>
           )}
-          {enabled.apple && (
+          {enabled.apple && appleDevice && (
             <button className="btn bg-black text-white" disabled={busy} onClick={() => social("apple")}>
               <span className="text-2xl"></span> {t("continueWith", { p: "Apple" })}
             </button>
@@ -76,7 +108,6 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
             <Mail size={22} /> {t("continueWith", { p: t("email") })}
           </button>
           <div className="pt-6">
-            <p className="mb-3 text-center text-base font-semibold text-muted">{t("tryDemo")}</p>
             <div className="grid grid-cols-2 gap-2">
               {(["admin", "caretaker"] as const).map((role) => (
                 <button
@@ -104,7 +135,9 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
       {mode === "email" && <EmailForm next={next} run={run} busy={busy} back={() => setMode("menu")} />}
 
       {err && <p className="mt-4 rounded-2xl bg-bad-soft p-4 text-lg font-semibold text-bad">{err}</p>}
-      <p className="mt-auto pt-10 text-center text-base text-muted">{t("installHint")}</p>
+      <div className="mt-auto flex justify-center pt-10">
+        <InstallLink />
+      </div>
     </main>
   );
 }

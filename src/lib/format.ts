@@ -42,7 +42,7 @@ export const KINDS = [{ id: "salary" }, { id: "health" }, { id: "other" }] as co
 /** Icon id for a phase 2 record kind (its "other" icon differs from the expense category's). */
 export const kindIconId = (kind: string) => (kind === "other" ? "record_other" : kind);
 
-/** Date only, relative while recent: "today", "yesterday", "3 days ago", then "11/24". In the reader's language. */
+/** Date only, relative while recent: "today", "yesterday", "3 days ago", then "Nov 24". In the reader's language. */
 export function day(ms: number, lang: string) {
   const toDay = (t: number) => Date.parse(`${new Date(t).toLocaleDateString("en-CA", { timeZone: TZ })}T00:00:00Z`) / 86_400_000;
   const diff = Math.round(toDay(ms) - toDay(Date.now()));
@@ -51,5 +51,6 @@ export function day(ms: number, lang: string) {
       return new Intl.RelativeTimeFormat(lang, { numeric: "auto" }).format(diff, "day");
     } catch {}
   }
-  return new Date(ms).toLocaleDateString(lang, { timeZone: TZ, month: "numeric", day: "numeric" });
+  // Month as a word ("Nov 17"), never 11/17, which reads as a different date in some regions
+  return new Date(ms).toLocaleDateString(lang, { timeZone: TZ, month: "short", day: "numeric" });
 }

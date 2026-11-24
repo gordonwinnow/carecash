@@ -47,10 +47,10 @@ export function seedDemo(userId: string, role: "admin" | "caretaker") {
     m.run(caretaker, fid, role === "caretaker" ? userId : `demo:${newId()}`, "caretaker", "Siti", now - 60 * DAY);
 
     // Cash: two acknowledged hand-overs, one the caretaker recorded herself, one still waiting
-    ins.cash.run(newId(), fid, caretaker, 5000, "Groceries", master, master, now - 38 * DAY, now - 38 * DAY + 3600e3, null);
-    ins.cash.run(newId(), fid, caretaker, 5000, "Groceries", master, master, now - 8 * DAY, now - 8 * DAY + 600e3, null);
+    ins.cash.run(newId(), fid, caretaker, 5000, null, master, master, now - 38 * DAY, now - 38 * DAY + 3600e3, null);
+    ins.cash.run(newId(), fid, caretaker, 5000, null, master, master, now - 8 * DAY, now - 8 * DAY + 600e3, null);
     ins.cash.run(newId(), fid, caretaker, 1000, "For medicine", master, caretaker, now - 3 * DAY, now - 3 * DAY, null);
-    ins.cash.run(newId(), fid, caretaker, 3000, "Groceries", master, master, now - 2 * 3600e3, null, null);
+    ins.cash.run(newId(), fid, caretaker, 3000, null, master, master, now - 2 * 3600e3, null, null);
 
     const exps: [number, number, string, string][] = [
       [36, 820, "food", "全聯 vegetables & fruit"],

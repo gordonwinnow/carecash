@@ -36,20 +36,17 @@ export default async function Home() {
 /** A money card that needs a tap from this person: receive it, or confirm it was given. */
 function PendingCard({ icon, title, amount, note, at, children }: { icon: React.ReactNode; title: string; amount: string; note: string | null; at: string; children: React.ReactNode }) {
   return (
-    // Two lines, laid out like the balance card so the amounts line up
-    <section className="space-y-4 rounded-[28px] bg-warn-soft px-[18px] pb-[18px] pt-5">
-      <p className="flex items-center gap-2 text-base font-semibold">
+    // One row: who gave it and when on the left, the amount on the right (lined up with the list amounts)
+    <section className="space-y-4 rounded-[28px] bg-warn-soft px-[18px] pb-[18px] pt-4">
+      <div className="flex items-center gap-2">
         <span className="shrink-0 text-warn">{icon}</span>
-        <span className="truncate">{title}</span>
-        <span className="shrink-0 font-medium text-muted">· {at}</span>
-      </p>
-      <p className="flex items-baseline justify-between gap-3 leading-none">
-        <span className="min-w-0 truncate text-lg font-semibold text-muted">{note}</span>
-        <span className="tabular flex shrink-0 items-baseline gap-2">
-          <span className="text-lg font-bold text-muted">NTD</span>
-          <span className="text-[44px] font-extrabold tracking-tight">{amount}</span>
+        <span className="min-w-0 truncate text-base font-semibold">{title}</span>
+        <span className="shrink-0 text-base font-medium text-muted">· {at}</span>
+        <span className="tabular ml-auto flex shrink-0 items-baseline gap-1.5 leading-none">
+          <span className="text-base font-bold text-muted">NTD</span>
+          <span className="text-[30px] font-extrabold tracking-tight">{amount}</span>
         </span>
-      </p>
+      </div>
       {children}
     </section>
   );

@@ -30,12 +30,13 @@ export function RecordFields({ t, caretakers, initial, forWho }: { t: T; caretak
         </div>
       )}
       <div>
-        <label className="label" htmlFor="date">{t("date")}</label>
-        <input id="date" name="date" type="date" defaultValue={initial?.date ?? today()} className="field" required />
-      </div>
-      <div>
         <label className="label" htmlFor="note">{t("note")}</label>
         <input id="note" name="note" className="field" maxLength={200} defaultValue={initial?.note ?? ""} />
+      </div>
+      {/* Date always right below the note, as on every form */}
+      <div>
+        <label className="label" htmlFor="date">{t("date")}</label>
+        <input id="date" name="date" type="date" defaultValue={initial?.date ?? today()} className="field" required />
       </div>
       <PhotoInput big={false} label={initial?.photo ? t("replacePhoto") : t("addPhoto")} existing={initial?.photo} />
       <label className="flex min-h-16 cursor-pointer items-center justify-between gap-4 rounded-2xl bg-card px-5 [box-shadow:var(--shadow)]">

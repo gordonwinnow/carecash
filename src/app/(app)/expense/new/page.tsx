@@ -15,7 +15,7 @@ export default async function NewExpense({ searchParams }: { searchParams: Promi
       : [];
   const payers =
     me.role === "admin"
-      ? { me: me.id, caretakers, initial: caretakers.find((c) => c.id === sp.for)?.id ?? caretakers[0]?.id ?? me.id }
+      ? { me: me.id, caretakers, initial: sp.for === me.id ? me.id : (caretakers.find((c) => c.id === sp.for)?.id ?? caretakers[0]?.id ?? me.id) }
       : undefined;
   return (
     <form action={addExpense} className="space-y-6">

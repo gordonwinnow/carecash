@@ -133,10 +133,12 @@ export async function giveCash(fd: FormData) {
   const { me } = await requireCtx();
   const now = Date.now();
   const other = String(fd.get("who") ?? "");
+  // An employer may also put cash into their own pot (no caretaker involved): it counts and is confirmed at once
+  const toSelf = me.role === "admin" && other === me.id;
   const wantRole = me.role === "admin" ? "caretaker" : "admin";
-  const ok = db.prepare("select 1 from member where id = ? and family_id = ? and role = ? and active = 1").get(other, me.family_id, wantRole);
+  const ok = toSelf || db.prepare("select 1 from member where id = ? and family_id = ? and role = ? and active = 1").get(other, me.family_id, wantRole);
   if (!ok) throw new Error("Unknown member");
-  const [caretaker, giver, ack] = me.role === "admin" ? [other, me.id, null] : [me.id, other, now];
+  const [caretaker, giver, ack] = toSelf ? [me.id, me.id, now] : me.role === "admin" ? [other, me.id, null] : [me.id, other, now];
   const id = newId();
   const amount = amountOf(fd);
   const note = text(fd, "note");
@@ -145,9 +147,9 @@ export async function giveCash(fd: FormData) {
     caretaker,
     () => {
       db.prepare(
-        "insert into cash (id, family_id, caretaker_id, amount, note, given_by, created_by, created_at, ack_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      ).run(id, me.family_id, caretaker, amount, note, giver, me.id, now, ack);
-      logChange(me.family_id, me.id, "cash", id, "create", null, { amount, note }, caretaker);
+        "insert into cash (id, family_id, caretaker_id, amount, note, given_by, created_by, created_at, ack_at, confirmed_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      ).run(id, me.family_id, caretaker, amount, note, giver, me.id, now, ack, toSelf ? now : null);
+      logChange(me.family_id, me.id, "cash", id, "create", null, { amount, note }, toSelf ? null : caretaker);
     },
     { actorId: me.id, actorName: me.name, kind: "cash", amount },
   );

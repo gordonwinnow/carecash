@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { Check, Crown, Plus, UserRound } from "lucide-react";
+import { Check, Crown, UserRound } from "lucide-react";
 import { db } from "@/lib/db";
 import { getT, requireCtx } from "@/lib/ctx";
 import { giveCash } from "../../../actions";
@@ -14,21 +13,10 @@ export default async function NewCash({ searchParams }: { searchParams: Promise<
   const others = db
     .prepare("select id, name from member where family_id = ? and role = ? and active = 1 order by created_at")
     .all(me.family_id, isAdmin ? "caretaker" : "admin") as { id: string; name: string }[];
+  // Employers can also put cash in their own pot
+  if (isAdmin) others.push({ id: me.id, name: t("myself") });
   const title = isAdmin ? t("giveCash") : t("iGotMoney");
   const PersonIcon = isAdmin ? UserRound : Crown;
-  // Household cash is always handed to a caretaker: with none yet, point to the invite instead of a form that can't be sent
-  if (isAdmin && others.length === 0)
-    return (
-      <div className="space-y-6">
-        <BackHeader title={title} />
-        <section className="card space-y-4 py-8 text-center">
-          <p className="text-lg text-muted">{t("cashNeedsCaretaker")}</p>
-          <Link href="/settings?invite=caretaker#invite" className="btn-primary">
-            <Plus size={24} /> {t("inviteCaretaker")}
-          </Link>
-        </section>
-      </div>
-    );
   return (
     <form action={giveCash} className="space-y-6">
       <BackHeader title={title} />
@@ -40,7 +28,7 @@ export default async function NewCash({ searchParams }: { searchParams: Promise<
             name="who"
             cols={2}
             initial={others.some((c) => c.id === to) ? to : others[0]?.id}
-            options={others.map((c) => ({ value: c.id, label: c.name, icon: <PersonIcon size={22} /> }))}
+            options={others.map((c) => ({ value: c.id, label: c.name, icon: c.id === me.id ? <Crown size={22} /> : <PersonIcon size={22} /> }))}
           />
         </div>
       )}

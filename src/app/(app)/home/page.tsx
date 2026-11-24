@@ -102,39 +102,22 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
     )
     .all(me.family_id) as Expense[];
 
-  if (caretakers.length === 0)
-    return (
-      <section className="card space-y-4 py-8 text-center">
-        <span className="badge mx-auto h-20 w-20 rounded-3xl">
-          <HeartHandshake size={40} />
-        </span>
-        <h2 className="text-2xl font-extrabold">{t("noCaretaker")}</h2>
-        <p className="text-lg text-muted">{t("noCaretakerHint")}</p>
-        <Link href="/settings?invite=caretaker#invite" className="btn-primary">
-          <Plus size={24} /> {t("inviteCaretaker")}
-        </Link>
-        <Link href="/settings?invite=admin#invite" className="btn-tint">
-          <Users size={22} /> {t("inviteAdmin")}
-        </Link>
-        {/* Add expense wide, add cash as a short side button */}
-        <div className="grid grid-cols-[1fr_auto] gap-3">
-          <Link href="/expense/new" className="btn-soft">
-            <Camera size={22} className="shrink-0" /> {t("addExpense")}
-          </Link>
-          <Link href="/cash/new" className="btn-soft w-auto px-5">
-            <Banknote size={22} className="shrink-0" /> {t("cashShort")}
-          </Link>
-        </div>
-      </section>
-    );
-
   // Money a caretaker recorded herself, waiting for an employer to confirm
   const toConfirm = db
     .prepare(
       `select c.*, m.name as giver from cash c join member m on m.id = c.caretaker_id
-       where c.family_id = ? and c.created_by = c.caretaker_id and c.confirmed_at is null order by c.created_at`,
+       where c.family_id = ? and c.created_by = c.caretaker_id and c.confirmed_at is null and m.role = 'caretaker' order by c.created_at`,
     )
     .all(me.family_id) as Cash[];
+
+  // An employer can hold household cash too (the family's own cash pot). Shown when there is no caretaker, or once it is used.
+  const myPotUsed = !!db
+    .prepare("select 1 from cash where caretaker_id = @id union select 1 from expense where member_id = @id limit 1")
+    .get({ id: me.id });
+  const holders = [
+    ...caretakers.map((c) => ({ id: c.id, title: c.name, caretaker: true })),
+    ...(caretakers.length === 0 || myPotUsed ? [{ id: me.id, title: t("myCash"), caretaker: false }] : []),
+  ];
 
   return (
     <>
@@ -148,29 +131,44 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
           </ActionButton>
         </PendingCard>
       ))}
-      {caretakers.map((c) => {
-        const b = balanceOf(c.id);
-        return (
-          <section key={c.id} className="space-y-3">
-            <BalanceCard title={c.name} b={b} t={t} />
-            {/* One row: add household cash wide, other costs (salary, health…) as a short side button */}
-            <div className="grid grid-cols-[1fr_auto_auto] gap-2">
-              <Link href={`/cash/new?to=${c.id}`} className="btn-primary min-h-20 px-4 text-xl leading-tight">
-                <Plus size={26} className="shrink-0" /> {t("giveCash")}
-              </Link>
-              <Link href={`/expense/new?for=${c.id}`} className="btn-tint min-h-20 w-auto flex-col !gap-1 px-3 text-[15px] leading-tight">
-                <Camera size={24} /> {t("expenseShort")}
-              </Link>
-              <Link href={`/more/new?for=${c.id}`} className="btn-tint min-h-20 w-auto flex-col !gap-1 px-3 text-[15px] leading-tight">
+      {holders.map((h) => (
+        <section key={h.id} className="space-y-3">
+          <BalanceCard title={h.title} b={balanceOf(h.id)} t={t} />
+          {/* One row: add household cash wide; expense (and, for a caretaker, other costs) as short side buttons */}
+          <div className={`grid gap-2 ${h.caretaker ? "grid-cols-[1fr_auto_auto]" : "grid-cols-[1fr_auto]"}`}>
+            <Link href={`/cash/new?to=${h.id}`} className="btn-primary min-h-20 px-4 text-xl leading-tight">
+              <Plus size={26} className="shrink-0" /> {t("giveCash")}
+            </Link>
+            <Link href={`/expense/new?for=${h.id}`} className="btn-tint min-h-20 w-auto flex-col !gap-1 px-3 text-[15px] leading-tight">
+              <Camera size={24} /> {t("expenseShort")}
+            </Link>
+            {h.caretaker && (
+              <Link href={`/more/new?for=${h.id}`} className="btn-tint min-h-20 w-auto flex-col !gap-1 px-3 text-[15px] leading-tight">
                 <Wallet size={24} /> {t("otherShort")}
               </Link>
-            </div>
-          </section>
-        );
-      })}
-      <Link href="/settings?invite=caretaker#invite" className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">
-        <Plus size={18} /> {t("inviteAnother")}
-      </Link>
+            )}
+          </div>
+        </section>
+      ))}
+      {caretakers.length === 0 ? (
+        <section className="card space-y-4 py-6 text-center">
+          <span className="badge mx-auto h-16 w-16 rounded-3xl">
+            <HeartHandshake size={32} />
+          </span>
+          <h2 className="text-xl font-extrabold">{t("noCaretaker")}</h2>
+          <p className="text-base text-muted">{t("noCaretakerHint")}</p>
+          <Link href="/settings?invite=caretaker#invite" className="btn-primary">
+            <Plus size={24} /> {t("inviteCaretaker")}
+          </Link>
+          <Link href="/settings?invite=admin#invite" className="btn-tint">
+            <Users size={22} /> {t("inviteAdmin")}
+          </Link>
+        </section>
+      ) : (
+        <Link href="/settings?invite=caretaker#invite" className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">
+          <Plus size={18} /> {t("inviteAnother")}
+        </Link>
+      )}
       <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} showWho />
     </>
   );

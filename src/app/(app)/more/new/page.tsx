@@ -4,7 +4,8 @@ import { addRecord } from "../../../actions";
 import { BackHeader } from "@/components/ui";
 import { RecordFields } from "../form";
 
-export default async function NewRecord() {
+export default async function NewRecord({ searchParams }: { searchParams: Promise<{ for?: string }> }) {
+  const sp = await searchParams;
   const { me } = await requireAdmin();
   const t = await getT();
   const caretakers = db
@@ -12,8 +13,8 @@ export default async function NewRecord() {
     .all(me.family_id) as { id: string; name: string }[];
   return (
     <form action={addRecord} className="space-y-6">
-      <BackHeader title={t("addRecord")} href="/more" />
-      <RecordFields t={t} caretakers={caretakers} />
+      <BackHeader title={t("addRecord")} href={sp.for ? "/home" : "/more"} />
+      <RecordFields t={t} caretakers={caretakers} forWho={caretakers.some((c) => c.id === sp.for) ? sp.for : undefined} />
     </form>
   );
 }

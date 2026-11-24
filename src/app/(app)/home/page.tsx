@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, Camera, Check, HandCoins, HeartHandshake, Plus } from "lucide-react";
+import { Banknote, Camera, Check, HandCoins, Wallet, HeartHandshake, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { balanceOf, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
 import { day, money } from "@/lib/format";
@@ -144,9 +144,15 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
         return (
           <section key={c.id} className="space-y-3">
             <BalanceCard title={c.name} b={b} t={t} />
-            <Link href={`/cash/new?to=${c.id}`} className="btn-primary">
-              <Plus size={24} /> {t("giveCash")}
-            </Link>
+            {/* One row: add household cash wide, other costs (salary, health…) as a short side button */}
+            <div className="grid grid-cols-[1fr_auto] gap-3">
+              <Link href={`/cash/new?to=${c.id}`} className="btn-primary min-h-20 px-4 text-xl leading-tight">
+                <Plus size={26} className="shrink-0" /> {t("giveCash")}
+              </Link>
+              <Link href={`/more/new?for=${c.id}`} className="btn-tint min-h-20 w-auto flex-col !gap-1 px-4 text-[15px] leading-tight">
+                <Wallet size={24} /> {t("otherShort")}
+              </Link>
+            </div>
           </section>
         );
       })}

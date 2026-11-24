@@ -6,7 +6,7 @@ import { Badge } from "@/components/icons";
 
 type Initial = { kind: string; amount: number; caretaker_id: string | null; date: string; note: string | null; photo: string | null; shared: number };
 
-export function RecordFields({ t, caretakers, initial }: { t: T; caretakers: { id: string; name: string }[]; initial?: Initial }) {
+export function RecordFields({ t, caretakers, initial, forWho }: { t: T; caretakers: { id: string; name: string }[]; initial?: Initial; forWho?: string }) {
   return (
     <>
       <AmountInput autoFocus={!initial} initial={initial?.amount} />
@@ -21,7 +21,7 @@ export function RecordFields({ t, caretakers, initial }: { t: T; caretakers: { i
           <ChipGroup
             name="caretaker"
             cols={2}
-            initial={initial ? (initial.caretaker_id ?? "") : undefined}
+            initial={initial ? (initial.caretaker_id ?? "") : forWho}
             options={[
               ...caretakers.map((c) => ({ value: c.id, label: c.name, icon: <UserRound size={22} /> })),
               { value: "", label: t("general"), icon: <House size={22} /> },

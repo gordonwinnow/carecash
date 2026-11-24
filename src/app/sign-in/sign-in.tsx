@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Crown, Mail, UserRound, Wallet } from "lucide-react";
+import { Mail, Wallet } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useT } from "@/components/i18n";
 import { LanguagePicker } from "@/components/settings";
@@ -89,14 +89,14 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
               <WhatsAppIcon /> {t("continueWith", { p: "WhatsApp" })}
             </button>
           )}
-          {enabled.line && (
-            <button className="btn text-white" style={{ background: "#06C755" }} disabled={busy} onClick={() => social("line")}>
-              <span className="rounded-md bg-white px-1.5 text-sm font-black text-[#06C755]">LINE</span> {t("continueWith", { p: "LINE" })}
-            </button>
-          )}
           {enabled.google && (
             <button className="btn-soft" disabled={busy} onClick={() => social("google")}>
               <GoogleIcon /> {t("continueWith", { p: "Google" })}
+            </button>
+          )}
+          {enabled.line && (
+            <button className="btn text-white" style={{ background: "#06C755" }} disabled={busy} onClick={() => social("line")}>
+              <span className="rounded-md bg-white px-1.5 text-sm font-black text-[#06C755]">LINE</span> {t("continueWith", { p: "LINE" })}
             </button>
           )}
           {enabled.apple && appleDevice && (
@@ -108,11 +108,11 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
             <Mail size={22} /> {t("continueWith", { p: t("email") })}
           </button>
           <div className="pt-6">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-wrap gap-2">
               {(["admin", "caretaker"] as const).map((role) => (
                 <button
                   key={role}
-                  className="chip min-h-16 text-base"
+                  className="chip min-h-14 flex-[1_1_auto] whitespace-nowrap px-4 text-base"
                   disabled={busy}
                   onClick={() =>
                     run(async () => {
@@ -122,7 +122,6 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
                     })
                   }
                 >
-                  {role === "admin" ? <Crown size={20} /> : <UserRound size={20} />}
                   {t("tryAs", { role: role === "admin" ? t("roleAdmin") : t("roleCaretaker") })}
                 </button>
               ))}

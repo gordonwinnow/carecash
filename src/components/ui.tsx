@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
-import { Camera, ChevronLeft, House, Lock, ReceiptText, RotateCcw, Settings, X } from "lucide-react";
+import { Banknote, Camera, ChevronLeft, Lock, ReceiptText, RotateCcw, Settings, X } from "lucide-react";
 import { useT } from "./i18n";
 
 export function Submit({ children, className = "btn-primary", disabled }: { children: React.ReactNode; className?: string; disabled?: boolean }) {
@@ -84,7 +84,7 @@ export function BottomNav({ showMore }: { showMore: boolean }) {
   if (path.endsWith("/new")) return null;
 
   const items = [
-    { href: "/home", Icon: House, label: t("navHome") },
+    { href: "/home", Icon: Banknote, label: t("navHome") },
     { href: "/history", Icon: ReceiptText, label: t("navHistory") },
     ...(showMore ? [{ href: "/more", Icon: Lock, label: t("navMore") }] : []),
     { href: "/settings", Icon: Settings, label: t("navSettings") },

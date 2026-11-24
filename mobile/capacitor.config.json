@@ -1,0 +1,12 @@
+{
+  "appId": "app.carecash.ios",
+  "appName": "CareCash",
+  "webDir": "www",
+  "server": {
+    "url": "https://carecash.fly.dev",
+    "cleartext": false
+  },
+  "ios": {
+    "contentInset": "never"
+  }
+}

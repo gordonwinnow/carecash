@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "carecash", "runtimeExecutable": "npx", "runtimeArgs": ["next", "start", "-p", "3101"], "port": 3101, "autoPort": false }
+  ]
+}

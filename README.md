@@ -1,0 +1,72 @@
+# CareCash 看護零用金
+
+A very simple app for a Taiwanese family (雇主) and their household caretaker (家庭移工) to track grocery cash.
+
+**Live:** https://carecash.fly.dev
+
+## What it does
+
+**Phase 1: grocery cash**
+1. Money goes both ways, and the other side always confirms:
+   - An employer (雇主) taps **Add money**. The caretaker sees a big card and taps **I received it**. Until then the employer sees "waiting".
+   - A caretaker who was handed cash taps **I got money**. It counts at once, and the employer sees a card to tap **Yes, I gave it**.
+2. The caretaker taps **Add expense**, takes a photo of the receipt, enters the amount and picks a category.
+3. Both see **money left**, shown monthly: last month's leftover + received this month − spent this month. Money left itself is cumulative, because it is real cash in hand. The full history is grouped by month, with receipt photos.
+
+**Family:** an employer creates a family and invites more employers or caretakers by a one-time link (sent by WhatsApp, LINE or copy). Each caretaker has their own balance.
+
+**Phase 2: Pay & health tab** (🔒)
+Employers record salary, healthcare and other costs, with an optional photo. Each record is **employers only** by default; the **Caretaker can see this** switch shares it. Caretakers only get the tab once something is shared with them. This is checked on the server, including the photo URLs.
+
+**Guest demo:** on the sign-in page, **Try as Employer** / **Try as Caretaker** signs in a throwaway guest with two months of sample data. Invites are off in the demo, and demo families are deleted after 3 days.
+
+**Settings:** 10 languages (繁體中文, English, Bahasa Indonesia, Tiếng Việt, Tagalog, ภาษาไทย, 日本語, 한국어, Español, Français), light/dark/auto, and 6 main colors. All are stored per device.
+
+## Stack
+
+Next.js 16 + React 19, Tailwind 4, Better Auth, SQLite (better-sqlite3), one Fly.io machine in Tokyo (`nrt`), with a 1 GB volume at `/data` holding the database and photos. Photos are shrunk in the browser to ~1600px JPEG before upload. The machine sleeps when idle, so the first visit after a quiet spell takes a few seconds.
+
+## Sign-in
+
+| Method | Status | To turn on (as Fly secrets) |
+|---|---|---|
+| Email + password | **On** | — |
+| WhatsApp code | Off until keys are set | `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, and an approved **Authentication** template (`WHATSAPP_TEMPLATE`, default `login_code`; `WHATSAPP_TEMPLATE_LANG`, default `en`) from Meta WhatsApp Cloud API |
+| Google | Off until keys are set | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. Redirect URI: `https://carecash.fly.dev/api/auth/callback/google` |
+| Apple | Off until keys are set | `APPLE_CLIENT_ID` (Services ID), `APPLE_CLIENT_SECRET` (JWT signed with your .p8 key), `APPLE_APP_BUNDLE_IDENTIFIER=app.carecash.ios`. Return URL: `https://carecash.fly.dev/api/auth/callback/apple` |
+| LINE | Off until keys are set | `LINE_CLIENT_ID`, `LINE_CLIENT_SECRET` from a LINE Login channel. Callback: `https://carecash.fly.dev/api/auth/callback/line` |
+
+A button only appears once its keys are set. Set them like this; it restarts the app:
+
+```powershell
+flyctl secrets set GOOGLE_CLIENT_ID=... GOOGLE_CLIENT_SECRET=... -a carecash
+```
+
+Google blocks its sign-in inside app web views, so in the iOS shell, Google sign-in needs extra work (open it in the system browser). Email, WhatsApp, LINE and Apple work in the web view.
+
+## Deploy
+
+```powershell
+flyctl deploy --remote-only --ha=false -a carecash
+```
+
+Keep `--ha=false`: SQLite lives on one volume, so there must be one machine. Volume snapshots are taken daily (5 kept).
+
+## Run locally
+
+```powershell
+npm install
+```
+
+Create `.env.local` with `BETTER_AUTH_URL=http://localhost:3101`, any `BETTER_AUTH_SECRET`, and `WHATSAPP_DEV_LOG=1`. With that flag, WhatsApp codes are printed in the server log instead of being sent. Never set it in production. Then:
+
+```powershell
+npm run build; npx next start -p 3101
+```
+
+Data goes to `.data/`. The local test accounts used during development are `master@carecash.test` (email) and `+886912345678` (WhatsApp), in the local `.data` database only.
+
+## iPhone
+
+- **Today:** open the site in Safari → Share → **Add to Home Screen**. It opens full screen with its own icon, and the receipt button opens the camera.
+- **App Store shell:** `mobile/` is a Capacitor 8 iOS project (`app.carecash.ios`) that opens the live site, the same pattern as TwoClass. Camera and photo permission texts are set, and icons are generated. Building it needs a Mac with Xcode and an Apple Developer account: `cd mobile; npx cap sync ios`, then open `mobile/ios/App/App.xcodeproj` in Xcode, set your Team, and Archive. A web deploy updates the app instantly. No store build is needed for changes.

@@ -94,19 +94,22 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
               <GoogleIcon /> {t("continueWith", { p: "Google" })}
             </button>
           )}
-          {enabled.line && (
-            <button className="btn text-white" style={{ background: "#06C755" }} disabled={busy} onClick={() => social("line")}>
-              <span className="rounded-md bg-white px-1.5 text-sm font-black text-[#06C755]">LINE</span> {t("continueWith", { p: "LINE" })}
-            </button>
-          )}
           {enabled.apple && appleDevice && (
             <button className="btn bg-black text-white" disabled={busy} onClick={() => social("apple")}>
               <span className="text-2xl"></span> {t("continueWith", { p: "Apple" })}
             </button>
           )}
-          <button className="btn-soft" onClick={() => setMode("email")}>
-            <Mail size={22} /> {t("continueWith", { p: t("email") })}
-          </button>
+          {/* Smaller options side by side */}
+          <div className="flex gap-3">
+            <button className="btn-soft min-h-13 flex-1 text-lg" onClick={() => setMode("email")}>
+              <Mail size={20} /> {t("email")}
+            </button>
+            {enabled.line && (
+              <button className="btn min-h-13 flex-1 text-lg text-white" style={{ background: "#06C755" }} disabled={busy} onClick={() => social("line")}>
+                <span className="font-black">LINE</span>
+              </button>
+            )}
+          </div>
           <div className="pt-6">
             <div className="flex flex-wrap gap-2">
               {(["admin", "caretaker"] as const).map((role) => (
@@ -122,7 +125,7 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
                     })
                   }
                 >
-                  {t("tryAs", { role: role === "admin" ? t("roleAdmin") : t("roleCaretaker") })}
+                  {role === "admin" ? t("demoAdmin") : t("demoCaretaker")}
                 </button>
               ))}
             </div>

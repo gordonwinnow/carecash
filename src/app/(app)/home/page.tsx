@@ -161,7 +161,7 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
   );
 }
 
-/** The hero number, kept to three figures: money left now, and this month's spent and received. */
+/** The hero number: money left now, and what was spent this month. */
 function BalanceCard({ title, b, t }: { title?: string; b: ReturnType<typeof balanceOf>; t: T }) {
   const n = (v: number) => `$${v.toLocaleString("en-US")}`;
   return (
@@ -181,10 +181,7 @@ function BalanceCard({ title, b, t }: { title?: string; b: ReturnType<typeof bal
           <span className="text-[44px] font-extrabold tracking-tight">{b.left < 0 ? "−" : ""}{n(Math.abs(b.left))}</span>
         </span>
       </p>
-      <div className="relative mt-4 flex flex-wrap justify-end gap-2 text-base font-semibold">
-        <span className="tabular rounded-full bg-white/15 px-3.5 py-1.5">{n(b.spent)} {t("spentShort")}</span>
-        <span className="tabular rounded-full bg-white/15 px-3.5 py-1.5">{n(b.received)} {t("receivedShort")}</span>
-      </div>
+      <p className="tabular relative mt-2 text-right text-base font-semibold text-white/80">{t("spentLine", { amount: n(b.spent) })}</p>
     </section>
   );
 }

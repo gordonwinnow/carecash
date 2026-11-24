@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { db, newId } from "@/lib/db";
 import { savePhoto } from "@/lib/photos";
 import { getLang, getUser, requireAdmin, requireCtx, membershipsOf } from "@/lib/ctx";
-import { CATEGORIES, KINDS } from "@/lib/format";
+import { CATEGORIES, KINDS, dayKey, movedDate } from "@/lib/format";
 import { seedDemo } from "@/lib/demo";
 import { logChange } from "@/lib/audit";
 import { watchBalance } from "@/lib/notify";
@@ -27,12 +27,12 @@ function done(to?: string) {
 }
 
 // Row shapes kept in the change history (photos are recorded by name only)
-type CashRow = { id: string; family_id: string; caretaker_id: string; amount: number; note: string | null; created_by: string | null; ack_at: number | null; confirmed_at: number | null };
-type ExpenseRow = { id: string; family_id: string; member_id: string; amount: number; category: string; note: string | null; photo: string | null };
+type CashRow = { id: string; family_id: string; caretaker_id: string; amount: number; note: string | null; created_by: string | null; created_at: number; ack_at: number | null; confirmed_at: number | null };
+type ExpenseRow = { id: string; family_id: string; member_id: string; amount: number; category: string; note: string | null; photo: string | null; spent_at: number };
 type RecordRow = { id: string; family_id: string; caretaker_id: string | null; kind: string; amount: number; note: string | null; photo: string | null; date: string; shared: number };
 
-const cashView = (r: CashRow) => ({ amount: r.amount, note: r.note });
-const expenseView = (r: ExpenseRow) => ({ amount: r.amount, category: r.category, note: r.note, photo: r.photo, payer: r.member_id });
+const cashView = (r: CashRow) => ({ amount: r.amount, note: r.note, date: dayKey(r.ack_at ?? r.created_at) });
+const expenseView = (r: ExpenseRow) => ({ amount: r.amount, category: r.category, note: r.note, photo: r.photo, payer: r.member_id, date: dayKey(r.spent_at) });
 const recordView = (r: RecordRow) => ({ kind: r.kind, amount: r.amount, note: r.note, date: r.date, shared: r.shared, caretaker_id: r.caretaker_id, photo: r.photo });
 
 // ---------- Family ----------
@@ -178,9 +178,14 @@ export async function updateCash(cashId: string, fd: FormData) {
     if (!selfAdded) ack_at = null;
     else confirmed_at = me.role === "admin" ? Date.now() : null;
   }
+  // The date is when the money was handed over; moving it also moves it to that month's balance
+  const at = movedDate(fd.get("date"), c.ack_at ?? c.created_at);
+  const moved = at !== (c.ack_at ?? c.created_at);
+  const created_at = moved ? at : c.created_at;
+  if (moved && ack_at) ack_at = at;
   await watchBalance(me.family_id, c.caretaker_id, () => {
-    db.prepare("update cash set amount = ?, note = ?, ack_at = ?, confirmed_at = ? where id = ?").run(amount, note, ack_at, confirmed_at, c.id);
-    logChange(me.family_id, me.id, "cash", c.id, "update", cashView(c), { amount, note }, c.caretaker_id);
+    db.prepare("update cash set amount = ?, note = ?, ack_at = ?, confirmed_at = ?, created_at = ? where id = ?").run(amount, note, ack_at, confirmed_at, created_at, c.id);
+    logChange(me.family_id, me.id, "cash", c.id, "update", cashView(c), { amount, note, date: dayKey(at) }, c.caretaker_id);
   });
   done("/history");
 }
@@ -279,10 +284,11 @@ export async function updateExpense(expenseId: string, fd: FormData) {
   const photo = (await savePhoto(fd)) ?? e.photo;
   // Employers may also change who paid
   const payer = me.role === "admin" ? payerOf(fd, me).id : e.member_id;
+  const spentAt = movedDate(fd.get("date"), e.spent_at);
   const isCaretaker = (id: string) => !!db.prepare("select 1 from member where id = ? and role = 'caretaker'").get(id);
   await watchBalance(me.family_id, payer, () => {
-    db.prepare("update expense set amount = ?, category = ?, note = ?, photo = ?, member_id = ? where id = ?").run(amount, category, note, photo, payer, e.id);
-    logChange(me.family_id, me.id, "expense", e.id, "update", expenseView(e), { amount, category, note, photo, payer }, isCaretaker(payer) ? payer : isCaretaker(e.member_id) ? e.member_id : null);
+    db.prepare("update expense set amount = ?, category = ?, note = ?, photo = ?, member_id = ?, spent_at = ? where id = ?").run(amount, category, note, photo, payer, spentAt, e.id);
+    logChange(me.family_id, me.id, "expense", e.id, "update", expenseView(e), { amount, category, note, photo, payer, date: dayKey(spentAt) }, isCaretaker(payer) ? payer : isCaretaker(e.member_id) ? e.member_id : null);
   });
   done("/history");
 }

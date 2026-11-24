@@ -31,6 +31,22 @@ export function monthStart() {
   return Date.parse(`${today().slice(0, 7)}-01T00:00:00+08:00`);
 }
 
+/** A day as YYYY-MM-DD in Taiwan time. */
+export function dayKey(ms: number) {
+  return new Date(ms).toLocaleDateString("en-CA", { timeZone: TZ });
+}
+
+/**
+ * A changed date from an edit form: keeps the original moment if the day is unchanged,
+ * otherwise noon (Taiwan time) on the chosen day. Future dates are not allowed.
+ */
+export function movedDate(raw: unknown, original: number) {
+  const v = String(raw ?? "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(v) || v === dayKey(original)) return original;
+  const ms = Date.parse(`${v}T12:00:00+08:00`);
+  return Number.isFinite(ms) && ms <= Date.now() + 86_400_000 ? ms : original;
+}
+
 export function today() {
   return new Date().toLocaleDateString("en-CA", { timeZone: TZ });
 }

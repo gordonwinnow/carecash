@@ -3,6 +3,7 @@ import { Check, Info, Trash2 } from "lucide-react";
 import { db } from "@/lib/db";
 import { getLang, getT, requireCtx } from "@/lib/ctx";
 import { historyOf } from "@/lib/audit";
+import { dayKey, today } from "@/lib/format";
 import { deleteCash, updateCash } from "../../../actions";
 import { ActionButton, AmountInput, BackHeader, Submit } from "@/components/ui";
 import { ByLine, ChangeList } from "@/components/changes";
@@ -16,7 +17,7 @@ export default async function EditCash({ params }: { params: Promise<{ id: strin
   const c = db
     .prepare("select c.*, m.name as caretaker from cash c join member m on m.id = c.caretaker_id where c.id = ? and c.family_id = ?")
     .get(id, me.family_id) as
-    | { id: string; caretaker_id: string; created_by: string | null; amount: number; note: string | null; confirmed_at: number | null; caretaker: string }
+    | { id: string; caretaker_id: string; created_by: string | null; amount: number; note: string | null; confirmed_at: number | null; created_at: number; ack_at: number | null; caretaker: string }
     | undefined;
   const isAdmin = me.role === "admin";
   const own = !!c && c.created_by === me.id && c.caretaker_id === me.id;
@@ -34,6 +35,10 @@ export default async function EditCash({ params }: { params: Promise<{ id: strin
         <p className="flex items-start gap-2 px-1 text-[15px] text-muted">
           <Info size={18} className="mt-0.5 shrink-0" /> {t("reagree")}
         </p>
+        <div>
+          <label className="label" htmlFor="date">{t("date")}</label>
+          <input id="date" name="date" type="date" className="field" defaultValue={dayKey(c.ack_at ?? c.created_at)} max={today()} required />
+        </div>
         <div>
           <label className="label" htmlFor="note">{t("note")}</label>
           <input id="note" name="note" className="field" maxLength={200} defaultValue={c.note ?? ""} />

@@ -1,10 +1,10 @@
 import { Check, Crown, UserRound } from "lucide-react";
-import { CATEGORIES } from "@/lib/format";
+import { CATEGORIES, dayKey, today } from "@/lib/format";
 import type { T } from "@/lib/i18n";
 import { AmountInput, ChipGroup, PhotoInput, Submit } from "@/components/ui";
 import { Badge } from "@/components/icons";
 
-type Initial = { amount: number; category: string; note: string | null; photo: string | null; member_id?: string };
+type Initial = { amount: number; category: string; note: string | null; photo: string | null; member_id?: string; spent_at?: number };
 /** For employers: who paid. Caretakers pay from their household cash; "me" is the employer themselves. */
 type Payers = { me: string; caretakers: { id: string; name: string }[]; initial: string };
 
@@ -39,6 +39,12 @@ export function ExpenseFields({ t, initial, payers }: { t: T; initial?: Initial;
         />
       </div>
       <PhotoInput label={initial?.photo ? t("replacePhoto") : t("takePhoto")} existing={initial?.photo} />
+      {initial?.spent_at && (
+        <div>
+          <label className="label" htmlFor="date">{t("date")}</label>
+          <input id="date" name="date" type="date" className="field" defaultValue={dayKey(initial.spent_at)} max={today()} required />
+        </div>
+      )}
       <div>
         <label className="label" htmlFor="note">{t("note")}</label>
         <input id="note" name="note" className="field" maxLength={200} defaultValue={initial?.note ?? ""} />

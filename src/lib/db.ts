@@ -117,6 +117,8 @@ function open() {
   addColumn(d, "member", "low_threshold", "integer not null default 1000");
   addColumn(d, "member", "notify_expense", "integer not null default 0");
   addColumn(d, "member", "notify_cash", "integer not null default 0");
+  // Older demo data had a note "Next week" that read like a date
+  d.prepare("update cash set note = 'Groceries' where note = 'Next week' and family_id in (select id from family where demo = 1)").run();
   return d;
 }
 

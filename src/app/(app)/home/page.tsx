@@ -40,12 +40,9 @@ function PendingCard({ icon, title, amount, note, at, children }: { icon: React.
     <section className="space-y-4 rounded-[28px] bg-warn-soft px-[18px] pb-[18px] pt-4">
       <div className="flex items-center gap-2">
         <span className="shrink-0 text-warn">{icon}</span>
-        <span className="min-w-0 truncate text-base font-semibold">{title}</span>
-        <span className="shrink-0 text-base font-medium text-muted">· {at}</span>
-        <span className="tabular ml-auto flex shrink-0 items-baseline gap-1.5 leading-none">
-          <span className="text-base font-bold text-muted">NTD</span>
-          <span className="text-[30px] font-extrabold tracking-tight">{amount}</span>
-        </span>
+        {/* Who, when and how much all in one type style; the amount sized like the list amounts */}
+        <span className="min-w-0 truncate text-[17px] font-semibold">{title} · {at}</span>
+        <span className="tabular ml-auto shrink-0 text-[17px] font-bold">{amount}</span>
       </div>
       {children}
     </section>

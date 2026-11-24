@@ -71,15 +71,27 @@ export async function getT(): Promise<T> {
  * last month's leftover + received this month − spent this month. Cash counts from the moment it is acknowledged.
  */
 export function balanceOf(caretakerId: string) {
+  return balanceFor("= @id", { id: caretakerId });
+}
+
+/**
+ * The family's own cash pot: household cash any employer put in for themselves, minus what any employer paid.
+ * Shared by all employers of the family, so one employer can add cash and another spend it.
+ */
+export function familyPotBalance(familyId: string) {
+  return balanceFor("in (select id from member where family_id = @fid and role = 'admin')", { fid: familyId });
+}
+
+function balanceFor(who: string, params: Record<string, string>) {
   const r = db
     .prepare(
       `select
-        (select coalesce(sum(amount),0) from cash where caretaker_id = @id and ack_at is not null and ack_at < @m) -
-        (select coalesce(sum(amount),0) from expense where member_id = @id and spent_at < @m) as carry,
-        (select coalesce(sum(amount),0) from cash where caretaker_id = @id and ack_at >= @m) as received,
-        (select coalesce(sum(amount),0) from cash where caretaker_id = @id and ack_at is null) as pending,
-        (select coalesce(sum(amount),0) from expense where member_id = @id and spent_at >= @m) as spent`,
+        (select coalesce(sum(amount),0) from cash where caretaker_id ${who} and ack_at is not null and ack_at < @m) -
+        (select coalesce(sum(amount),0) from expense where member_id ${who} and spent_at < @m) as carry,
+        (select coalesce(sum(amount),0) from cash where caretaker_id ${who} and ack_at >= @m) as received,
+        (select coalesce(sum(amount),0) from cash where caretaker_id ${who} and ack_at is null) as pending,
+        (select coalesce(sum(amount),0) from expense where member_id ${who} and spent_at >= @m) as spent`,
     )
-    .get({ id: caretakerId, m: monthStart() }) as { carry: number; received: number; pending: number; spent: number };
+    .get({ ...params, m: monthStart() }) as { carry: number; received: number; pending: number; spent: number };
   return { ...r, left: r.carry + r.received - r.spent };
 }

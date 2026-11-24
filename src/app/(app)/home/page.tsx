@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Banknote, Camera, Check, HandCoins, Users, Wallet, HeartHandshake, Plus } from "lucide-react";
 import { db } from "@/lib/db";
-import { balanceOf, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
+import { balanceOf, familyPotBalance, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
 import { day, money } from "@/lib/format";
 import type { T } from "@/lib/i18n";
 import { ackCash, confirmCash, deleteCash } from "../../actions";
@@ -111,12 +111,16 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
     .all(me.family_id) as Cash[];
 
   // An employer can hold household cash too (the family's own cash pot). Shown when there is no caretaker, or once it is used.
-  const myPotUsed = !!db
-    .prepare("select 1 from cash where caretaker_id = @id union select 1 from expense where member_id = @id limit 1")
-    .get({ id: me.id });
+  // It is shared by all employers: cash any of them put in, minus what any of them paid
+  const potUsed = !!db
+    .prepare(
+      `select 1 from cash where caretaker_id in (select id from member where family_id = @fid and role = 'admin')
+       union select 1 from expense where member_id in (select id from member where family_id = @fid and role = 'admin') limit 1`,
+    )
+    .get({ fid: me.family_id });
   const holders = [
-    ...caretakers.map((c) => ({ id: c.id, title: c.name, caretaker: true })),
-    ...(caretakers.length === 0 || myPotUsed ? [{ id: me.id, title: t("myCash"), caretaker: false }] : []),
+    ...caretakers.map((c) => ({ id: c.id, title: c.name, caretaker: true, b: balanceOf(c.id) })),
+    ...(caretakers.length === 0 || potUsed ? [{ id: me.id, title: t("myCash"), caretaker: false, b: familyPotBalance(me.family_id) }] : []),
   ];
 
   return (
@@ -133,7 +137,7 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
       ))}
       {holders.map((h) => (
         <section key={h.id} className="space-y-3">
-          <BalanceCard title={h.title} b={balanceOf(h.id)} t={t} />
+          <BalanceCard title={h.title} b={h.b} t={t} />
           {/* One row: add household cash wide; expense (and, for a caretaker, other costs) as short side buttons */}
           <div className={`grid gap-2 ${h.caretaker ? "grid-cols-[1fr_auto_auto]" : "grid-cols-[1fr_auto]"}`}>
             <Link href={`/cash/new?to=${h.id}`} className="btn-primary min-h-20 px-4 text-xl leading-tight">

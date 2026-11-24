@@ -19,6 +19,8 @@ type Rec = {
   shared: number;
   who: string | null;
   edited_by: string | null;
+  caretaker_id: string | null;
+  ack_at: number | null;
 };
 
 /** Phase 2: salary, healthcare and other costs. Employers see everything; caretakers only what is shared with them. */
@@ -84,8 +86,10 @@ export default async function More() {
                   .join(" · ")}
                 amount={money(r.amount, me.currency)}
                 edited={isAdmin ? r.edited_by : null}
+                pending={r.kind === "salary" && !!r.caretaker_id && !r.ack_at}
               />
-              {isAdmin && (
+              {/* A caretaker's salary is always shown to her, so it has no share switch */}
+              {isAdmin && !(r.kind === "salary" && r.caretaker_id) && (
                 <div className="-mt-1 pb-2 pl-[72px]">
                   <ActionButton
                     action={toggleShare.bind(null, r.id)}

@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { balanceOf, familyPotBalance, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
 import { day, money } from "@/lib/format";
 import type { T } from "@/lib/i18n";
-import { ackCash, confirmCash, deleteCash } from "../../actions";
+import { ackCash, ackRecord, confirmCash, deleteCash } from "../../actions";
 import { ActionButton } from "@/components/ui";
 import { EntryRow, RowList, SectionHead, Empty } from "@/components/rows";
 
@@ -59,6 +59,13 @@ function CaretakerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
        where c.caretaker_id = ? and c.ack_at is null order by c.created_at`,
     )
     .all(me.id) as Cash[];
+  // Salary an employer recorded for her, waiting for her to confirm
+  const salaries = db
+    .prepare(
+      `select r.id, r.amount, r.date, m.name as payer from record r left join member m on m.id = r.created_by
+       where r.caretaker_id = ? and r.kind = 'salary' and r.ack_at is null order by r.date`,
+    )
+    .all(me.id) as { id: string; amount: number; date: string; payer: string | null }[];
   const b = balanceOf(me.id);
   const recent = db
     .prepare("select e.*, '' as who, (select em.name from audit a join member em on em.id = a.member_id where a.entity_id = e.id and a.action = 'update' order by a.at desc limit 1) as edited_by from expense e where member_id = ? order by spent_at desc limit 5")
@@ -69,6 +76,20 @@ function CaretakerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
       {pending.map((c) => (
         <PendingCard key={c.id} icon={<HandCoins size={20} />} title={t("gaveYou", { name: c.giver })} amount={money(c.amount, me.currency)} note={c.note} at={day(c.created_at, lang)}>
           <ActionButton action={ackCash.bind(null, c.id)} className="btn-good">
+            <Check size={26} strokeWidth={2.6} /> {t("iReceived")}
+          </ActionButton>
+        </PendingCard>
+      ))}
+      {salaries.map((r) => (
+        <PendingCard
+          key={r.id}
+          icon={<Wallet size={20} />}
+          title={t("salaryPaid", { name: r.payer ?? "" })}
+          amount={money(r.amount, me.currency)}
+          note={null}
+          at={day(Date.parse(`${r.date}T12:00:00+08:00`), lang)}
+        >
+          <ActionButton action={ackRecord.bind(null, r.id)} className="btn-good">
             <Check size={26} strokeWidth={2.6} /> {t("iReceived")}
           </ActionButton>
         </PendingCard>

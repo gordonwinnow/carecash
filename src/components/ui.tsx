@@ -202,7 +202,10 @@ export function AmountInput({ quick, autoFocus, initial }: { quick?: number[]; a
   const [v, setV] = useState(initial ? String(initial) : "");
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (autoFocus) ref.current?.focus();
+    if (!autoFocus) return;
+    ref.current?.focus();
+    // Hand over from the number-pad primer (see NumpadPrimer) now that the real field has focus
+    document.getElementById(PRIMER_ID)?.remove();
   }, [autoFocus]);
   return (
     <div>
@@ -291,4 +294,38 @@ export function PageTitle({ children, sub }: { children: React.ReactNode; sub?: 
       {sub && <p className="mt-1 text-base text-muted">{sub}</p>}
     </header>
   );
+}
+
+const PRIMER_ID = "numpad-primer";
+const ADD_PAGE = /^\/(expense|cash|more)\/new(\?|$)/;
+
+/**
+ * iPhone only opens the keyboard when a field is focused inside the tap itself, but the amount field
+ * appears a moment later on the next screen. So a tap on any "add" link focuses an invisible number
+ * field right away (the number pad opens), and AmountInput takes the focus over when it mounts.
+ */
+export function NumpadPrimer() {
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a || !ADD_PAGE.test(a.getAttribute("href") ?? "")) return;
+      let el = document.getElementById(PRIMER_ID) as HTMLInputElement | null;
+      if (!el) {
+        el = document.createElement("input");
+        el.id = PRIMER_ID;
+        el.inputMode = "numeric";
+        el.setAttribute("aria-hidden", "true");
+        el.tabIndex = -1;
+        // 16px avoids iOS zooming in; kept on screen but invisible so iOS agrees to focus it
+        el.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px;border:0;padding:0";
+        document.body.appendChild(el);
+      }
+      el.focus();
+      // In case the next screen has no amount field, don't leave it around
+      setTimeout(() => document.getElementById(PRIMER_ID)?.remove(), 4000);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, []);
+  return null;
 }

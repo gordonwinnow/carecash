@@ -124,6 +124,11 @@ function open() {
   addColumn(d, "member", "notify_expense", "integer not null default 0");
   // Who typed the expense in (an employer may record one paid by a caretaker, or by themselves)
   addColumn(d, "expense", "created_by", "text");
+  // A salary paid to a caretaker waits for her to confirm receipt, like household cash.
+  // Salaries recorded before this existed count as already confirmed.
+  const hadAck = (d.prepare("pragma table_info(record)").all() as { name: string }[]).some((c) => c.name === "ack_at");
+  addColumn(d, "record", "ack_at", "integer");
+  if (!hadAck) d.prepare("update record set ack_at = created_at where kind = 'salary' and caretaker_id is not null").run();
   addColumn(d, "member", "notify_cash", "integer not null default 0");
   // Older demo data had sample notes on household cash that read like labels
   d.prepare("update cash set note = null where note in ('Next week', 'Groceries') and family_id in (select id from family where demo = 1)").run();

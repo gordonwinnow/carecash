@@ -29,7 +29,7 @@ function done(to?: string) {
 // Row shapes kept in the change history (photos are recorded by name only)
 type CashRow = { id: string; family_id: string; caretaker_id: string; amount: number; note: string | null; created_by: string | null; created_at: number; ack_at: number | null; confirmed_at: number | null };
 type ExpenseRow = { id: string; family_id: string; member_id: string; amount: number; category: string; note: string | null; photo: string | null; spent_at: number };
-type RecordRow = { id: string; family_id: string; caretaker_id: string | null; kind: string; amount: number; note: string | null; photo: string | null; date: string; shared: number };
+type RecordRow = { id: string; family_id: string; caretaker_id: string | null; kind: string; amount: number; note: string | null; photo: string | null; date: string; shared: number; ack_at: number | null };
 
 const cashView = (r: CashRow) => ({ amount: r.amount, note: r.note, date: dayKey(r.ack_at ?? r.created_at) });
 const expenseView = (r: ExpenseRow) => ({ amount: r.amount, category: r.category, note: r.note, photo: r.photo, payer: r.member_id, date: dayKey(r.spent_at) });
@@ -314,8 +314,11 @@ function recordFields(fd: FormData, familyId: string) {
     ? ((db.prepare("select id from member where id = ? and family_id = ? and role = 'caretaker'").get(who, familyId) as { id: string } | undefined)?.id ?? null)
     : null;
   const date = /^\d{4}-\d{2}-\d{2}$/.test(String(fd.get("date"))) ? String(fd.get("date")) : new Date().toISOString().slice(0, 10);
-  return { kind, caretaker_id: caretaker, date, amount: amountOf(fd), note: text(fd, "note"), shared: fd.get("shared") ? 1 : 0 };
+  // A salary paid to a caretaker is always shown to her, since she confirms she received it
+  const salaryFor = kind === "salary" && !!caretaker;
+  return { kind, caretaker_id: caretaker, date, amount: amountOf(fd), note: text(fd, "note"), shared: salaryFor || fd.get("shared") ? 1 : 0 };
 }
+const needsAck = (r: { kind: string; caretaker_id: string | null }) => r.kind === "salary" && !!r.caretaker_id;
 
 export async function addRecord(fd: FormData) {
   const { me } = await requireAdmin();
@@ -325,7 +328,7 @@ export async function addRecord(fd: FormData) {
   db.prepare(
     "insert into record (id, family_id, caretaker_id, kind, amount, note, photo, date, shared, created_by, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
   ).run(id, me.family_id, f.caretaker_id, f.kind, f.amount, f.note, photo, f.date, f.shared, me.id, Date.now());
-  logChange(me.family_id, me.id, "record", id, "create", null, { ...f, photo });
+  logChange(me.family_id, me.id, "record", id, "create", null, { ...f, photo }, needsAck(f) ? f.caretaker_id : null);
   done("/more");
 }
 
@@ -339,19 +342,31 @@ export async function updateRecord(recordId: string, fd: FormData) {
   if (!r) redirect("/more");
   const f = recordFields(fd, me.family_id);
   const photo = (await savePhoto(fd)) ?? r.photo;
-  db.prepare("update record set kind = ?, amount = ?, note = ?, date = ?, shared = ?, caretaker_id = ?, photo = ? where id = ?").run(
-    f.kind, f.amount, f.note, f.date, f.shared, f.caretaker_id, photo, r.id,
+  // A salary she already confirmed has to be confirmed again if the amount or the person changes
+  const ack_at = needsAck(f) && needsAck(r) && f.amount === r.amount && f.caretaker_id === r.caretaker_id ? r.ack_at : null;
+  db.prepare("update record set kind = ?, amount = ?, note = ?, date = ?, shared = ?, caretaker_id = ?, photo = ?, ack_at = ? where id = ?").run(
+    f.kind, f.amount, f.note, f.date, f.shared, f.caretaker_id, photo, ack_at, r.id,
   );
-  logChange(me.family_id, me.id, "record", r.id, "update", recordView(r), { ...f, photo });
+  logChange(me.family_id, me.id, "record", r.id, "update", recordView(r), { ...f, photo }, needsAck(f) ? f.caretaker_id : null);
   done("/more");
 }
 
 export async function toggleShare(recordId: string) {
   const { me } = await requireAdmin();
   const r = getRecord(recordId, me.family_id);
-  if (!r) return;
+  if (!r || needsAck(r)) return; // a caretaker's salary always stays visible to her
   db.prepare("update record set shared = ? where id = ?").run(r.shared ? 0 : 1, r.id);
   logChange(me.family_id, me.id, "record", r.id, r.shared ? "unshare" : "share", null, null);
+  done();
+}
+
+/** The caretaker confirms she received her salary. */
+export async function ackRecord(recordId: string) {
+  const { me } = await requireCtx();
+  const r = db
+    .prepare("update record set ack_at = ? where id = ? and caretaker_id = ? and kind = 'salary' and ack_at is null")
+    .run(Date.now(), recordId, me.id);
+  if (r.changes) logChange(me.family_id, me.id, "record", recordId, "ack", null, null, me.id);
   done();
 }
 

@@ -71,6 +71,8 @@ export function seedDemo(userId: string, role: "admin" | "caretaker") {
     ins.rec.run(newId(), fid, caretaker, "health", 850, "Health check", dateAgo(12), 1, master, now - 12 * DAY);
     ins.rec.run(newId(), fid, caretaker, "other", 1900, "Agency service fee", dateAgo(10), 0, master, now - 10 * DAY);
     ins.rec.run(newId(), fid, null, "other", 1000, "ARC renewal", today(), 0, master, now);
+    // Sample salaries are already confirmed by the caretaker
+    db.prepare("update record set ack_at = created_at where family_id = ? and kind = 'salary' and caretaker_id is not null").run(fid);
   })();
   return fid;
 }

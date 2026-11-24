@@ -37,16 +37,18 @@ export default async function Home() {
 function PendingCard({ icon, title, amount, note, at, children }: { icon: React.ReactNode; title: string; amount: string; note: string | null; at: string; children: React.ReactNode }) {
   return (
     // Two lines, laid out like the balance card so the amounts line up
-    <section className="space-y-4 rounded-[28px] bg-warn-soft px-6 pb-5 pt-5">
+    <section className="space-y-4 rounded-[28px] bg-warn-soft px-[18px] pb-[18px] pt-5">
       <p className="flex items-center gap-2 text-base font-semibold">
         <span className="shrink-0 text-warn">{icon}</span>
         <span className="truncate">{title}</span>
         <span className="shrink-0 font-medium text-muted">· {at}</span>
       </p>
-      <p className="tabular flex flex-wrap items-baseline gap-x-2 leading-none">
-        <span className="text-lg font-bold text-muted">NTD</span>
-        <span className="text-[48px] font-extrabold tracking-tight">{amount}</span>
-        {note && <span className="text-lg font-semibold text-muted">{note}</span>}
+      <p className="flex items-baseline justify-between gap-3 leading-none">
+        <span className="min-w-0 truncate text-lg font-semibold text-muted">{note}</span>
+        <span className="tabular flex shrink-0 items-baseline gap-2">
+          <span className="text-lg font-bold text-muted">NTD</span>
+          <span className="text-[44px] font-extrabold tracking-tight">{amount}</span>
+        </span>
       </p>
       {children}
     </section>
@@ -158,7 +160,7 @@ function BalanceCard({ title, b, t }: { title?: string; b: ReturnType<typeof bal
   const n = (v: number) => `$${v.toLocaleString("en-US")}`;
   return (
     <section
-      className="relative overflow-hidden rounded-[28px] px-6 pb-5 pt-6 text-white"
+      className="relative overflow-hidden rounded-[28px] px-[18px] pb-[18px] pt-5 text-white"
       style={{
         background: "linear-gradient(145deg, color-mix(in srgb, var(--accent) 85%, white) 0%, var(--accent) 45%, color-mix(in srgb, var(--accent) 72%, black) 100%)",
         boxShadow: "0 14px 32px -14px color-mix(in srgb, var(--accent) 70%, transparent)",
@@ -166,12 +168,14 @@ function BalanceCard({ title, b, t }: { title?: string; b: ReturnType<typeof bal
     >
       {title && <p className="relative mb-2 text-lg font-bold text-white/90">{title}</p>}
       {/* "NTD $5,765 remaining" on one line; wraps only for very large amounts */}
-      <p className={`tabular relative flex flex-wrap items-baseline gap-x-2 leading-none ${b.left < 0 ? "text-[#ffd7dc]" : ""}`}>
-        <span className="text-lg font-bold text-white/75">NTD</span>
-        <span className="text-[48px] font-extrabold tracking-tight">{b.left < 0 ? "−" : ""}{n(Math.abs(b.left))}</span>
-        <span className="text-lg font-semibold text-white/80">{t("remaining")}</span>
+      <p className="relative flex items-baseline justify-between gap-3 leading-none">
+        <span className="text-lg font-semibold text-white/85">{t("remaining")}</span>
+        <span className={`tabular flex shrink-0 items-baseline gap-2 ${b.left < 0 ? "text-[#ffd7dc]" : ""}`}>
+          <span className="text-lg font-bold text-white/75">NTD</span>
+          <span className="text-[44px] font-extrabold tracking-tight">{b.left < 0 ? "−" : ""}{n(Math.abs(b.left))}</span>
+        </span>
       </p>
-      <div className="relative mt-4 flex flex-wrap gap-2 text-base font-semibold">
+      <div className="relative mt-4 flex flex-wrap justify-end gap-2 text-base font-semibold">
         <span className="tabular rounded-full bg-white/15 px-3.5 py-1.5">{n(b.spent)} {t("spentShort")}</span>
         <span className="tabular rounded-full bg-white/15 px-3.5 py-1.5">{n(b.received)} {t("receivedShort")}</span>
       </div>

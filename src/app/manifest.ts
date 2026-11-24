@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "CareCash 看護零用金",
+    name: "CareCash 看護家用金",
     short_name: "CareCash",
     start_url: "/home",
     display: "standalone",

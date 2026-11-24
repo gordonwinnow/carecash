@@ -435,7 +435,7 @@ const id: Dict = {
   category: "Untuk apa?",
   cat_food: "Makanan",
   cat_daily: "Keperluan harian",
-  cat_transport: "Transportasi",
+  cat_transport: "Ongkos",
   cat_medicine: "Obat",
   cat_other: "Lainnya",
   giveCash: "Tambah uang",

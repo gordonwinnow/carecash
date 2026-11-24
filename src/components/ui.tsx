@@ -243,18 +243,27 @@ export function ChipGroup({
   options,
   initial,
   cols = 3,
+  compact,
 }: {
   name: string;
   options: { value: string; label: string; icon?: React.ReactNode }[];
   initial?: string;
   cols?: number;
+  /** Narrow chips so five fit in one row on a phone; labels may wrap to two lines. */
+  compact?: boolean;
 }) {
   const [v, setV] = useState(initial ?? options[0]?.value ?? "");
   return (
-    <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+    <div className={`grid ${compact ? "gap-1.5" : "gap-2"}`} style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
       <input type="hidden" name={name} value={v} />
       {options.map((o) => (
-        <button key={o.value} type="button" className="chip min-h-16 flex-col !gap-1 py-2.5 text-base" aria-pressed={v === o.value} onClick={() => setV(o.value)}>
+        <button
+          key={o.value}
+          type="button"
+          className={`chip flex-col !gap-1 ${compact ? "min-h-20 justify-start !px-0.5 pb-2 pt-2.5 text-[12px] tracking-tight" : "min-h-16 py-2.5 text-base"}`}
+          aria-pressed={v === o.value}
+          onClick={() => setV(o.value)}
+        >
           {o.icon}
           <span className="leading-tight">{o.label}</span>
         </button>

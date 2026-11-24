@@ -32,7 +32,7 @@ export function LanguagePicker({ compact }: { compact?: boolean }) {
       <select
         value={lang}
         onChange={(e) => choose(e.target.value as Lang)}
-        className="rounded-full bg-card px-4 py-2 text-base font-semibold [box-shadow:var(--shadow)]"
+        className="rounded-full bg-sunk px-4 py-2 text-base font-semibold outline-none"
         aria-label="Language"
       >
         {LANGS.map((l) => (

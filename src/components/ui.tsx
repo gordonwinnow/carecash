@@ -260,7 +260,7 @@ export function ChipGroup({
         <button
           key={o.value}
           type="button"
-          className={`chip flex-col !gap-1 ${compact ? "min-h-20 justify-start !px-0.5 pb-2 pt-2.5 text-[12px] tracking-tight" : "min-h-16 py-2.5 text-base"}`}
+          className={`chip flex-col !gap-1 ${compact ? "min-h-[88px] justify-center !gap-1.5 !px-0.5 py-2.5 text-[12px] tracking-tight" : "min-h-16 py-2.5 text-base"}`}
           aria-pressed={v === o.value}
           onClick={() => setV(o.value)}
         >

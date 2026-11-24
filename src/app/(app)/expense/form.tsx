@@ -18,7 +18,7 @@ export function ExpenseFields({ t, initial }: { t: T; initial?: Initial }) {
           initial={initial?.category}
           cols={5}
           compact
-          options={CATEGORIES.map((c) => ({ value: c.id, icon: <Badge id={c.id} size={32} />, label: t(`cat_${c.id}`) }))}
+          options={CATEGORIES.map((c) => ({ value: c.id, icon: <Badge id={c.id} size={38} />, label: t(`cat_${c.id}`) }))}
         />
       </div>
       <PhotoInput label={initial?.photo ? t("replacePhoto") : t("takePhoto")} existing={initial?.photo} />

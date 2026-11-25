@@ -6,6 +6,7 @@ import { day, money } from "@/lib/format";
 import type { T } from "@/lib/i18n";
 import { ackCash, ackRecord, confirmCash, deleteCash } from "../../actions";
 import { ActionButton } from "@/components/ui";
+import { Barcode } from "@/components/barcode";
 import { EntryRow, RowList, SectionHead, Empty } from "@/components/rows";
 
 type Cash = { id: string; amount: number; note: string | null; created_at: number; ack_at: number | null; giver: string; caretaker_id: string };
@@ -29,13 +30,13 @@ export default async function Home() {
           {me.role === "admin" ? t("roleAdmin") : t("roleCaretaker")}
         </span>
         {/* The e-invoice barcode, one tap away at checkout */}
-        {(carrier.carrier || carrier.carrier_photo) && (
+        {me.role === "admin" && (carrier.carrier || carrier.carrier_photo) && (
           <Link href="/carrier" className="ml-auto flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-sm font-bold [box-shadow:var(--shadow)]">
             <BarcodeIcon size={18} /> {t("carrierShort")}
           </Link>
         )}
       </header>
-      {me.role === "caretaker" ? <CaretakerHome me={me} t={t} lang={lang} /> : <EmployerHome me={me} t={t} lang={lang} />}
+      {me.role === "caretaker" ? <CaretakerHome me={me} t={t} lang={lang} carrier={carrier} /> : <EmployerHome me={me} t={t} lang={lang} />}
     </div>
   );
 }
@@ -56,7 +57,7 @@ function PendingCard({ icon, title, amount, note, at, children }: { icon: React.
   );
 }
 
-function CaretakerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
+function CaretakerHome({ me, t, lang, carrier }: { me: Member; t: T; lang: string; carrier: { carrier: string | null; carrier_photo: string | null } }) {
   const pending = db
     .prepare(
       `select c.*, m.name as giver from cash c join member m on m.id = c.given_by
@@ -79,6 +80,22 @@ function CaretakerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
     <>
       {/* Summary first; things to confirm and actions below it */}
       <BalanceCard b={b} t={t} />
+
+      {/* The e-invoice barcode, ready to scan at checkout without a tap; tapping opens it full size */}
+      {(carrier.carrier || carrier.carrier_photo) && (
+        <Link href="/carrier" aria-label={t("carrier")} className="block overflow-hidden rounded-3xl bg-white [box-shadow:var(--shadow)]">
+          {carrier.carrier ? (
+            // Full width so the bars stay wide enough to scan; the number small underneath
+            <div className="px-5 pb-2.5 pt-4">
+              <Barcode value={carrier.carrier} className="h-16" />
+              <p className="tabular mt-1.5 text-center text-sm font-bold tracking-[0.2em] text-[#1c1b19]">{carrier.carrier}</p>
+            </div>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={`/api/photo/${carrier.carrier_photo}`} alt={t("carrier")} className="max-h-32 w-full object-contain" />
+          )}
+        </Link>
+      )}
 
       {pending.map((c) => (
         <PendingCard key={c.id} icon={<HandCoins size={20} />} title={t("gaveYou", { name: c.giver })} amount={money(c.amount, me.currency)} note={c.note} at={day(c.created_at, lang)}>

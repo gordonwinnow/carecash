@@ -41,7 +41,8 @@ export function seedDemo(userId: string, role: "admin" | "caretaker") {
   const dateAgo = (days: number) => new Date(now - days * DAY).toLocaleDateString("en-CA", { timeZone: "Asia/Taipei" });
 
   db.transaction(() => {
-    db.prepare("insert into family (id, name, created_at, demo) values (?, ?, ?, 1)").run(fid, "Demo 陳家", now);
+    // A sample e-invoice barcode. "/SAMPLE" is one character short of a real code, so it is nobody's and stores reject it.
+    db.prepare("insert into family (id, name, created_at, demo, carrier) values (?, ?, ?, 1, ?)").run(fid, "Demo 陳家", now, "/SAMPLE");
     const m = db.prepare("insert into member (id, family_id, user_id, role, name, created_at) values (?, ?, ?, ?, ?, ?)");
     m.run(master, fid, role === "admin" ? userId : `demo:${newId()}`, "admin", "陳先生", now - 60 * DAY);
     m.run(caretaker, fid, role === "caretaker" ? userId : `demo:${newId()}`, "caretaker", "Siti", now - 60 * DAY);

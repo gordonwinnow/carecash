@@ -130,6 +130,25 @@ function open() {
   addColumn(d, "record", "ack_at", "integer");
   if (!hadAck) d.prepare("update record set ack_at = created_at where kind = 'salary' and caretaker_id is not null").run();
   addColumn(d, "member", "notify_cash", "integer not null default 0");
+  // The family's e-invoice mobile barcode (手機條碼), shared by an employer so a caretaker can show it at checkout.
+  // A typed code is drawn as a barcode; a screenshot of one is the fallback.
+  addColumn(d, "family", "carrier", "text");
+  addColumn(d, "family", "carrier_photo", "text");
+  // Feature requests and problem reports from anyone using the app, with the reply and status they can follow.
+  // Kept apart from the family (no foreign key), so they outlive a demo family.
+  d.exec(`create table if not exists feedback (
+    id text primary key,
+    user_id text not null,
+    family_id text,
+    name text,
+    body text not null,
+    photo text,
+    status text not null default 'new',
+    reply text,
+    created_at integer not null,
+    updated_at integer not null
+  );
+  create index if not exists feedback_user on feedback(user_id);`);
   // Older demo data had sample notes on household cash that read like labels
   d.prepare("update cash set note = null where note in ('Next week', 'Groceries') and family_id in (select id from family where demo = 1)").run();
   return d;

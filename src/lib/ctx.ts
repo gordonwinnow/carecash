@@ -95,3 +95,12 @@ function balanceFor(who: string, params: Record<string, string>) {
     .get({ ...params, m: monthStart() }) as { carry: number; received: number; pending: number; spent: number };
   return { ...r, left: r.carry + r.received - r.spent };
 }
+
+/**
+ * The people who run the app and answer feedback: the accounts whose email is in OWNER_EMAILS (comma separated).
+ * Set it as a server secret, never in the code.
+ */
+export function isOwner(user: { email?: string | null } | null | undefined) {
+  const list = (process.env.OWNER_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  return !!user?.email && list.includes(user.email.toLowerCase());
+}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, Camera, Check, HandCoins, Users, Wallet, HeartHandshake, Plus } from "lucide-react";
+import { Banknote, Barcode as BarcodeIcon, Camera, Check, HandCoins, Users, Wallet, HeartHandshake, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { balanceOf, familyPotBalance, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
 import { day, money } from "@/lib/format";
@@ -15,6 +15,7 @@ export default async function Home() {
   const { me } = await requireCtx();
   const t = await getT();
   const lang = await getLang();
+  const carrier = db.prepare("select carrier, carrier_photo from family where id = ?").get(me.family_id) as { carrier: string | null; carrier_photo: string | null };
 
   return (
     <div className="space-y-6">
@@ -27,6 +28,12 @@ export default async function Home() {
         <span className="shrink-0 rounded-full bg-accent-soft px-3 py-1 text-sm font-bold text-accent-ink">
           {me.role === "admin" ? t("roleAdmin") : t("roleCaretaker")}
         </span>
+        {/* The e-invoice barcode, one tap away at checkout */}
+        {(carrier.carrier || carrier.carrier_photo) && (
+          <Link href="/carrier" className="ml-auto flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-card px-3.5 text-sm font-bold [box-shadow:var(--shadow)]">
+            <BarcodeIcon size={18} /> {t("carrierShort")}
+          </Link>
+        )}
       </header>
       {me.role === "caretaker" ? <CaretakerHome me={me} t={t} lang={lang} /> : <EmployerHome me={me} t={t} lang={lang} />}
     </div>

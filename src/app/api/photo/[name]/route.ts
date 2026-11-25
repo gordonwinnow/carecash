@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { imageType, readPhoto } from "@/lib/photos";
-import { getUser } from "@/lib/ctx";
+import { getUser, isOwner } from "@/lib/ctx";
 
 /** Serves a receipt photo only to members allowed to see the row it belongs to. */
 export async function GET(_req: Request, { params }: { params: Promise<{ name: string }> }) {
@@ -36,7 +36,18 @@ export async function GET(_req: Request, { params }: { params: Promise<{ name: s
                and (m.role = 'admin' or a.subject_id = m.id)`,
           )
           .get({ pat: `%"${name}"%`, user: user.id });
-  if (!viaExpense && !viaRecord && !viaHistory) return new Response("Not found", { status: 404 });
+  // The family's e-invoice barcode screenshot: anyone in the family shows it at checkout
+  const viaCarrier =
+    viaExpense || viaRecord || viaHistory
+      ? null
+      : db.prepare("select 1 from family f join member m on m.family_id = f.id where f.carrier_photo = ? and m.user_id = ? and m.active = 1").get(name, user.id);
+  // A feedback screenshot: the person who sent it, and the app's owners
+  const viaFeedback =
+    viaExpense || viaRecord || viaHistory || viaCarrier
+      ? null
+      : db.prepare("select user_id from feedback where photo = ?").get(name) as { user_id: string } | undefined;
+  const feedbackOk = !!viaFeedback && (viaFeedback.user_id === user.id || isOwner(user));
+  if (!viaExpense && !viaRecord && !viaHistory && !viaCarrier && !feedbackOk) return new Response("Not found", { status: 404 });
 
   const buf = await readPhoto(name);
   // Only real images are served, with their real type; nosniff and a locked-down CSP stop a browser from running it as anything else

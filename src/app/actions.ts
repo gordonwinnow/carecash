@@ -4,11 +4,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, newId } from "@/lib/db";
 import { savePhoto } from "@/lib/photos";
-import { getLang, getUser, requireAdmin, requireCtx, membershipsOf } from "@/lib/ctx";
+import { getLang, getUser, isOwner, requireAdmin, requireCtx, membershipsOf } from "@/lib/ctx";
 import { CATEGORIES, KINDS, dayKey, movedDate } from "@/lib/format";
 import { seedDemo } from "@/lib/demo";
 import { logChange } from "@/lib/audit";
-import { watchBalance } from "@/lib/notify";
+import { deliver, watchBalance } from "@/lib/notify";
+import { normalizeCarrier } from "@/lib/carrier";
+import { ownerUserIds, updateFeedback } from "@/lib/feedback";
 
 const COOKIE = { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" as const };
 
@@ -410,3 +412,55 @@ export async function removeDevice(endpoint: string) {
   if (user) db.prepare("delete from push_sub where endpoint = ? and user_id = ?").run(endpoint, user.id);
 }
 
+
+// ---------- E-invoice barcode (發票載具) ----------
+
+/**
+ * An employer shares the family's mobile barcode. A typed code is preferred (it is drawn sharp at any size);
+ * a screenshot of the barcode is the fallback. Saving one clears the other.
+ */
+export async function saveCarrier(fd: FormData) {
+  const { me } = await requireAdmin();
+  const before = db.prepare("select carrier as code, carrier_photo as photo from family where id = ?").get(me.family_id) as { code: string | null; photo: string | null };
+  const raw = String(fd.get("code") ?? "").trim();
+  const code = raw ? normalizeCarrier(raw) : null;
+  if (raw && !code) throw new Error("Bad code");
+  const photo = code ? null : await savePhoto(fd);
+  if (!code && !photo) return done("/carrier");
+  db.prepare("update family set carrier = ?, carrier_photo = ? where id = ?").run(code, photo, me.family_id);
+  logChange(me.family_id, me.id, "carrier", me.family_id, before.code || before.photo ? "update" : "create", before.code || before.photo ? before : null, { code, photo });
+  done("/carrier");
+}
+
+export async function removeCarrier() {
+  const { me } = await requireAdmin();
+  const before = db.prepare("select carrier as code, carrier_photo as photo from family where id = ?").get(me.family_id) as { code: string | null; photo: string | null };
+  if (!before.code && !before.photo) return done("/carrier");
+  db.prepare("update family set carrier = null, carrier_photo = null where id = ?").run(me.family_id);
+  logChange(me.family_id, me.id, "carrier", me.family_id, "delete", before, null);
+  done("/carrier");
+}
+
+// ---------- Feedback ----------
+
+/** Anyone signed in can send a feature request or a problem, with an optional screenshot. The app's owners get a push. */
+export async function sendFeedback(fd: FormData) {
+  const { user, me } = await requireCtx();
+  const body = text(fd, "body", 4000);
+  if (!body) return done("/feedback");
+  const photo = await savePhoto(fd);
+  const now = Date.now();
+  db.prepare("insert into feedback (id, user_id, family_id, name, body, photo, status, created_at, updated_at) values (?, ?, ?, ?, ?, ?, 'new', ?, ?)").run(
+    newId(), user.id, me.family_id, me.name, body, photo, now, now,
+  );
+  for (const id of ownerUserIds()) if (id !== user.id) deliver(id, "/feedback/review", () => `${me.name}: ${body.slice(0, 120)}`);
+  done("/feedback?sent=1");
+}
+
+/** The app's owners set a status and a reply. */
+export async function reviewFeedback(id: string, fd: FormData) {
+  const user = await getUser();
+  if (!isOwner(user)) throw new Error("Not allowed");
+  updateFeedback(id, String(fd.get("status") ?? ""), text(fd, "reply", 4000));
+  done("/feedback/review");
+}

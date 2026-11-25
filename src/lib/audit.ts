@@ -1,6 +1,6 @@
 import { db, newId } from "./db";
 
-export type Entity = "cash" | "expense" | "record" | "member";
+export type Entity = "cash" | "expense" | "record" | "member" | "carrier";
 export type AuditAction = "create" | "update" | "delete" | "ack" | "confirm" | "share" | "unshare" | "join" | "remove";
 
 export type AuditRow = {

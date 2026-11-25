@@ -26,6 +26,12 @@ They go to every device the person turned them on for: browsers and the iPhone h
 **Phase 2: Pay & health tab** (🔒)
 Employers record salary, healthcare and other costs, with an optional photo. Each record is **employers only** by default; the **Caretaker can see this** switch shares it. Caretakers only get the tab once something is shared with them. This is checked on the server, including the photo URLs.
 
+**E-invoice barcode (發票載具):** an employer pastes the family's mobile barcode number (`/` + 7 characters) in Settings → 發票載具, and the app draws the Code 39 barcode from it; a screenshot of the barcode is the fallback. Everyone in the family gets a **載具** button at the top of home that opens it full width, black on white, with a **Copy** button for the number.
+
+**Feedback:** Settings → 意見回饋. Anyone can send a feature request or a problem, with an optional screenshot, and follow its status (Received, Planned, In progress, Done, Not planned) and the reply. They get a push when either changes.
+- Owners (accounts whose email is in the `OWNER_EMAILS` secret) review and reply at `/feedback/review`, and get a push for each new one.
+- From a terminal, or for Claude to triage and fix: `FEEDBACK_TOKEN=… node scripts/feedback.mjs list open`, `… reply <id> <status> "<text>"`, `… photo <name>`. This calls `/api/feedback`, which is off unless the `FEEDBACK_TOKEN` secret is set.
+
 **Guest demo:** on the sign-in page, **Try as Employer** / **Try as Caretaker** signs in a throwaway guest with two months of sample data. Invites are off in the demo, and demo families are deleted after 3 days.
 
 **Settings:** 10 languages (繁體中文, English, Bahasa Indonesia, Tiếng Việt, Tagalog, ภาษาไทย, 日本語, 한국어, Español, Français), light/dark/auto, and 6 main colors. All are stored per device.

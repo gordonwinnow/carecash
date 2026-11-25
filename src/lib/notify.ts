@@ -16,7 +16,7 @@ function watchersOf(familyId: string, caretakerId: string) {
     .all(familyId, caretakerId) as Watcher[];
 }
 
-function deliver(userId: string, url: string, body: (lang: Lang) => string) {
+export function deliver(userId: string, url: string, body: (lang: Lang) => string) {
   for (const s of subsOf(userId)) {
     const lang = s.lang as Lang;
     void send(s, { title: translate(lang, "appName"), body: body(lang), url });

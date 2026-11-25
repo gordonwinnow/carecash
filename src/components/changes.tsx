@@ -28,6 +28,7 @@ const FIELD_KEY: Record<string, string> = {
   caretaker_id: "forWho",
   payer: "paidBy",
   name: "yourName",
+  code: "carrierCode",
 };
 
 function show(field: string, v: unknown, t: T, currency: string, names: Record<string, string>) {

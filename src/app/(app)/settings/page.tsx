@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, Crown, Globe, House, Palette, Plus, UserRound } from "lucide-react";
+import { Barcode as BarcodeIcon, Bell, Crown, Globe, House, MessageSquareText, Palette, Plus, UserRound } from "lucide-react";
 import { db } from "@/lib/db";
 import { getT, requireCtx } from "@/lib/ctx";
 import { removeMember, renameMe, switchFamily } from "../../actions";
@@ -8,6 +8,7 @@ import { ColorPicker, LanguagePicker, SignOutButton } from "@/components/setting
 import { InvitePanel } from "./invite";
 import { NotifySettings } from "@/components/notify";
 import { InstallLink } from "@/components/install";
+import { BorderlessRow } from "./row";
 
 export default async function Settings({ searchParams }: { searchParams: Promise<{ invite?: string }> }) {
   const { invite } = await searchParams;
@@ -24,11 +25,18 @@ export default async function Settings({ searchParams }: { searchParams: Promise
     notify_expense: number;
     notify_cash: number;
   };
+  const carrier = db.prepare("select carrier, carrier_photo from family where id = ?").get(me.family_id) as { carrier: string | null; carrier_photo: string | null };
   const notify = { notify_low: !!n.notify_low, low_threshold: n.low_threshold, notify_expense: !!n.notify_expense, notify_cash: !!n.notify_cash };
 
   return (
     <div className="space-y-6">
       <PageTitle>{t("navSettings")}</PageTitle>
+
+      {/* Quick links: the e-invoice barcode and feedback */}
+      <section className="card !p-2">
+        <BorderlessRow href="/carrier" icon={<BarcodeIcon size={20} />} title={t("carrier")} value={carrier.carrier ?? (carrier.carrier_photo ? "✓" : isAdmin ? t("carrierAdd") : "—")} />
+        <BorderlessRow href="/feedback" icon={<MessageSquareText size={20} />} title={t("feedback")} />
+      </section>
 
       <section className="card space-y-3">
         <SettingHead icon={<Bell size={20} />}>{t("notifications")}</SettingHead>

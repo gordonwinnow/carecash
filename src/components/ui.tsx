@@ -148,7 +148,8 @@ async function compress(file: File): Promise<Blob> {
   }
 }
 
-export function PhotoInput({ big = true, label, existing }: { big?: boolean; label: string; existing?: string | null }) {
+/** camera=false opens the photo library instead of the camera (for a screenshot). */
+export function PhotoInput({ big = true, label, existing, camera = true }: { big?: boolean; label: string; existing?: string | null; camera?: boolean }) {
   const t = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const hiddenRef = useRef<HTMLInputElement>(null);
@@ -166,7 +167,7 @@ export function PhotoInput({ big = true, label, existing }: { big?: boolean; lab
 
   return (
     <div>
-      <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={onPick} />
+      <input ref={fileRef} type="file" accept="image/*" capture={camera ? "environment" : undefined} className="hidden" onChange={onPick} />
       <input ref={hiddenRef} type="file" name="photo" className="hidden" />
       {preview ? (
         // The whole photo is shown, letterboxed, so nothing on the receipt is cut off

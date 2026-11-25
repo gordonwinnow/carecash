@@ -134,6 +134,8 @@ function open() {
   // A typed code is drawn as a barcode; a screenshot of one is the fallback.
   addColumn(d, "family", "carrier", "text");
   addColumn(d, "family", "carrier_photo", "text");
+  // Where the family came from: the first ?ref= / utm_source the employer arrived with (see src/proxy.ts)
+  addColumn(d, "family", "source", "text");
   // Feature requests and problem reports from anyone using the app, with the reply and status they can follow.
   // Kept apart from the family (no foreign key), so they outlive a demo family.
   d.exec(`create table if not exists feedback (

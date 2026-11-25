@@ -36,6 +36,8 @@ Employers record salary, healthcare and other costs, with an optional photo. Eac
 
 **Settings:** 10 languages (繁體中文, English, Bahasa Indonesia, Tiếng Việt, Tagalog, ภาษาไทย, 日本語, 한국어, Español, Français), light/dark/auto, and 6 main colors. All are stored per device.
 
+**Public site and growth:** logged-out visitors get a zh-TW landing page at `/` and a broker page at `/partners` (its contact buttons show once `CONTACT_EMAIL` / `CONTACT_LINE_URL` are set). A visit with `?ref=<code>` or `utm_source` is remembered for 90 days (`src/proxy.ts`) and saved as `family.source` when that person creates a family. Owners see signups, weekly active users and households by source at `/stats`; scripts use `METRICS_TOKEN=… node scripts/metrics.mjs` (falls back to `FEEDBACK_TOKEN`). The growth plan, broker playbook and weekly log are in `growth/`.
+
 ## Stack
 
 Next.js 16 + React 19, Tailwind 4, Better Auth, SQLite (better-sqlite3), one Fly.io machine in Tokyo (`nrt`), with a 1 GB volume at `/data` holding the database and photos. Photos are shrunk in the browser to ~1600px JPEG before upload. The machine sleeps when idle, so the first visit after a quiet spell takes a few seconds.

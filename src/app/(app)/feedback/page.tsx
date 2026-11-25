@@ -58,7 +58,10 @@ export default async function FeedbackPage({ searchParams }: { searchParams: Pro
       )}
 
       {isOwner(user) && (
-        <Link href="/feedback/review" className="btn-tint">{t("reviewFeedback")}</Link>
+        <>
+          <Link href="/feedback/review" className="btn-tint">{t("reviewFeedback")}</Link>
+          <Link href="/stats" className="btn-tint">Growth 成長</Link>
+        </>
       )}
     </div>
   );

@@ -5,10 +5,12 @@ import { cookies } from "next/headers";
 import { I18nProvider } from "@/components/i18n";
 import { getLang } from "@/lib/ctx";
 import { ACCENTS, THEMES } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin", "latin-ext", "vietnamese"], variable: "--font-jakarta", display: "swap" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "CareCash",
   description: "Track grocery cash and expenses between a family and its caretaker",
   appleWebApp: { capable: true, title: "CareCash", statusBarStyle: "default" },

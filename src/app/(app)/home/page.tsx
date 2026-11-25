@@ -78,24 +78,8 @@ function CaretakerHome({ me, t, lang, carrier }: { me: Member; t: T; lang: strin
 
   return (
     <>
-      {/* Summary first; things to confirm and actions below it */}
+      {/* Order: summary, anything waiting for her tap (rare, urgent), the barcode, then the actions */}
       <BalanceCard b={b} t={t} />
-
-      {/* The e-invoice barcode, ready to scan at checkout without a tap; tapping opens it full size */}
-      {(carrier.carrier || carrier.carrier_photo) && (
-        <Link href="/carrier" aria-label={t("carrier")} className="block overflow-hidden rounded-3xl bg-white [box-shadow:var(--shadow)]">
-          {carrier.carrier ? (
-            // Full width so the bars stay wide enough to scan; the number small underneath
-            <div className="px-5 pb-2.5 pt-4">
-              <Barcode value={carrier.carrier} className="h-16" />
-              <p className="tabular mt-1.5 text-center text-sm font-bold tracking-[0.2em] text-[#1c1b19]">{carrier.carrier}</p>
-            </div>
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={`/api/photo/${carrier.carrier_photo}`} alt={t("carrier")} className="max-h-32 w-full object-contain" />
-          )}
-        </Link>
-      )}
 
       {pending.map((c) => (
         <PendingCard key={c.id} icon={<HandCoins size={20} />} title={t("gaveYou", { name: c.giver })} amount={money(c.amount, me.currency)} note={c.note} at={day(c.created_at, lang)}>
@@ -118,6 +102,22 @@ function CaretakerHome({ me, t, lang, carrier }: { me: Member; t: T; lang: strin
           </ActionButton>
         </PendingCard>
       ))}
+
+      {/* The e-invoice barcode, right above "add expense": at the till she scans it, pays, then records the receipt. No tap needed; tapping opens it full size */}
+      {(carrier.carrier || carrier.carrier_photo) && (
+        <Link href="/carrier" aria-label={t("carrier")} className="block overflow-hidden rounded-3xl bg-white [box-shadow:var(--shadow)]">
+          {carrier.carrier ? (
+            // Full width so the bars stay wide enough to scan; the number small underneath
+            <div className="px-5 pb-2.5 pt-4">
+              <Barcode value={carrier.carrier} className="h-16" />
+              <p className="tabular mt-1.5 text-center text-sm font-bold tracking-[0.2em] text-[#1c1b19]">{carrier.carrier}</p>
+            </div>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={`/api/photo/${carrier.carrier_photo}`} alt={t("carrier")} className="max-h-32 w-full object-contain" />
+          )}
+        </Link>
+      )}
 
       {/* One row: the main action wide, "got money" as a short side button */}
       <div className="grid grid-cols-[1fr_auto] gap-3">

@@ -3,6 +3,13 @@ export type Article = { slug: string; title: string; description: string; publis
 
 export const ARTICLES: Article[] = [
   {
+    slug: "how-employers-give-grocery-money",
+    title: "家庭移工買菜怎麼給錢？6 種常見方式比較",
+    description:
+      "請家庭看護，買菜和日用品的錢怎麼給？比較固定週轉金、每次給整數找零、先墊後報、雇主網購、固定伙食費、店家記帳或儲值卡 6 種方式的做法、適合誰、風險與記帳方法，附怎麼選。",
+    published: "2026-11-27",
+  },
+  {
     slug: "lunar-new-year-caregiver-holiday-money",
     title: "過年請外籍看護：放假、紅包、加班費與家用金怎麼安排",
     description:

@@ -54,7 +54,7 @@ export default async function Stats() {
 
       <div className="card">
         <h2 className="mb-1 font-bold">By source 來源</h2>
-        <p className="mb-2 text-xs text-muted">From links with ?ref=code, e.g. carecash.fly.dev/?ref=broker-abc</p>
+        <p className="mb-2 text-xs text-muted">From links with ?ref=code, e.g. carecash.me/?ref=broker-abc</p>
         <table className="w-full text-right text-sm tabular-nums">
           <thead className="text-muted">
             <tr><th className="text-left font-semibold">Source</th><th className="font-semibold">Households</th><th className="font-semibold">Activated</th><th className="font-semibold">Active 7d</th></tr>

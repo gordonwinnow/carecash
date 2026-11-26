@@ -2,7 +2,7 @@
 
 A very simple app for a Taiwanese family (雇主) and their household caretaker (家庭移工) to track grocery cash.
 
-**Live:** https://carecash.fly.dev
+**Live:** https://carecash.me
 
 ## What it does
 
@@ -48,9 +48,9 @@ Next.js 16 + React 19, Tailwind 4, Better Auth, SQLite (better-sqlite3), one Fly
 |---|---|---|
 | Email + password | **On** | — |
 | WhatsApp code | Off until keys are set | `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, and an approved **Authentication** template (`WHATSAPP_TEMPLATE`, default `login_code`; `WHATSAPP_TEMPLATE_LANG`, default `en`) from Meta WhatsApp Cloud API |
-| Google | Off until keys are set | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. Redirect URI: `https://carecash.fly.dev/api/auth/callback/google` |
-| Apple | Off until keys are set; shown on iPhone, iPad and Mac only | `APPLE_CLIENT_ID` (a Services ID), `APPLE_TEAM_ID`, `APPLE_KEY_ID` and `APPLE_KEY_P8` (a Sign in with Apple key's .p8 contents). The server makes the client secret JWT from the key at startup. `APPLE_APP_BUNDLE_IDENTIFIER=app.carecash.ios`. Return URL: `https://carecash.fly.dev/api/auth/callback/apple` |
-| LINE | Off until keys are set | `LINE_CLIENT_ID`, `LINE_CLIENT_SECRET` from a LINE Login channel. Callback: `https://carecash.fly.dev/api/auth/callback/line` |
+| Google | Off until keys are set | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`. Redirect URI: `https://carecash.me/api/auth/callback/google` |
+| Apple | Off until keys are set; shown on iPhone, iPad and Mac only | `APPLE_CLIENT_ID` (a Services ID), `APPLE_TEAM_ID`, `APPLE_KEY_ID` and `APPLE_KEY_P8` (a Sign in with Apple key's .p8 contents). The server makes the client secret JWT from the key at startup. `APPLE_APP_BUNDLE_IDENTIFIER=app.carecash.ios`. Return URL: `https://carecash.me/api/auth/callback/apple` |
+| LINE | Off until keys are set | `LINE_CLIENT_ID`, `LINE_CLIENT_SECRET` from a LINE Login channel. Callback: `https://carecash.me/api/auth/callback/line` |
 
 A button only appears once its keys are set. Set them like this; it restarts the app:
 
@@ -60,7 +60,15 @@ flyctl secrets set GOOGLE_CLIENT_ID=... GOOGLE_CLIENT_SECRET=... -a carecash
 
 Google blocks its sign-in inside app web views, so the iOS app opens Google sign-in in Safari (`/native-login`), and `/api/native/finish` sends the session back to the app through a one-time code on the `carecash://` link. Email, WhatsApp, LINE and Apple work in the web view directly.
 
+## Custom domain
+
+The public address is **carecash.me**. It goes live in two steps, so a deploy never points visitors at a domain that doesn't work yet:
+1. DNS + certificate: `flyctl certs add carecash.me -a carecash`, then add the A/AAAA records it prints at the domain's DNS (Vercel), and wait until `flyctl certs show carecash.me -a carecash` says Ready.
+2. Switch: `flyctl secrets set SITE_URL=https://carecash.me -a carecash`. Sign-in, links and the sitemap then use it, and browsers on carecash.fly.dev are redirected there (308, path and `?ref=` kept). API calls and the shipped iPhone app keep working on carecash.fly.dev. Add the carecash.me callback URLs at Google, Apple and LINE.
+
 ## Deploy
+
+Pushing to `main` deploys automatically (`.github/workflows/deploy.yml`) once the repository secret `FLY_API_TOKEN` is set (`flyctl tokens create deploy -a carecash`). By hand:
 
 ```powershell
 flyctl deploy --remote-only --ha=false -a carecash

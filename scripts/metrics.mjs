@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
  * CareCash growth numbers from the terminal (for the owners, and for Claude's weekly growth review).
- * Needs METRICS_TOKEN (or FEEDBACK_TOKEN, the same secret as on the server); CARECASH_URL defaults to https://carecash.fly.dev.
+ * Needs METRICS_TOKEN (or FEEDBACK_TOKEN, the same secret as on the server); CARECASH_URL defaults to https://carecash.me.
  *
  *   node scripts/metrics.mjs          readable summary
  *   node scripts/metrics.mjs json     raw JSON
  */
-const base = (process.env.CARECASH_URL || "https://carecash.fly.dev").replace(/\/$/, "");
+const base = (process.env.CARECASH_URL || "https://carecash.me").replace(/\/$/, "");
 const token = process.env.METRICS_TOKEN || process.env.FEEDBACK_TOKEN;
 if (!token) {
   console.error("Set METRICS_TOKEN (or FEEDBACK_TOKEN) first.");

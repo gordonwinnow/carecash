@@ -57,9 +57,9 @@ Pick 姐 or 阿姨 from your dad's answer. Keep it this short.
 - overstay the 20 minutes
 
 ## Step 3: same-day thank-you (LINE)
-> Leona 姐，謝謝您今天花時間指點我，收穫很多！特別是您提到的 [具體一件事]，我會先從這裡改起。[如果答應試辦：這是給您的專屬連結 https://carecash.fly.dev/?ref=leona ，我這週把中文和印尼文的說明單張整理好給您。] 有任何想法隨時跟我說 🙏
+> Leona 姐，謝謝您今天花時間指點我，收穫很多！特別是您提到的 [具體一件事]，我會先從這裡改起。[如果答應試辦：這是給您的專屬連結 https://carecash.me/?ref=leona ，我這週把中文和印尼文的說明單張整理好給您。] 有任何想法隨時跟我說 🙏
 
-Her referral link is `https://carecash.fly.dev/?ref=leona`. Families who start from it show up as `leona` in `/stats`.
+Her referral link is `https://carecash.me/?ref=leona`. Families who start from it show up as `leona` in `/stats`.
 
 ## After the meeting
 Write 5 bullet notes in this file under "Meeting notes". Claude turns them into the pilot plan, the flyer and the follow-ups.

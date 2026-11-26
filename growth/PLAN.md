@@ -106,7 +106,7 @@ Validate by asking the pilot broker "would you pay for X?" before building.
   - Worth a 10-minute check with the broker.
 - **Trust:** caregivers may read the app as surveillance. Always pitch it as fairness for both sides, and get Indonesian copy right; have a native speaker review it.
 - **Single Fly machine in Tokyo that sleeps:** the first visit is slow, which hurts landing-page conversion. Consider `min_machines_running = 1` once traffic starts (small cost).
-- **Domain:** `carecash.fly.dev` looks unofficial to brokers. A `.tw` or `.app` domain is about NT$500–1,500 a year.
+- **Domain:** `carecash.me` looks unofficial to brokers. A `.tw` or `.app` domain is about NT$500–1,500 a year.
 
 ## 7. What I need from the founder (blockers)
 
@@ -119,7 +119,7 @@ Validate by asking the pilot broker "would you pay for X?" before building.
 4. **Decide:** buy a domain? (Recommend yes: carecash.tw or carecash.app.)
 5. **Social accounts** (must be created by you): LINE OA, FB Page, Threads/IG.
 6. **Broker contact:** name, company, relationship, what they already know about CareCash.
-7. **For weekly reviews:** give Claude read access to `/api/metrics` (store `METRICS_TOKEN` as a credential for carecash.fly.dev in the cloud environment, when asked).
+7. **For weekly reviews:** give Claude read access to `/api/metrics` (store `METRICS_TOKEN` as a credential for carecash.me in the cloud environment, when asked).
 
 ## 8. Weekly rhythm (what Claude does each week)
 

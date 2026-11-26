@@ -1,11 +1,29 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+const OLD_HOST = "carecash.fly.dev";
+
+/**
+ * The iPhone app opens carecash.fly.dev inside a web view that cannot leave that address,
+ * so it must not be redirected. Its web view's user agent has no "Safari/" token, unlike Safari and other browsers.
+ * In-app browsers of Facebook, Instagram and LINE are redirected like any browser.
+ */
+function isNativeApp(ua: string) {
+  return /iPhone|iPad|iPod/.test(ua) && !/Safari\/|FBAN|FBAV|Instagram|Line\//.test(ua);
+}
+
 /**
  * First-touch attribution: a visit with ?ref=<code> (a broker, a post, a flyer) or ?utm_source=<x>
  * keeps that code in a cookie for 90 days. When the visitor later creates a family, it is saved on the family
  * (family.source), so the metrics can say which channel brought which households.
  */
 export function proxy(req: NextRequest) {
+  // Once SITE_URL is set (the custom domain works), web visitors on the old address move there, keeping the path and ?ref=
+  const site = process.env.SITE_URL;
+  const host = req.headers.get("host")?.split(":")[0];
+  if (site && host === OLD_HOST && new URL(site).host !== OLD_HOST && !isNativeApp(req.headers.get("user-agent") ?? "")) {
+    const to = new URL(req.nextUrl.pathname + req.nextUrl.search, site);
+    return NextResponse.redirect(to, 308);
+  }
   const res = NextResponse.next();
   if (req.cookies.get("cc_ref")) return res;
   const p = req.nextUrl.searchParams;

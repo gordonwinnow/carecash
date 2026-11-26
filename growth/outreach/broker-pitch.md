@@ -30,7 +30,7 @@ The pitch is: **"a free tool you hand to every new family on placement day that 
 
 ### Pilot offer (30 days)
 - They pick 5–10 new or recent placements.
-- We give: a personal link `carecash.fly.dev/?ref=<code>` + QR, a zh-TW employer flyer, an Indonesian/Vietnamese caregiver flyer, and a 5-minute setup we can do by video call for each family if needed.
+- We give: a personal link `carecash.me/?ref=<code>` + QR, a zh-TW employer flyer, an Indonesian/Vietnamese caregiver flyer, and a 5-minute setup we can do by video call for each family if needed.
 - We report weekly: how many families started, how many caregivers joined, how many expenses logged. Counts only, no family data.
 - At day 30, a 15-minute review:
   - Did disputes/calls go down?
@@ -44,7 +44,7 @@ The pitch is: **"a free tool you hand to every new family on placement day that 
 >
 > 很多家庭跟看護之間的摩擦，其實都是從菜錢、家用金對不清楚開始的。想請教您這方面的經驗，也想聽聽看這個工具對你們的雇主客戶有沒有幫助。方便約 15 分鐘嗎？我可以到公司拜訪或線上都可以。
 >
-> 介紹網頁：https://carecash.fly.dev/partners
+> 介紹網頁：https://carecash.me/partners
 
 ### B2. Cold message: website form / email to agencies
 **主旨：** 免費給雇主客戶的家用金工具：減少看護菜錢糾紛
@@ -60,7 +60,7 @@ The pitch is: **"a free tool you hand to every new family on placement day that 
 > 我們希望與重視服務品質的仲介公司合作，在新案媒合時免費推薦給雇主。目前正在找 2–3 家仲介做 30 天試辦，我們提供專屬連結、中印文說明單張，並每週回報使用情形。
 >
 > 不知道是否方便安排 15 分鐘線上或到府介紹？
-> 介紹網頁：https://carecash.fly.dev/partners
+> 介紹網頁：https://carecash.me/partners
 >
 > [名字]｜[電話]｜[LINE ID]
 

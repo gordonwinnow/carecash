@@ -29,6 +29,10 @@ export function proxy(req: NextRequest) {
     return NextResponse.redirect(to, 308);
   }
   const res = NextResponse.next();
+  const lang = req.nextUrl.searchParams.get("lang");
+  if (lang && /^(zh-TW|en|id|vi|tl|th|ja|ko|es|fr)$/.test(lang)) {
+    res.cookies.set("lang", lang, { maxAge: 365 * 24 * 3600, path: "/", sameSite: "lax" });
+  }
   if (req.cookies.get("cc_ref")) return res;
   const p = req.nextUrl.searchParams;
   const raw = (p.get("ref") || p.get("utm_source") || "").trim().toLowerCase();

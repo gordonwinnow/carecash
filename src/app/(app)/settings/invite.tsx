@@ -3,6 +3,17 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Copy, Plus } from "lucide-react";
 import { createInvite } from "../../actions";
 import { useT } from "@/components/i18n";
+import { translate, type Lang } from "@/lib/i18n";
+
+/** Languages a caregiver is likely to read; the invite message and the page she opens use the one picked here. */
+const CARETAKER_LANGS: { code: Lang; label: string }[] = [
+  { code: "id", label: "Bahasa Indonesia" },
+  { code: "vi", label: "Tiếng Việt" },
+  { code: "tl", label: "Tagalog" },
+  { code: "th", label: "ภาษาไทย" },
+  { code: "en", label: "English" },
+  { code: "zh-TW", label: "中文" },
+];
 
 /** With `auto`, a link for that role is made as soon as the page opens (from the home screen's invite buttons). */
 export function InvitePanel({ auto }: { auto?: "admin" | "caretaker" }) {
@@ -10,6 +21,7 @@ export function InvitePanel({ auto }: { auto?: "admin" | "caretaker" }) {
   const [link, setLink] = useState<{ url: string; role: string } | null>(null);
   const [copied, setCopied] = useState(false);
   const [pending, start] = useTransition();
+  const [ctLang, setCtLang] = useState<Lang>("id");
 
   const make = (role: "admin" | "caretaker") =>
     start(async () => {
@@ -28,7 +40,9 @@ export function InvitePanel({ auto }: { auto?: "admin" | "caretaker" }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auto]);
 
-  const msg = link ? `${t("inviteMessage")} ${link.url}` : "";
+  // A caregiver gets the message in her language, and the link opens the app in it (?lang=, see src/proxy.ts)
+  const url = link ? (link.role === "caretaker" ? `${link.url}?lang=${encodeURIComponent(ctLang)}` : link.url) : "";
+  const msg = link ? (link.role === "caretaker" ? `${translate(ctLang, "inviteCaretakerMessage")} ${url}` : `${t("inviteMessage")} ${url}`) : "";
 
   return (
     <div id="invite" className="space-y-3">
@@ -45,7 +59,20 @@ export function InvitePanel({ auto }: { auto?: "admin" | "caretaker" }) {
           <p className="text-base font-semibold">
             {link.role === "caretaker" ? t("roleCaretaker") : t("roleAdmin")} · {t("inviteHint")}
           </p>
-          <p className="break-all rounded-xl bg-card p-3 font-mono text-base">{link.url}</p>
+          {link.role === "caretaker" && (
+            <div>
+              <p className="mb-2 text-sm font-semibold">{t("inviteLangLabel")}</p>
+              <div className="flex flex-wrap gap-2">
+                {CARETAKER_LANGS.map((l) => (
+                  <button key={l.code} type="button" className="chip min-h-10 px-3 text-sm" aria-pressed={ctLang === l.code} onClick={() => setCtLang(l.code)}>
+                    {l.label}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-3 rounded-xl bg-card p-3 text-[15px] leading-6 [overflow-wrap:anywhere]">{msg}</p>
+            </div>
+          )}
+          {link.role !== "caretaker" && <p className="break-all rounded-xl bg-card p-3 font-mono text-base">{url}</p>}
           <a className="btn text-white" style={{ background: "#128C4B" }} href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noreferrer">
             {t("sendWhatsApp")}
           </a>
@@ -59,7 +86,7 @@ export function InvitePanel({ auto }: { auto?: "admin" | "caretaker" }) {
               try {
                 if (navigator.share) await navigator.share({ text: msg });
                 else {
-                  await navigator.clipboard.writeText(link.url);
+                  await navigator.clipboard.writeText(msg);
                   setCopied(true);
                 }
               } catch {

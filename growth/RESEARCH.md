@@ -66,3 +66,22 @@ Facebook groups don't show in web search, and ptt.cc and dcard.tw couldn't be op
 | 台灣雇主協會 (FB IAFED0421) | Employer advocacy body. Criticized by worker groups (TIWA/DCU) over a worker-data incident. Use caution. |
 
 Compliance angle for content: employers may not 保管 or 代扣 a worker's wages or property (fines of NT$60k–300k are cited). So keep 家用金 separate from salary. A clear shared ledger helps both sides.
+
+## Forum threads (checked Nov 27)
+- **No caregiver-employer board exists** on PTT (tried LTC, Caregiver, ForeignLabor, Migrant…: all 404), Dcard (only a "外籍看護" topic page) or Mobile01 (old threads in f=37). PTT `elderly` is mostly survey ads.
+- **Money threads are rare and mostly old**, e.g.:
+  - PTT WomenTalk 「[心情] 跟外籍看護溝通到心累」 (2021, 164 pushes), on grocery money
+  - PTT elderly 「南部給外勞看護的伙食費…」 (2018)
+  - Mobile01 f=37 t=1624949 「請問僱用外傭要注意什麼地方呢?」, on daily expense logging
+- **Recent (2025) threads** are about siblings splitting caregiver costs:
+  - PTT Gossiping M.1757221784, M.1748475728, M.1741893735
+  - PTT ask M.1675970677 (2023, 85 pushes)
+- **Quotes for copy:**
+  - 「為了怕她亂報帳…請她每天都要把買的東西記帳記下來」 (Mobile01)
+  - 「花錢的細目弄得不清楚反而造成雇傭之間的間隙」 (Mobile01)
+  - 「如果有拿錢 最後都是親戚反目」 (PTT ask)
+  - 「有人實際真的遇到兄弟姐妹如何開始付看護費用，如何分攤」 (PTT Gossiping)
+- **Conclusion:**
+  - Forums are a weak channel. The live community is on Facebook (e.g. 愛長照), which needs a logged-in check (laptop task 4).
+  - The siblings cost-splitting angle has the most recent, active discussion, so that article and its posts should be pushed.
+- **Caution:** PTT treats links to your own product as advertising. Reply without links; mention the method, and the app only if asked.

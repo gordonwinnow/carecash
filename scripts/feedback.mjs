@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Read and answer CareCash feedback from the terminal (for the owners, and for Claude when asked to triage or fix it).
- * Needs FEEDBACK_TOKEN (the same secret as on the server); CARECASH_URL defaults to https://carecash.me.
+ * Needs FEEDBACK_TOKEN (the same secret as on the server); CARECASH_URL defaults to https://carecash.fly.dev.
  *
  *   node scripts/feedback.mjs list [open|new|planned|doing|done|declined]
  *   node scripts/feedback.mjs reply <id> <status> "<reply text>"
@@ -9,7 +9,7 @@
  */
 import fs from "node:fs";
 
-const base = (process.env.CARECASH_URL || "https://carecash.me").replace(/\/$/, "");
+const base = (process.env.CARECASH_URL || "https://carecash.fly.dev").replace(/\/$/, "");
 const token = process.env.FEEDBACK_TOKEN;
 if (!token) {
   console.error("Set FEEDBACK_TOKEN first.");

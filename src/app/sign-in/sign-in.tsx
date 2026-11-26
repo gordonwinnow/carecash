@@ -111,7 +111,7 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
               </button>
             )}
           </div>
-          <div className="pt-6">
+          <div id="demo" className="pt-6">
             <div className="flex flex-wrap gap-2">
               {(["admin", "caretaker"] as const).map((role) => (
                 <button

@@ -44,8 +44,10 @@ export const providers = {
 export const auth = betterAuth({
   database: db,
   secret: env.BETTER_AUTH_SECRET || "dev-only-secret-change-me-dev-only-secret",
-  baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: ["https://appleid.apple.com"],
+  // SITE_URL (the custom domain, set as a secret once its DNS works) wins over the fly.dev address in fly.toml
+  baseURL: env.SITE_URL || env.BETTER_AUTH_URL,
+  // carecash.fly.dev: the old address, still used by the iPhone app
+  trustedOrigins: ["https://appleid.apple.com", "https://carecash.fly.dev"],
   session: { expiresIn: 60 * 60 * 24 * 180, updateAge: 60 * 60 * 24 },
   emailAndPassword: { enabled: true, minPasswordLength: 6, autoSignIn: true },
   socialProviders: {

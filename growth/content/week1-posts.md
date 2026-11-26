@@ -7,7 +7,7 @@ Use a `?ref=` per channel so `/stats` shows what works: `?ref=ptt`, `?ref=dcard`
 
 ## 1. Personal network: LINE message to friends with a caregiver at home (send to 10)
 
-> 嗨～想請你幫個小忙 🙏 我做了一個免費的小工具「看護家用金」，給家裡有請外籍看護的人用：你給看護家用金、她按「已收到」，每筆買菜拍收據記帳，你手機上隨時看到還剩多少。看護可以用印尼文、越南文操作。
+> 嗨～想請你幫個小忙 🙏 我做了一個免費的小工具「CareCash 家用金」，給家裡有請外籍看護的人用：你給CareCash 家用金、她按「已收到」，每筆買菜拍收據記帳，你手機上隨時看到還剩多少。看護可以用印尼文、越南文操作。
 >
 > 想找幾個家庭先用兩週，給我一些真心的意見（好用、難用都要說！）。願意的話我可以視訊 10 分鐘幫你跟看護一起設定。
 > 👉 https://carecash.me/?ref=friend
@@ -54,7 +54,7 @@ Follow-up after 3 days if they signed up but no caretaker joined:
 > ✅ 家人一起看同一本帳，誰給過都清楚
 > ✅ 看護用印尼文看，不用比手畫腳
 >
-> 用的是一個免費工具「看護家用金」，不用下載，手機打開就能用：
+> 用的是一個免費工具「CareCash 家用金」，不用下載，手機打開就能用：
 > https://carecash.me/?ref=fb
 >
 > 也想聽聽大家：你們一週給多少家用金？用什麼方式對帳？
@@ -83,7 +83,7 @@ Follow-up after 3 days if they signed up but no caretaker joined:
 
 ## 6. Employer flyer (zh-TW, A5, for brokers to hand out on placement day)
 
-> **看護家用金 CareCash｜每一筆菜錢都清楚**
+> **CareCash 家用金｜每一筆菜錢都清楚**
 > 給錢雙方確認・收據拍照留存・餘額隨時看・看護用母語操作・免費
 > 三步驟：① 掃 QR 註冊建立家庭 ② 用 LINE 邀請看護 ③ 看護拍收據記帳
 > [QR: carecash.me/?ref=<broker>]

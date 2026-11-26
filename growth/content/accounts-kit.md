@@ -1,6 +1,6 @@
 # Account setup kit: LINE Login, LINE Official Account, Facebook, Threads
 
-Only the founder can create these, because each is tied to your own LINE / Facebook / Instagram login. Everything you need to paste is below. Use the same name everywhere: **看護家用金 CareCash**.
+Only the founder can create these, because each is tied to your own LINE / Facebook / Instagram login. Everything you need to paste is below. Use the same name everywhere: **CareCash 家用金**.
 
 Profile picture: `public/icon-1024.png` from the repo (the green purse icon).
 
@@ -14,7 +14,7 @@ The code is already in the app. The LINE button appears on the sign-in page, nex
 2. **Create a provider**. Name: `CareCash`.
 3. Inside it, **Create a new channel** → choose **LINE Login**.
    - Region: **Taiwan**
-   - Channel name: `看護家用金 CareCash`
+   - Channel name: `CareCash 家用金`
    - Channel description: `讓雇主與外籍看護清楚記錄家用金的免費工具`
    - App types: tick **Web app**
    - Email address: yours
@@ -37,7 +37,7 @@ Optional, later: under Basic settings → **OpenID Connect → Email address per
 
 1. Go to https://tw.linebiz.com/ → 建立帳號 → **一般帳號 (free)**.
 2. Fill in:
-   - 帳號名稱: `看護家用金 CareCash`
+   - 帳號名稱: `CareCash 家用金`
    - 業種: 生活服務 → 其他 (or the closest match)
 3. In the **LINE Official Account Manager**, set up the following.
 
@@ -45,7 +45,7 @@ Optional, later: under Basic settings → **OpenID Connect → Email address per
 > 家用金每一筆都清楚
 
 **Greeting message** (加入好友的歡迎訊息):
-> 您好，歡迎加入「看護家用金 CareCash」😊
+> 您好，歡迎加入「CareCash 家用金」😊
 >
 > 我們幫聘請外籍看護的家庭，把家用金記得清清楚楚：
 > ✅ 給錢時看護按「已收到」，雙方確認
@@ -75,13 +75,13 @@ When it's done, send me the OA's add-friend link (`https://lin.ee/...`). I'll pu
 ## 3. Facebook Page — about 10 minutes
 
 1. Go to https://www.facebook.com/pages/create.
-   - Page name: `看護家用金 CareCash`
+   - Page name: `CareCash 家用金`
    - Category: `應用程式頁面` (App page); you can add `社區服務` too
 2. **簡介 (bio, max 255 characters):**
    > 給聘請外籍看護的家庭：看護拍收據記帳、交錢雙方確認，雇主隨時看到家用金餘額。支援印尼文、越南文等 10 種語言，免費、免下載。
 3. Website: `https://carecash.me/?ref=fb-page`
 4. Action button: **報名 / Sign up** → the same URL.
-5. Cover image: plain green (#1f9461) with white text `看護家用金，每一筆都清楚`. Canva is quickest; I can make a cover in the repo instead if you want.
+5. Cover image: plain green (#1f9461) with white text `CareCash 家用金，每一筆都清楚`. Canva is quickest; I can make a cover in the repo instead if you want.
 6. First post: use the Facebook group post in `week1-posts.md` §3, changing `?ref=fb` to `?ref=fb-page`.
 
 The Page also lets you join Facebook groups as the Page. Still, post in groups **as yourself**, because personal stories work better there.
@@ -89,9 +89,9 @@ The Page also lets you join Facebook groups as the Page. Still, post in groups *
 ## 4. Threads (needs an Instagram account) — about 5 minutes
 
 1. Create an Instagram account. Handle: `carecash.tw`, or `carecash_tw` if that's taken.
-   - Name: `看護家用金 CareCash`
+   - Name: `CareCash 家用金`
    - Bio:
-     > 外籍看護家用金，每一筆都清楚 ✅ 雙方確認・收據留存・母語操作・免費
+     > 看護、幫傭的家用金，每一筆都清楚 ✅ 雙方確認・收據留存・母語操作・免費
    - Link: `https://carecash.me/?ref=ig`
 2. Open the Threads app and log in with that Instagram account. Bio link: `https://carecash.me/?ref=threads`
 3. Post the 3 Threads posts in `week1-posts.md` §4, one per day.

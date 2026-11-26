@@ -4,8 +4,8 @@ import { BarChart3, HeartHandshake, Languages, PhoneOff, ShieldCheck, Sparkles }
 import { SiteFooter, SiteHeader } from "../landing";
 
 export const metadata: Metadata = {
-  title: "仲介公司合作｜看護家用金 CareCash",
-  description: "免費提供給您的雇主客戶：看護家用金雙方確認、收據留存、多語介面，減少家用金糾紛與處理時間。",
+  title: "仲介公司合作｜CareCash 家用金",
+  description: "免費提供給您的雇主客戶：家用金雙方確認、收據留存、多語介面，減少家用金糾紛與處理時間。",
   alternates: { canonical: "/partners" },
 };
 
@@ -37,7 +37,7 @@ export default function Partners() {
           <p className="mx-auto mb-4 inline-block rounded-full bg-accent-soft px-4 py-1.5 text-sm font-bold text-accent-ink">給人力仲介公司</p>
           <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">讓雇主和看護之間<br />少一件需要調解的事</h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted sm:text-xl">
-            看護家用金 CareCash 讓每筆家用金都有收據、交錢收錢雙方確認。免費提供給您的雇主客戶，減少您處理家用金糾紛的時間。
+            CareCash 家用金 讓每筆家用金都有收據、交錢收錢雙方確認。免費提供給您的雇主客戶，減少您處理家用金糾紛的時間。
           </p>
         </section>
 
@@ -71,7 +71,7 @@ export default function Partners() {
           <p className="mt-3 text-lg text-muted">或先自己試用：登入頁點「以雇主試用」或「以看護試用」，不用註冊。</p>
           <div className="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:flex-row">
             {line && <a href={line} className="btn text-white" style={{ background: "#06C755" }}>LINE 聯絡我們</a>}
-            {email && <a href={`mailto:${email}?subject=${encodeURIComponent("仲介合作：看護家用金 CareCash")}`} className="btn-primary">Email 聯絡我們</a>}
+            {email && <a href={`mailto:${email}?subject=${encodeURIComponent("仲介合作：CareCash 家用金")}`} className="btn-primary">Email 聯絡我們</a>}
             <Link href="/sign-in#demo" className="btn-soft">先試用看看</Link>
           </div>
         </section>

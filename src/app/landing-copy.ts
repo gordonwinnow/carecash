@@ -19,13 +19,13 @@ export type LandingCopy = {
 
 const zh: LandingCopy = {
   meta: {
-    title: "看護家用金 CareCash｜外籍看護菜錢、家用金記帳 App（免費）",
-    description: "給聘請外籍看護的家庭：看護拍收據記帳、交錢雙方確認，雇主隨時看到家用金餘額。支援印尼文、越南文、菲律賓文、泰文等 10 種語言，免費、免下載。",
+    title: "CareCash 家用金｜外籍看護、幫傭的家用金記帳 App（免費）",
+    description: "給家裡有外籍看護或幫傭的家庭：看護、幫傭拍收據記帳、交錢雙方確認，雇主隨時看到家用金餘額。支援印尼文、越南文、菲律賓文、泰文等 10 種語言，免費、免下載。",
   },
-  nav: { guide: "指南", signIn: "登入", partners: "仲介公司合作", privacy: "隱私權政策", guideFooter: "看護家用金指南" },
+  nav: { guide: "指南", signIn: "登入", partners: "仲介公司合作", privacy: "隱私權政策", guideFooter: "家用金指南" },
   hero: {
-    badge: "給聘請外籍看護的家庭",
-    title1: "看護的家用金",
+    badge: "給家裡有看護或幫傭的家庭",
+    title1: "看護、幫傭的家用金",
     title2: "每一筆都清楚",
     sub: "看護拍收據記帳、交錢雙方確認，你隨時在手機上看到餘額。不用每週對帳，也不會因為菜錢傷感情。",
     cta: "免費開始使用",
@@ -82,7 +82,7 @@ const en: LandingCopy = {
   },
   nav: { guide: "Guide", signIn: "Sign in", partners: "For agencies", privacy: "Privacy", guideFooter: "Guide" },
   hero: {
-    badge: "For families with a live-in caregiver",
+    badge: "For families with a live-in caregiver or helper",
     title1: "Household cash,",
     title2: "every dollar clear",
     sub: "Your caregiver logs each expense with a receipt photo, both of you confirm every handover, and you see the balance on your phone anytime. No weekly receipt checks, no arguments over grocery money.",
@@ -140,7 +140,7 @@ const id: LandingCopy = {
   },
   nav: { guide: "Panduan", signIn: "Masuk", partners: "Untuk agensi", privacy: "Privasi", guideFooter: "Panduan" },
   hero: {
-    badge: "Untuk keluarga dengan perawat",
+    badge: "Untuk keluarga dengan perawat atau asisten rumah tangga",
     title1: "Uang belanja,",
     title2: "setiap rupiah jelas",
     sub: "Perawat mencatat setiap belanja dengan foto struk, setiap serah terima uang dikonfirmasi kedua pihak, dan saldo terlihat di HP kapan saja. Tidak perlu cocokkan struk tiap minggu, tidak ada salah paham soal uang belanja.",
@@ -198,7 +198,7 @@ const vi: LandingCopy = {
   },
   nav: { guide: "Hướng dẫn", signIn: "Đăng nhập", partners: "Dành cho công ty môi giới", privacy: "Quyền riêng tư", guideFooter: "Hướng dẫn" },
   hero: {
-    badge: "Dành cho gia đình có người chăm sóc",
+    badge: "Dành cho gia đình có người chăm sóc hoặc giúp việc",
     title1: "Tiền chợ,",
     title2: "từng khoản đều rõ ràng",
     sub: "Người chăm sóc ghi từng khoản chi kèm ảnh hóa đơn, mỗi lần giao tiền đều được hai bên xác nhận, và bạn xem số dư trên điện thoại bất cứ lúc nào. Không cần đối chiếu hóa đơn mỗi tuần, không còn hiểu lầm vì tiền chợ.",
@@ -256,7 +256,7 @@ const tl: LandingCopy = {
   },
   nav: { guide: "Gabay", signIn: "Mag-sign in", partners: "Para sa ahensya", privacy: "Privacy", guideFooter: "Gabay" },
   hero: {
-    badge: "Para sa pamilyang may caregiver",
+    badge: "Para sa pamilyang may caregiver o kasambahay",
     title1: "Pera para sa bahay,",
     title2: "malinaw ang bawat piso",
     sub: "Itinatala ng caregiver ang bawat gastos na may litrato ng resibo, kinukumpirma ninyong dalawa ang bawat abot ng pera, at makikita mo ang balanse sa phone kahit kailan. Wala nang lingguhang pag-check ng resibo, wala nang tampuhan dahil sa pambili.",
@@ -314,7 +314,7 @@ const th: LandingCopy = {
   },
   nav: { guide: "คู่มือ", signIn: "เข้าสู่ระบบ", partners: "สำหรับบริษัทจัดหางาน", privacy: "ความเป็นส่วนตัว", guideFooter: "คู่มือ" },
   hero: {
-    badge: "สำหรับครอบครัวที่มีผู้ดูแล",
+    badge: "สำหรับครอบครัวที่มีผู้ดูแลหรือแม่บ้าน",
     title1: "เงินค่าใช้จ่ายในบ้าน",
     title2: "ชัดเจนทุกบาท",
     sub: "ผู้ดูแลบันทึกค่าใช้จ่ายทุกรายการพร้อมรูปใบเสร็จ ทั้งสองฝ่ายยืนยันทุกครั้งที่ส่งเงิน และคุณดูยอดคงเหลือในมือถือได้ตลอดเวลา ไม่ต้องตรวจใบเสร็จทุกสัปดาห์ ไม่ต้องผิดใจกันเรื่องเงินค่ากับข้าว",
@@ -372,7 +372,7 @@ const ja: LandingCopy = {
   },
   nav: { guide: "ガイド", signIn: "ログイン", partners: "仲介会社の方へ", privacy: "プライバシー", guideFooter: "ガイド" },
   hero: {
-    badge: "住み込みの介護者がいるご家庭へ",
+    badge: "介護者や家事ヘルパーがいるご家庭へ",
     title1: "介護者に渡す生活費、",
     title2: "一円まで明確に",
     sub: "介護者がレシート写真付きで支出を記録し、現金の受け渡しは双方で確認。残高はスマホでいつでも見られます。毎週のレシート確認も、お金をめぐる気まずさもなくなります。",
@@ -430,7 +430,7 @@ const ko: LandingCopy = {
   },
   nav: { guide: "가이드", signIn: "로그인", partners: "중개업체 안내", privacy: "개인정보", guideFooter: "가이드" },
   hero: {
-    badge: "입주 간병인이 있는 가정을 위해",
+    badge: "간병인이나 가사도우미가 있는 가정을 위해",
     title1: "간병인 생활비,",
     title2: "한 푼까지 투명하게",
     sub: "간병인이 영수증 사진과 함께 지출을 기록하고, 현금 전달은 양쪽이 확인합니다. 잔액은 휴대폰으로 언제든지. 매주 영수증 대조도, 장보기 돈 때문에 서운할 일도 없습니다.",
@@ -488,7 +488,7 @@ const es: LandingCopy = {
   },
   nav: { guide: "Guía", signIn: "Entrar", partners: "Para agencias", privacy: "Privacidad", guideFooter: "Guía" },
   hero: {
-    badge: "Para familias con cuidadora interna",
+    badge: "Para familias con cuidadora o empleada del hogar",
     title1: "El dinero de la casa,",
     title2: "claro hasta el último peso",
     sub: "Tu cuidadora registra cada gasto con foto del recibo, ambas partes confirman cada entrega y ves el saldo en el móvil cuando quieras. Sin revisar recibos cada semana, sin malentendidos por el dinero de la compra.",
@@ -546,7 +546,7 @@ const fr: LandingCopy = {
   },
   nav: { guide: "Guide", signIn: "Connexion", partners: "Pour les agences", privacy: "Confidentialité", guideFooter: "Guide" },
   hero: {
-    badge: "Pour les familles avec une aide à domicile",
+    badge: "Pour les familles avec une aide à domicile ou une employée de maison",
     title1: "L'argent du foyer,",
     title2: "clair au centime près",
     sub: "Votre aide note chaque dépense avec la photo du ticket, vous confirmez tous les deux chaque remise d'argent, et vous voyez le solde sur votre téléphone. Plus de vérification de tickets chaque semaine, plus de malentendus sur l'argent des courses.",

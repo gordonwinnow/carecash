@@ -15,7 +15,7 @@ export function SiteHeader({ copy = LANDING["zh-TW"], picker = false }: { copy?:
       <Link href="/" className="flex shrink-0 items-center gap-2 font-extrabold">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-accent text-white"><PurseIcon size={20} /></span>
         <span className="whitespace-nowrap text-lg">
-          看護家用金 <span className="hidden font-semibold text-muted sm:inline">CareCash</span>
+          CareCash <span className="font-semibold text-muted">家用金</span>
         </span>
       </Link>
       <nav className="flex min-w-0 items-center gap-2 sm:gap-3">
@@ -35,7 +35,7 @@ export function SiteFooter({ copy = LANDING["zh-TW"] }: { copy?: LandingCopy }) 
   return (
     <footer className="mx-auto max-w-5xl px-4 pb-10 pt-6 text-sm text-muted">
       <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-line pt-6">
-        <span>© {new Date().getFullYear()} CareCash 看護家用金</span>
+        <span>© {new Date().getFullYear()} CareCash 家用金</span>
         <Link href="/guide" className="underline-offset-4 hover:underline">{copy.nav.guideFooter}</Link>
         <Link href="/partners" className="underline-offset-4 hover:underline">{copy.nav.partners}</Link>
         <Link href="/privacy" className="underline-offset-4 hover:underline">{copy.nav.privacy}</Link>

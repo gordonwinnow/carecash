@@ -40,7 +40,7 @@ The pitch is: **"a free tool you hand to every new family on placement day that 
 ## Part B: Pitch copy (zh-TW, ready to send)
 
 ### B1. First message: warm contact (LINE)
-> ○○您好，我是 CareCash 看護家用金的創辦人 [名字]。我們做了一個免費的手機工具，讓雇主和看護的家用金每一筆都有收據、交錢收錢雙方確認，看護可以用印尼文、越南文操作。
+> ○○您好，我是 CareCash 家用金的創辦人 [名字]。我們做了一個免費的手機工具，讓雇主和看護的家用金每一筆都有收據、交錢收錢雙方確認，看護可以用印尼文、越南文操作。
 >
 > 很多家庭跟看護之間的摩擦，其實都是從菜錢、家用金對不清楚開始的。想請教您這方面的經驗，也想聽聽看這個工具對你們的雇主客戶有沒有幫助。方便約 15 分鐘嗎？我可以到公司拜訪或線上都可以。
 >
@@ -51,7 +51,7 @@ The pitch is: **"a free tool you hand to every new family on placement day that 
 
 > ○○人力仲介 您好：
 >
-> 我是看護家用金 CareCash 的 [名字]。我們提供一個免費的手機工具，給聘請外籍看護的家庭使用：
+> 我是 CareCash 家用金的 [名字]。我們提供一個免費的手機工具，給聘請外籍看護的家庭使用：
 >
 > ・雇主給家用金、看護按「已收到」，雙方確認，不再有「我明明給了」的爭議
 > ・看護每筆支出拍收據，雇主隨時看到餘額

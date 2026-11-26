@@ -241,7 +241,7 @@ export type Key = keyof typeof en;
 export type Dict = Partial<Record<Key, string>>;
 
 const zh: Dict = {
-  appName: "看護家用金",
+  appName: "CareCash 家用金",
   tagline: "家用金，簡單又清楚",
   continueWith: "使用 {p} 繼續",
   email: "電子郵件",
@@ -309,7 +309,7 @@ const zh: Dict = {
   copied: "已複製！",
   sendWhatsApp: "用 WhatsApp 傳送",
   sendLine: "用 LINE 傳送",
-  inviteMessage: "加入我們家的看護家用金：",
+  inviteMessage: "加入我們家的 CareCash 家用金：",
   members: "家庭成員",
   remove: "移除",
   you: "你",

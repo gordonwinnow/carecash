@@ -83,7 +83,7 @@ Contacts are **public channels only** (website, official LINE, listed toll-free 
 
 | Tier | Agency | Why | Public channel | Status |
 |---|---|---|---|---|
-| 0 | **Founder's contact** | Warm intro | (founder to share) | To do |
+| 0 | **Leona** (dad's friend; company/role unknown) | Warm intro via dad | LINE (founder has it) | Plan in `leona.md` |
 | 1 | 21世紀人力仲介 (21manpower.com.tw) | Daily blog, posts caregiver stats; marketing-minded; Taipei/Taichung/Kaohsiung | Official LINE / toll-free on site | — |
 | 1 | 惜福人力集團 (xifu.com.tw) | ~10 sites; active 2026 blog (has written on 薪資單) | Site contact | — |
 | 1 | 亞太人力仲介 (asiapacific.tw) | Since 2002, 6 cities, writes 評鑑 explainers | Site contact | — |
@@ -116,4 +116,4 @@ Keep it here until it outgrows a table: agency, contact, date, stage (研究 →
 
 | Agency | Contact | Last touch | Stage | Next step |
 |---|---|---|---|---|
-| (founder's contact) | | | 研究 | Founder shares details |
+| Leona (company TBD) | LINE, via dad | — | 研究 | Ask dad 3 questions → dad intro → founder's LINE (`leona.md`) |

@@ -3,7 +3,7 @@
 Newest week on top. Numbers from `/stats` / `node scripts/metrics.mjs`.
 
 ## Founder asks (open), smallest first
-1. Share the broker contact: name, company, your relationship, what they know about CareCash.
+1. Leona: ask your dad the 3 questions, get his LINE intro, then send the message in `outreach/leona.md`.
 2. Merge branch `claude/busy-lamport-a2yiza` and deploy.
 3. Fly secrets: `METRICS_TOKEN` (32+ chars), `CONTACT_EMAIL` and/or `CONTACT_LINE_URL`.
 4. Send the network message (`content/week1-posts.md` §1) to 10 people.

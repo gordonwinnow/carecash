@@ -26,7 +26,8 @@ const HOW = [
 ];
 
 export default function Partners() {
-  const email = process.env.CONTACT_EMAIL;
+  // Public contact for brokers; the CONTACT_EMAIL secret overrides it
+  const email = process.env.CONTACT_EMAIL || "gosomini@googlegroups.com";
   const line = process.env.CONTACT_LINE_URL;
   return (
     <div className="min-h-dvh bg-bg">

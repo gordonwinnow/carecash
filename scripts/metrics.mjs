@@ -23,6 +23,8 @@ const t = m.totals;
 console.log(`CareCash metrics at ${m.at}`);
 console.log(`Signups ${t.signups} / ${m.goal.signups}   Weekly active users ${t.weeklyActiveUsers} / ${m.goal.weeklyActiveUsers}`);
 console.log(`Households ${t.households}  with caretaker ${t.householdsWithCaretaker}  activated ${t.activatedHouseholds}  active this week ${t.weeklyActiveHouseholds}`);
+console.log("\nFunnel");
+for (const f of m.funnel ?? []) console.log(`  ${f.step.padEnd(30)} ${String(f.count).padStart(5)}`);
 console.log("\nWeek ending   signups  households  active users");
 for (const w of m.weeks) console.log(`${w.weekEnding}   ${String(w.signups).padStart(7)}  ${String(w.households).padStart(10)}  ${String(w.activeUsers).padStart(12)}`);
 console.log("\nSource                         households  activated  active 7d");

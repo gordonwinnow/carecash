@@ -37,6 +37,30 @@ export default async function Stats() {
       </div>
 
       <div className="card">
+        <h2 className="mb-2 font-bold">Funnel 啟用漏斗</h2>
+        <div className="space-y-2">
+          {m.funnel.map((f, i) => {
+            const top = Math.max(1, m.funnel[0].count);
+            const prev = i > 0 ? m.funnel[i - 1].count : null;
+            return (
+              <div key={f.step}>
+                <div className="flex justify-between text-sm">
+                  <span>{f.step}</span>
+                  <span className="tabular-nums font-bold">
+                    {f.count}
+                    {prev ? <span className="ml-2 font-normal text-muted">{Math.round((100 * f.count) / prev)}%</span> : null}
+                  </span>
+                </div>
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-sunk">
+                  <div className="h-full rounded-full bg-accent" style={{ width: `${(100 * f.count) / top}%` }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="card">
         <h2 className="mb-2 font-bold">By week 每週</h2>
         <table className="w-full text-right text-sm tabular-nums">
           <thead className="text-muted">

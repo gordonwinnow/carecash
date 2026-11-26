@@ -66,3 +66,6 @@ Write 5 bullet notes in this file under "Meeting notes". Claude turns them into 
 
 ## Meeting notes
 (empty)
+
+## Leave-behind
+`growth/outreach/leona-onepager.pdf`: an A4 page in zh-TW for brokers, covering what employers and caregivers get, the broker benefit, and how the 30-day pilot works. The QR code opens `carecash.me/partners?ref=leona`. Write your LINE or phone number on the contact line, or ask Claude to fill it in. Send it on LINE after the meeting, or print it.

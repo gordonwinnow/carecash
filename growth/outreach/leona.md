@@ -64,6 +64,10 @@ Her referral link is `https://carecash.me/?ref=leona`. Families who start from i
 ## After the meeting
 Write 5 bullet notes in this file under "Meeting notes". Claude turns them into the pilot plan, the flyer and the follow-ups.
 
+## Status
+- **Nov 26:** first LINE message sent (asked for 20 minutes in December). Skipped dad's intro.
+- **Next:** if no reply by Mon Dec 1, send the nudge. When she replies, get her agency name so Claude can prepare the brief and pilot plan.
+
 ## Meeting notes
 (empty)
 

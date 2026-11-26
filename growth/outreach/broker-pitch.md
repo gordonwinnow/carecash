@@ -116,4 +116,4 @@ Keep it here until it outgrows a table: agency, contact, date, stage (研究 →
 
 | Agency | Contact | Last touch | Stage | Next step |
 |---|---|---|---|---|
-| Leona (company TBD) | LINE, via dad | — | 研究 | Ask dad 3 questions → dad intro → founder's LINE (`leona.md`) |
+| Leona (company TBD) | LINE | Nov 26 | 已聯絡 | Nudge Dec 1 if no reply; then brief + pilot plan (`leona.md`) |

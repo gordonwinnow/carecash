@@ -20,6 +20,10 @@ export function proxy(req: NextRequest) {
   // Once SITE_URL is set (the custom domain works), web visitors on the old address move there, keeping the path and ?ref=
   const site = process.env.SITE_URL;
   const host = req.headers.get("host")?.split(":")[0];
+  // www.carecash.me → carecash.me, so there is one address (and one sign-in) for everyone
+  if (site && host === `www.${new URL(site).host}`) {
+    return NextResponse.redirect(new URL(req.nextUrl.pathname + req.nextUrl.search, site), 308);
+  }
   if (site && host === OLD_HOST && new URL(site).host !== OLD_HOST && !isNativeApp(req.headers.get("user-agent") ?? "")) {
     const to = new URL(req.nextUrl.pathname + req.nextUrl.search, site);
     return NextResponse.redirect(to, 308);

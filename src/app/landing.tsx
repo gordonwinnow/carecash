@@ -39,6 +39,7 @@ export function SiteFooter({ copy = LANDING["zh-TW"] }: { copy?: LandingCopy }) 
         <Link href="/guide" className="underline-offset-4 hover:underline">{copy.nav.guideFooter}</Link>
         <Link href="/partners" className="underline-offset-4 hover:underline">{copy.nav.partners}</Link>
         <Link href="/privacy" className="underline-offset-4 hover:underline">{copy.nav.privacy}</Link>
+        <a href="https://www.instagram.com/carecash.me/" className="underline-offset-4 hover:underline" rel="noopener" target="_blank">Instagram</a>
       </div>
     </footer>
   );

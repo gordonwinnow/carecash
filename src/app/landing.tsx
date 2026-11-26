@@ -80,9 +80,8 @@ export function Landing() {
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted sm:text-xl">
             看護拍收據記帳、交錢雙方確認，你隨時在手機上看到餘額。不用每週對帳，也不會因為菜錢傷感情。
           </p>
-          <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
+          <div className="mx-auto mt-8 max-w-xs">
             <Link href="/sign-in" className="btn-primary">免費開始使用</Link>
-            <Link href="/sign-in#demo" className="btn-soft">免註冊，先試用</Link>
           </div>
           <p className="mt-5 text-sm text-muted">免費・免下載・支援 Bahasa Indonesia、Tiếng Việt、Tagalog、ภาษาไทย 等 10 種語言</p>
         </section>

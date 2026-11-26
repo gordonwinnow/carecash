@@ -52,3 +52,17 @@ Gathered by web search only. Official 勞動部 statistics pages could not be op
   - Hospitals' 外籍看護守護日 (e.g. 中山醫大附醫).
 
 **To do (founder, inside FB/LINE):** list the 5 biggest employer groups with member counts and self-promotion rules.
+
+## Where employers gather (web research, Nov 26)
+Facebook groups don't show in web search, and ptt.cc and dcard.tw couldn't be opened from the cloud. Treat this list as leads, not facts.
+
+| Place | Notes |
+|---|---|
+| 愛長照 (ilong-termcare.com, FB group) | Biggest 長照 community. Ran a 「聘僱外籍看護經驗談」 session. Exact group name not confirmed. |
+| Dcard 閒聊 / 心情 | Cost questions (e.g. p/261669255, on who pays for food); venting about caring for parents with a helper. |
+| PTT WomenTalk, city boards (Tainan) | Cost debates; local caregiver referrals. Gossiping is hostile to promotion. |
+| One-Forty | Employer meetups and newsletter. Guest-article partnership. |
+| 家總 | Family-caregiver network. Partnership. |
+| 台灣雇主協會 (FB IAFED0421) | Employer advocacy body. Criticized by worker groups (TIWA/DCU) over a worker-data incident. Use caution. |
+
+Compliance angle for content: employers may not 保管 or 代扣 a worker's wages or property (fines of NT$60k–300k are cited). So keep 家用金 separate from salary. A clear shared ledger helps both sides.

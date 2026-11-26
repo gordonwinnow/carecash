@@ -31,6 +31,17 @@ The cloud session does strategy, code, drafts and deploys. **This session does w
 - Sign up for Threads with the @carecash.me Instagram account.
 - Schedule the 3 posts in `POSTS.md`: Thu 27 12:30, Fri 28 12:30, Sat 29 21:00 (Taipei).
 
+### 4. Find the employer Facebook groups (logged in)
+In Facebook, search Groups for: 外籍看護 雇主, 印尼看護 雇主, 外看 心得, 長照 家屬, 愛長照.
+For the 5–8 most relevant groups, record in `growth/RESEARCH.md` under "Facebook groups (checked)":
+- exact name and URL
+- member count
+- posts per week (rough)
+- whether self-promotion or links are allowed (quote the rule)
+- whether employers (not brokers) do the talking
+
+Don't join or post without the founder's OK.
+
 ## When done
 - Tick the items in the plan doc (move them to its "Done" list), or tell the founder what was done so the cloud session can update the doc.
 - Write anything you couldn't do, and why, at the top of `growth/WEEKLY.md` under "Laptop agent notes", then commit and push.

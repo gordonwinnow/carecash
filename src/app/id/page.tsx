@@ -174,6 +174,15 @@ export default function IndonesianCaregivers() {
           </div>
         </section>
 
+        {/* Read also */}
+        <section className="mx-auto max-w-3xl px-4 py-4">
+          <Link href="/id/panduan/uang-belanja" className="card block hover:border-accent">
+            <p className="text-sm font-bold text-accent-ink">Baca juga</p>
+            <p className="mt-1 text-lg font-bold">Uang belanja dari majikan: cara mencatat supaya tidak ada salah paham</p>
+            <p className="mt-1 text-[15px] text-muted">Pisahkan dari gaji, hitung uang di depan majikan, simpan struk, dan cek bersama setiap minggu.</p>
+          </Link>
+        </section>
+
         {/* Final CTA */}
         <section className="mx-auto max-w-5xl px-4 py-12 text-center">
           <h2 className="text-3xl font-extrabold">Uang jelas, hati tenang</h2>

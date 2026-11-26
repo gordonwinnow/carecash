@@ -51,6 +51,9 @@ Don't join or post without the founder's OK.
 - Folder: `growth/content/social/2026-12-siblings/`. Carousel: Thu Dec 11 20:30. Threads: Dec 9 12:30, Dec 10 12:30, Dec 12 21:00.
 - The Dcard and PTT posts in `POSTS.md` must be adapted by the founder to his real experience. Never post them as written.
 
+### 7. January: set 4 on Lunar New Year (only after the founder approves it in the plan doc)
+- Folder: `growth/content/social/2027-01-lunar-new-year/`. Carousel: Thu Jan 8 2027 20:30. Threads: Jan 6, Jan 13 and Jan 27, as listed in `POSTS.md`.
+
 ## When done
 - Tick the items in the plan doc (move them to its "Done" list), or tell the founder what was done so the cloud session can update the doc.
 - Write anything you couldn't do, and why, at the top of `growth/WEEKLY.md` under "Laptop agent notes", then commit and push.

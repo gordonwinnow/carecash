@@ -10,7 +10,10 @@ export function SiteHeader() {
         <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-white"><PurseIcon size={20} /></span>
         <span className="text-lg">看護家用金 <span className="font-semibold text-muted">CareCash</span></span>
       </Link>
-      <Link href="/sign-in" className="rounded-full bg-card px-4 py-2 text-sm font-bold [box-shadow:var(--shadow)]">登入</Link>
+      <nav className="flex items-center gap-4">
+        <Link href="/guide" className="text-sm font-bold text-muted hover:text-ink">指南</Link>
+        <Link href="/sign-in" className="rounded-full bg-card px-4 py-2 text-sm font-bold [box-shadow:var(--shadow)]">登入</Link>
+      </nav>
     </header>
   );
 }
@@ -20,6 +23,7 @@ export function SiteFooter() {
     <footer className="mx-auto max-w-5xl px-4 pb-10 pt-6 text-sm text-muted">
       <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-line pt-6">
         <span>© {new Date().getFullYear()} CareCash 看護家用金</span>
+        <Link href="/guide" className="underline-offset-4 hover:underline">看護家用金指南</Link>
         <Link href="/partners" className="underline-offset-4 hover:underline">仲介公司合作</Link>
         <Link href="/privacy" className="underline-offset-4 hover:underline">隱私權政策</Link>
       </div>

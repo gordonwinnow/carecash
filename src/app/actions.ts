@@ -46,8 +46,9 @@ export async function createFamily(fd: FormData) {
   const fid = newId();
   const mid = newId();
   const now = Date.now();
+  const source = (await cookies()).get("cc_ref")?.value?.slice(0, 60) || null;
   db.transaction(() => {
-    db.prepare("insert into family (id, name, created_at) values (?, ?, ?)").run(fid, name, now);
+    db.prepare("insert into family (id, name, created_at, source) values (?, ?, ?, ?)").run(fid, name, now, source);
     db.prepare("insert into member (id, family_id, user_id, role, name, created_at) values (?, ?, ?, 'admin', ?, ?)").run(
       mid, fid, user.id, user.name || "Employer", now,
     );

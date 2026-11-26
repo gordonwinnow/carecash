@@ -42,6 +42,11 @@ For the 5–8 most relevant groups, record in `growth/RESEARCH.md` under "Facebo
 
 Don't join or post without the founder's OK.
 
+### 5. Week of Dec 1: second post set (after the founder approves)
+- Folder: `growth/content/social/2026-12-food-money/` (slides + `POSTS.md`).
+- Schedule the carousel for Thu Dec 4, 20:30, and the Threads posts for Tue Dec 2 12:30, Wed Dec 3 12:30 and Fri Dec 5 21:00.
+- Switch the Instagram bio link to the URL given in `POSTS.md` on Dec 4.
+
 ## When done
 - Tick the items in the plan doc (move them to its "Done" list), or tell the founder what was done so the cloud session can update the doc.
 - Write anything you couldn't do, and why, at the top of `growth/WEEKLY.md` under "Laptop agent notes", then commit and push.

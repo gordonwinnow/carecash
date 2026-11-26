@@ -47,6 +47,10 @@ Don't join or post without the founder's OK.
 - Schedule the carousel for Thu Dec 4, 20:30, and the Threads posts for Tue Dec 2 12:30, Wed Dec 3 12:30 and Fri Dec 5 21:00.
 - Switch the Instagram bio link to the URL given in `POSTS.md` on Dec 4.
 
+### 6. Week of Dec 8: set 3 on siblings (only after the founder approves it in the plan doc)
+- Folder: `growth/content/social/2026-12-siblings/`. Carousel: Thu Dec 11 20:30. Threads: Dec 9 12:30, Dec 10 12:30, Dec 12 21:00.
+- The Dcard and PTT posts in `POSTS.md` must be adapted by the founder to his real experience. Never post them as written.
+
 ## When done
 - Tick the items in the plan doc (move them to its "Done" list), or tell the founder what was done so the cloud session can update the doc.
 - Write anything you couldn't do, and why, at the top of `growth/WEEKLY.md` under "Laptop agent notes", then commit and push.

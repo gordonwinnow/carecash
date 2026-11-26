@@ -12,7 +12,7 @@ const env = process.env;
 export const webPushReady = !!(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY);
 const apnsReady = !!(env.APNS_KEY_P8 && env.APNS_KEY_ID && env.APNS_TEAM_ID);
 
-if (webPushReady) webpush.setVapidDetails(env.VAPID_SUBJECT || "https://carecash.fly.dev", env.VAPID_PUBLIC_KEY!, env.VAPID_PRIVATE_KEY!);
+if (webPushReady) webpush.setVapidDetails(env.VAPID_SUBJECT || "https://carecash.me", env.VAPID_PUBLIC_KEY!, env.VAPID_PRIVATE_KEY!);
 
 export type Sub = { id: string; kind: "web" | "apns"; endpoint: string; keys: string | null; lang: string };
 export type Message = { title: string; body: string; url: string };

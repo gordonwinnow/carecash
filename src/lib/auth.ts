@@ -45,7 +45,8 @@ export const auth = betterAuth({
   database: db,
   secret: env.BETTER_AUTH_SECRET || "dev-only-secret-change-me-dev-only-secret",
   baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: ["https://appleid.apple.com"],
+  // The old Fly address stays trusted while people move over to the main one
+  trustedOrigins: ["https://appleid.apple.com", "https://carecash.me", "https://carecash.fly.dev"],
   session: { expiresIn: 60 * 60 * 24 * 180, updateAge: 60 * 60 * 24 },
   emailAndPassword: { enabled: true, minPasswordLength: 6, autoSignIn: true },
   socialProviders: {

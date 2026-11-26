@@ -3,7 +3,7 @@
   "appName": "CareCash",
   "webDir": "www",
   "server": {
-    "url": "https://carecash.fly.dev",
+    "url": "https://carecash.me",
     "cleartext": false
   },
   "ios": {

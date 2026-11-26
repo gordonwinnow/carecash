@@ -66,6 +66,11 @@ export function Landing({ lang }: { lang: Lang }) {
             <Link href="/sign-in?mode=signup" className="btn-primary">{c.hero.cta}</Link>
           </div>
           <p className="mt-5 text-sm text-muted">{c.hero.note}</p>
+          {lang === "id" && (
+            <Link href="/id" className="card mx-auto mt-6 block max-w-md text-left font-bold text-accent-ink">
+              Kamu perawat? Baca bagaimana CareCash melindungi kamu →
+            </Link>
+          )}
         </section>
 
         {/* Pain points */}

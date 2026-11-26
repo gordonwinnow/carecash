@@ -163,7 +163,7 @@ const id: LandingCopy = {
   features: {
     title: "Semua yang dibutuhkan untuk uang belanja",
     items: [
-      { t: "Dikonfirmasi kedua pihak", d: "Majikan memberi uang, perawat tekan “Sudah diterima”; perawat terima uang, majikan tekan “Konfirmasi”. Tidak ada lagi “tapi saya sudah kasih”." },
+      { t: "Dikonfirmasi kedua pihak", d: "Majikan memberi uang, perawat tekan “Sudah saya terima”; perawat terima uang, majikan tekan “Konfirmasi”. Tidak ada lagi “tapi saya sudah kasih”." },
       { t: "Foto struk tersimpan", d: "Setiap belanja ada foto struknya, tersusun per bulan." },
       { t: "Saldo langsung terlihat", d: "Sisa bulan lalu + uang bulan ini − belanja bulan ini, dihitung otomatis. Kedua pihak melihat angka yang sama." },
       { t: "Pengingat uang menipis", d: "Notifikasi saat saldo di bawah jumlah yang diatur." },

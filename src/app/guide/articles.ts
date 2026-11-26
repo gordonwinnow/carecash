@@ -3,6 +3,20 @@ export type Article = { slug: string; title: string; description: string; publis
 
 export const ARTICLES: Article[] = [
   {
+    slug: "lunar-new-year-caregiver-holiday-money",
+    title: "過年請外籍看護：放假、紅包、加班費與家用金怎麼安排",
+    description:
+      "2027 年除夕是 2 月 5 日。家裡有外籍看護，過年要不要放假、國定假日出勤怎麼處理、紅包怎麼包、年前家用金要多準備多少？附替代照顧與常見問題。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "siblings-sharing-parent-care-costs",
+    title: "兄弟姊妹分攤爸媽的看護費、家用金：怎麼算才不吵架",
+    description:
+      "爸媽請了外籍看護，兄弟姊妹怎麼分攤薪水、規費、伙食和家用金？比較平均分、依收入比例、出錢出力折算三種方法，附範例、共用帳本與每月對帳做法。",
+    published: "2026-11-27",
+  },
+  {
     slug: "caregiver-food-and-household-cash-per-month",
     title: "外籍看護伙食費、家用金一個月多少？三種錢分清楚",
     description:

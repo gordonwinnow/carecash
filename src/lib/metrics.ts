@@ -49,10 +49,12 @@ export function metrics(now = Date.now()) {
       `select f.id, f.created_at, coalesce(f.source, '(direct)') as source,
         exists(select 1 from member m where m.family_id = f.id and m.role = 'caretaker' and m.active = 1) as has_caretaker,
         exists(select 1 from expense e where e.family_id = f.id) as has_expense,
+        exists(select 1 from expense e join member m on m.id = e.member_id where e.family_id = f.id and m.role = 'caretaker') as caretaker_logged,
+        exists(select 1 from cash c where c.family_id = f.id) as has_cash,
         (select max(at) from audit a where a.family_id = f.id) as last_at
        from family f where f.demo = 0`,
     )
-    .all() as { id: string; created_at: number; source: string; has_caretaker: number; has_expense: number; last_at: number | null }[];
+    .all() as { id: string; created_at: number; source: string; has_caretaker: number; has_expense: number; caretaker_logged: number; has_cash: number; last_at: number | null }[];
 
   const weekStart = now - WEEK;
   const activeNow = new Set([...actorsBetween(weekStart, now + 1), ...openedSince(weekStart, real)].filter((id) => real.has(id)));
@@ -77,8 +79,19 @@ export function metrics(now = Date.now()) {
     bySource.set(f.source, s);
   }
 
+  // Where families stall: each step counts households (except the first, which counts accounts)
+  const funnel = [
+    { step: "Signed up (accounts)", count: users.length },
+    { step: "Created a family", count: families.length },
+    { step: "Gave household cash", count: families.filter((f) => f.has_cash).length },
+    { step: "Caregiver joined", count: families.filter((f) => f.has_caretaker).length },
+    { step: "Caregiver logged an expense", count: families.filter((f) => f.caretaker_logged).length },
+    { step: "Active in the last 7 days", count: families.filter((f) => f.last_at && f.last_at >= weekStart).length },
+  ];
+
   return {
     at: new Date(now).toISOString(),
+    funnel,
     goal: { signups: 1000, weeklyActiveUsers: 100 },
     totals: {
       signups: users.length,

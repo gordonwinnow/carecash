@@ -85,6 +85,12 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
 
       {mode === "menu" && (
         <div className="space-y-3">
+          {/* Most families in Taiwan live in LINE, so it comes first */}
+          {enabled.line && (
+            <button className="btn text-white" style={{ background: "#06C755" }} disabled={busy} onClick={() => social("line")}>
+              <span className="font-black">{t("continueWith", { p: "LINE" })}</span>
+            </button>
+          )}
           {enabled.whatsapp && (
             <button className="btn text-white" style={{ background: "#128C4B" }} onClick={() => setMode("whatsapp")}>
               <WhatsAppIcon /> {t("continueWith", { p: "WhatsApp" })}
@@ -100,17 +106,9 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
               <span className="text-2xl"></span> {t("continueWith", { p: "Apple" })}
             </button>
           )}
-          {/* Smaller options side by side */}
-          <div className="flex gap-3">
-            <button className="btn-soft min-h-13 flex-1 text-lg" onClick={() => setMode("email")}>
-              <Mail size={20} /> {t("email")}
-            </button>
-            {enabled.line && (
-              <button className="btn min-h-13 flex-1 text-lg text-white" style={{ background: "#06C755" }} disabled={busy} onClick={() => social("line")}>
-                <span className="font-black">LINE</span>
-              </button>
-            )}
-          </div>
+          <button className="btn-soft min-h-13 text-lg" onClick={() => setMode("email")}>
+            <Mail size={20} /> {t("email")}
+          </button>
           <div id="demo" className="pt-6">
             <div className="flex flex-wrap gap-2">
               {(["admin", "caretaker"] as const).map((role) => (

@@ -54,6 +54,9 @@ Don't join or post without the founder's OK.
 ### 7. January: set 4 on Lunar New Year (only after the founder approves it in the plan doc)
 - Folder: `growth/content/social/2027-01-lunar-new-year/`. Carousel: Thu Jan 8 2027 20:30. Threads: Jan 6, Jan 13 and Jan 27, as listed in `POSTS.md`.
 
+### 8. Dec 15–20: set 5, the 6 ways employers give grocery money (only after the founder approves it in the plan doc)
+- Folder: `growth/content/social/2026-12-money-methods/` (8 slides). Carousel: Thu Dec 17, 20:30. Threads: the 6 posts and times listed in `POSTS.md`.
+
 ## When done
 - Tick the items in the plan doc (move them to its "Done" list), or tell the founder what was done so the cloud session can update the doc.
 - Write anything you couldn't do, and why, at the top of `growth/WEEKLY.md` under "Laptop agent notes", then commit and push.

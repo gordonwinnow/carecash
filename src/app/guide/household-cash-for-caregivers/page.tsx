@@ -7,7 +7,7 @@ import { article } from "../articles";
 const A = article("household-cash-for-caregivers")!;
 
 export const metadata: Metadata = {
-  title: `${A.title}｜看護家用金 CareCash`,
+  title: `${A.title}｜CareCash 家用金`,
   description: A.description,
   alternates: { canonical: `/guide/${A.slug}` },
   openGraph: { title: A.title, description: A.description, type: "article", locale: "zh_TW", publishedTime: A.published, images: [{ url: "/icon-1024.png" }] },
@@ -58,7 +58,7 @@ export default function ArticlePage() {
       <SiteHeader />
       <main className="mx-auto max-w-2xl px-4 pb-12 pt-4">
         <nav className="text-sm text-muted">
-          <Link href="/guide" className="underline-offset-4 hover:underline">看護家用金指南</Link>
+          <Link href="/guide" className="underline-offset-4 hover:underline">家用金指南</Link>
         </nav>
         <article>
           <h1 className="mt-3 text-3xl font-extrabold leading-tight sm:text-4xl">{A.title}</h1>
@@ -150,7 +150,7 @@ export default function ArticlePage() {
           <div className="card mt-12 p-6 text-center">
             <p className="text-2xl font-extrabold">想省掉紙本和對帳的麻煩？</p>
             <p className="mt-3 text-lg text-muted">
-              看護家用金 CareCash 把上面的方法做成免費工具：給錢雙方確認、收據拍照留存、餘額自動算好，看護可以用印尼文、越南文等母語操作。
+              CareCash 家用金 把上面的方法做成免費工具：給錢雙方確認、收據拍照留存、餘額自動算好，看護可以用印尼文、越南文等母語操作。
             </p>
             <div className="mx-auto mt-5 max-w-xs">
               <Link href="/sign-in?ref=guide" className="btn-primary">免費開始使用</Link>
@@ -176,7 +176,7 @@ export default function ArticlePage() {
               dateModified: A.updated ?? A.published,
               inLanguage: "zh-TW",
               mainEntityOfPage: url,
-              publisher: { "@type": "Organization", name: "看護家用金 CareCash", logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png` } },
+              publisher: { "@type": "Organization", name: "CareCash 家用金", logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png` } },
             },
             {
               "@context": "https://schema.org",

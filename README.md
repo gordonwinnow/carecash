@@ -1,4 +1,4 @@
-# CareCash 看護家用金
+# CareCash 家用金
 
 A very simple app for a Taiwanese family (雇主) and their household caretaker (家庭移工) to track grocery cash.
 

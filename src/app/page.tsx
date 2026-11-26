@@ -13,11 +13,11 @@ export async function generateMetadata(): Promise<Metadata> {
     description: m.description,
     alternates: { canonical: "/" },
     openGraph: {
-      title: "看護家用金 CareCash｜每一筆菜錢都清楚",
+      title: "CareCash 家用金｜看護、幫傭的家用金，每一筆都清楚",
       description: "看護拍收據記帳、交錢雙方確認，雇主隨時看到餘額。免費，支援 10 種語言。",
       type: "website",
       locale: "zh_TW",
-      siteName: "看護家用金 CareCash",
+      siteName: "CareCash 家用金",
       images: [{ url: "/icon-1024.png", width: 1024, height: 1024 }],
     },
   };

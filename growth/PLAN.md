@@ -35,7 +35,9 @@ Everything public-facing is in Traditional Chinese (zh-TW). Material for caregiv
 **Market:** about 200k employer households.
 - The 免巴氏量表 rule for people aged 80+ (Aug 2025) is adding a wave of **first-time employers**. They are our best segment: no habits yet, and they actively search for 「外籍看護 家用金 怎麼給」.
 
-**Positioning (one line):** 看護的家用金，每一筆都清楚 — 雙方確認、收據留存、母語操作、免費。
+**Brand (decided Nov 26):** CareCash 家用金 — named after the money, not the worker. **Tagline:** 看護、幫傭的家用金，每一筆都清楚. Keep 看護 in page titles and articles for search.
+
+**Positioning (one line):** 看護、幫傭的家用金，每一筆都清楚 — 雙方確認、收據留存、母語操作、免費。
 
 **No direct competitor found.**
 - Care Logger and HaloCare 家護通 do care diaries and translation. Paper notebooks and Excel are the real substitutes.

@@ -152,9 +152,8 @@ export default function ArticlePage() {
             <p className="mt-3 text-lg text-muted">
               看護家用金 CareCash 把上面的方法做成免費工具：給錢雙方確認、收據拍照留存、餘額自動算好，看護可以用印尼文、越南文等母語操作。
             </p>
-            <div className="mx-auto mt-5 flex max-w-md flex-col gap-3 sm:flex-row">
+            <div className="mx-auto mt-5 max-w-xs">
               <Link href="/sign-in?ref=guide" className="btn-primary">免費開始使用</Link>
-              <Link href="/sign-in#demo" className="btn-soft">免註冊，先試用</Link>
             </div>
           </div>
 

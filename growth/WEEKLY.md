@@ -3,12 +3,14 @@
 Newest week on top. Numbers from `/stats` / `node scripts/metrics.mjs`.
 
 ## Founder asks (open), smallest first
+Live checklist: the plan doc (https://claude.ai/artifact/3ekZHXvrrgPPgo8U13WwTy). Give the founder that link whenever it changes.
 1. Leona: ask your dad the 3 questions, get his LINE intro, then send the message in `outreach/leona.md`.
-2. Merge branch `claude/busy-lamport-a2yiza` and deploy.
-3. Fly secrets: `METRICS_TOKEN` (32+ chars), `CONTACT_EMAIL` and/or `CONTACT_LINE_URL`.
-4. Send the network message (`content/week1-posts.md` §1) to 10 people.
-5. LINE Login keys; create a LINE OA + FB Page + Threads account.
-6. Decide on a domain (recommend carecash.tw or carecash.app).
+2. One time: `flyctl tokens create deploy -a carecash` → GitHub repo secret `FLY_API_TOKEN` (then every merge to main deploys).
+3. carecash.me: `flyctl certs add carecash.me -a carecash`, add the printed records in Vercel DNS, then `flyctl secrets set SITE_URL=https://carecash.me -a carecash`.
+4. Fly secrets: `METRICS_TOKEN` (32+ chars), `CONTACT_EMAIL` and/or `CONTACT_LINE_URL`; then store METRICS_TOKEN as a credential for the weekly review.
+5. Send the network message (`content/week1-posts.md` §1) to 10 people.
+6. LINE Login keys (both callback URLs); LINE OA + FB Page + Threads (`content/accounts-kit.md`).
+Done: merged to main (Nov 26, gordonwinnow/carecash#1); domain chosen: carecash.me.
 
 ## Week of 2026-11-25 (week 1)
 **Scoreboard:** signups — / 1000 · weekly active — / 100 (baseline unknown until metrics are deployed)

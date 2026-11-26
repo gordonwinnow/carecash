@@ -7,6 +7,7 @@ primary_region = "nrt"
 [env]
   NODE_ENV = "production"
   DATA_DIR = "/data"
+  # Sign-in and links use SITE_URL (a secret, https://carecash.me) when set; this is the fallback
   BETTER_AUTH_URL = "https://carecash.fly.dev"
 
 # SQLite database and receipt photos live on this volume

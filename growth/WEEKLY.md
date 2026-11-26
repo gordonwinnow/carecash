@@ -9,7 +9,7 @@ Live checklist: the plan doc (https://claude.ai/artifact/3ekZHXvrrgPPgo8U13WwTy)
 3. carecash.me: `flyctl certs add carecash.me -a carecash`, add the printed records in Vercel DNS, then `flyctl secrets set SITE_URL=https://carecash.me -a carecash`.
 4. Fly secrets: `METRICS_TOKEN` (32+ chars), `CONTACT_EMAIL` and/or `CONTACT_LINE_URL`; then store METRICS_TOKEN as a credential for the weekly review.
 5. Send the network message (`content/week1-posts.md` §1) to 10 people.
-6. LINE Login keys (both callback URLs); LINE OA + FB Page + Threads (`content/accounts-kit.md`).
+6. Instagram + Threads (`content/accounts-kit.md` §4). On hold by founder's choice: LINE Login, LINE OA, Facebook Page.
 Done: merged to main (Nov 26, gordonwinnow/carecash#1); domain chosen: carecash.me.
 
 ## Week of 2026-11-25 (week 1)

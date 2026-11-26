@@ -29,9 +29,11 @@ function toE164(raw: string) {
   return `+${s}`;
 }
 
-export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
+export function SignIn({ next, enabled, signUp = false, invitedBy }: { next: string; enabled: Enabled; signUp?: boolean; invitedBy?: string }) {
   const t = useT();
-  const [mode, setMode] = useState<Mode>("menu");
+  // New people (sign-up buttons, invite links) go straight to creating an account when email is the only way in
+  const onlyEmail = !enabled.google && !enabled.apple && !enabled.line && !enabled.whatsapp;
+  const [mode, setMode] = useState<Mode>(signUp && onlyEmail ? "email" : "menu");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -83,6 +85,13 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
         <p className="mt-2 text-xl text-muted">{t("tagline")}</p>
       </div>
 
+      {invitedBy && (
+        <div className="mb-5 rounded-3xl bg-accent-soft p-5 text-center">
+          <p className="text-xl font-extrabold text-accent-ink">{t("invitedTo", { family: invitedBy })}</p>
+          <p className="mt-1 text-[17px] text-muted">{t("invitedHint")}</p>
+        </div>
+      )}
+
       {mode === "menu" && (
         <div className="space-y-3">
           {enabled.whatsapp && (
@@ -111,7 +120,7 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
               </button>
             )}
           </div>
-          <div id="demo" className="pt-6">
+          {!invitedBy && <div id="demo" className="pt-6">
             <div className="flex flex-wrap gap-2">
               {(["admin", "caretaker"] as const).map((role) => (
                 <button
@@ -130,12 +139,12 @@ export function SignIn({ next, enabled }: { next: string; enabled: Enabled }) {
                 </button>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
       )}
 
       {mode === "whatsapp" && <WhatsAppForm next={next} run={run} busy={busy} back={() => setMode("menu")} />}
-      {mode === "email" && <EmailForm next={next} run={run} busy={busy} back={() => setMode("menu")} />}
+      {mode === "email" && <EmailForm next={next} run={run} busy={busy} back={() => setMode("menu")} startSignUp={signUp} />}
 
       {err && <p className="mt-4 rounded-2xl bg-bad-soft p-4 text-lg font-semibold text-bad">{err}</p>}
       <div className="mt-auto flex justify-center pt-10">
@@ -198,9 +207,9 @@ function WhatsAppForm({ next, run, busy, back }: FormProps) {
   );
 }
 
-function EmailForm({ next, run, busy, back }: FormProps) {
+function EmailForm({ next, run, busy, back, startSignUp = false }: FormProps & { startSignUp?: boolean }) {
   const t = useT();
-  const [signUp, setSignUp] = useState(false);
+  const [signUp, setSignUp] = useState(startSignUp);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

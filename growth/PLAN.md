@@ -125,7 +125,7 @@ Validate by asking the pilot broker "would you pay for X?" before building.
 
 ## 8. Weekly rhythm (what Claude does each week)
 
-**Standing rule from the founder:** the plan doc "CareCash Growth Plan & Weekly Log" (https://claude.ai/artifact/3ekZHXvrrgPPgo8U13WwTy) must always be up to date. Whenever any session finishes a piece of work (shipped, merged, drafted, unblocked), it updates that doc in the same turn — founder asks, sprint checklist, weekly log, "where things live" — and gives the founder the link.
+**Standing rule from the founder:** the plan doc "CareCash Growth Plan & Weekly Log" (https://claude.ai/artifact/3ekZHXvrrgPPgo8U13WwTy) must always be up to date. Whenever any session finishes a piece of work (shipped, merged, drafted, unblocked), it updates that doc in the same turn — founder asks, sprint checklist, weekly log, "where things live" — and gives the founder the link. Finished founder asks move from the open list to the "Done" list under it, so the open list stays short.
 
 
 1. Pull metrics, update `WEEKLY.md` (scoreboard + what changed).

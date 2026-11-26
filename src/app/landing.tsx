@@ -63,7 +63,7 @@ export function Landing({ lang }: { lang: Lang }) {
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted sm:text-xl">{c.hero.sub}</p>
           <div className="mx-auto mt-8 max-w-xs">
-            <Link href="/sign-in" className="btn-primary">{c.hero.cta}</Link>
+            <Link href="/sign-in?mode=signup" className="btn-primary">{c.hero.cta}</Link>
           </div>
           <p className="mt-5 text-sm text-muted">{c.hero.note}</p>
         </section>
@@ -146,7 +146,7 @@ export function Landing({ lang }: { lang: Lang }) {
           <h2 className="text-3xl font-extrabold">{c.final.title}</h2>
           <p className="mt-3 text-lg text-muted">{c.final.sub}</p>
           <div className="mx-auto mt-6 max-w-sm">
-            <Link href="/sign-in" className="btn-primary">{c.hero.cta}</Link>
+            <Link href="/sign-in?mode=signup" className="btn-primary">{c.hero.cta}</Link>
           </div>
         </section>
       </main>

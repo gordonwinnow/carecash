@@ -2,6 +2,17 @@
 
 Newest week on top. Numbers from `/stats` / `node scripts/metrics.mjs`.
 
+## Laptop agent notes (Nov 27)
+**Done (tasks 1–3, Claude in Chrome):**
+- @carecash.me: name `CareCash 家用金` and profile photo set; switched to a **Business** account (category "Software": the web has no "App page"; hidden on profile; no contact info).
+- Threads scheduled (dates shifted because the plan's "Thu 27" is really a Friday, and Fri 12:30 had passed): Day 1 **Fri 27 21:30**, Day 2 **Sat 28 12:30**, Day 3 **Sun 29 21:00**.
+- Founder feedback → `content/social/2026-11-threads-voice/PLAN.md`: personal founder voice, pinned explainer, open-question posts, and reply drafts for 4 live threads.
+
+**Couldn't do, and why:**
+- **IG bio** didn't save ("There was a problem saving your profile", twice); **IG link** can only be edited in the phone app. Founder: add both on the phone.
+- **IG carousel not scheduled:** instagram.com has no scheduling, and Business Suite needs a Facebook Page (on hold). Draft was filled in Chrome but not shared. Founder: schedule it in the IG app (+ → Post → 6 slides → Advanced settings → Schedule). The 20:30 Fri slot passed; suggest **Sat 28 20:30**.
+- Personal intro post and replies need the founder's real details ([ ] in PLAN.md) before posting.
+
 ## Founder asks (open), smallest first
 Live checklist: the plan doc (https://claude.ai/artifact/3ekZHXvrrgPPgo8U13WwTy). Give the founder that link whenever it changes.
 1. Leona: ask your dad the 3 questions, get his LINE intro, then send the message in `outreach/leona.md`.

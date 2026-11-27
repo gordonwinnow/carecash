@@ -10,7 +10,7 @@ The cloud session does strategy, code, drafts and deploys. **This session does w
 
 ## Rules
 - **Standing approval (founder, Nov 27):** every post set under `growth/content/social/` is approved by default. Schedule them without asking first. Forum or Dcard story posts that need the founder's real experience are the exception.
-- The founder approved the November post set on Nov 26 (`growth/content/social/2026-11-household-cash/`). Any new public post needs the founder's OK in this chat first.
+- Forum, Facebook-group, Dcard and PTT posts in `growth/outreach/posting-queue.md` are written as the founder: show each one and wait for "OK #N" before submitting, and never post text with an unfilled 【】 placeholder.
 - Never type passwords, and never change account security settings. If a login is needed, ask the founder to log in.
 - Show the founder each post (screenshot) before you press Schedule or Share.
 
@@ -64,6 +64,10 @@ Don't join or post without the founder's OK.
 - `growth/content/social/2027-01-reimbursement/`: IG Thu Jan 14; Threads Jan 12, 15, 17
 - `growth/content/social/2027-01-costs/`: IG Thu Jan 21; Threads Jan 19, 20, 23
 - Before scheduling each, check that its article URL opens.
+
+### 13. Posting queue (forums, FB groups, Dcard, collab pitches)
+- File: `growth/outreach/posting-queue.md` (29 items with URLs and paste-ready text). Follow its §5 "Laptop Claude prompt".
+- At most 2 posts a day. No links or product name on PTT. Log each item in its §4 status log, then commit and push.
 
 ## When done
 - Tick the items in the plan doc (move them to its "Done" list), or tell the founder what was done so the cloud session can update the doc.

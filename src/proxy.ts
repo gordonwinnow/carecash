@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { isNativeApp } from "@/lib/native";
 
 const OLD_HOST = "carecash.fly.dev";
 
@@ -7,9 +8,6 @@ const OLD_HOST = "carecash.fly.dev";
  * so it must not be redirected. Its web view's user agent has no "Safari/" token, unlike Safari and other browsers.
  * In-app browsers of Facebook, Instagram and LINE are redirected like any browser.
  */
-function isNativeApp(ua: string) {
-  return /iPhone|iPad|iPod/.test(ua) && !/Safari\/|FBAN|FBAV|Instagram|Line\//.test(ua);
-}
 
 /**
  * First-touch attribution: a visit with ?ref=<code> (a broker, a post, a flyer) or ?utm_source=<x>

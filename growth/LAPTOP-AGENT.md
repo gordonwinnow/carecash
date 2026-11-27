@@ -69,6 +69,12 @@ Don't join or post without the founder's OK.
 - File: `growth/outreach/posting-queue.md` (29 items with URLs and paste-ready text). Follow its §5 "Laptop Claude prompt".
 - At most 2 posts a day. No links or product name on PTT. Log each item in its §4 status log, then commit and push.
 
+### 14–16. Sets 10–12 (approved by default)
+- `growth/content/social/2027-01-hiring-costs/`: IG Thu Jan 28; Threads Jan 26, 27, 30 (bio link stays on the costs overview article)
+- `growth/content/social/2027-02-money-phrases/`: IG Thu Feb 4 (before Lunar New Year's Eve); Threads Feb 2, 3, 9
+- `growth/content/social/2027-02-remote-parents/`: IG Thu Feb 18; Threads Feb 16, 17, 20
+- Before scheduling each, check that its article URL opens.
+
 ## When done
 - Tick the items in the plan doc (move them to its "Done" list), or tell the founder what was done so the cloud session can update the doc.
 - Write anything you couldn't do, and why, at the top of `growth/WEEKLY.md` under "Laptop agent notes", then commit and push.

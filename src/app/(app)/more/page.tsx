@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Eye, Lock, Plus } from "lucide-react";
+import { ChevronRight, ClipboardCheck, Eye, Lock, Plus, ReceiptText } from "lucide-react";
 import { db } from "@/lib/db";
-import { getLang, getT, requireCtx } from "@/lib/ctx";
-import { KINDS, kindIconId, money, TZ } from "@/lib/format";
+import { getLang, getT, labsOn, requireCtx } from "@/lib/ctx";
+import { KINDS, kindIconId, money, today, TZ } from "@/lib/format";
+import { buildChecklist, type Dates } from "@/lib/labs";
+import type { T } from "@/lib/i18n";
+import { LabsTag } from "@/components/labs";
 import { toggleShare } from "../../actions";
 import { ActionButton, PageTitle } from "@/components/ui";
 import { Badge } from "@/components/icons";
@@ -64,6 +67,8 @@ export default async function More() {
         </div>
       </section>
 
+      {isAdmin && labsOn(me.family_id) && <LabsCard familyId={me.family_id} t={t} />}
+
       {isAdmin && (
         <Link href="/more/new" className="btn-primary">
           <Plus size={24} /> {t("addRecord")}
@@ -105,5 +110,45 @@ export default async function More() {
         </RowList>
       )}
     </div>
+  );
+}
+
+/** Labs entry point (employers, when Labs is on): the checklist with its overdue count, and the salary slip. */
+function LabsCard({ familyId, t }: { familyId: string; t: T }) {
+  const caretakers = db
+    .prepare("select id, arrival_date, contract_start, arc_expiry from member where family_id = ? and role = 'caretaker' and active = 1")
+    .all(familyId) as ({ id: string } & Dates)[];
+  const done = db.prepare("select member_id, item_key, period, done_at from checklist_done where family_id = ?").all(familyId) as {
+    member_id: string;
+    item_key: string;
+    period: string;
+    done_at: number;
+  }[];
+  const now = today();
+  const overdue = caretakers.reduce((n, c) => {
+    const mine = new Map(done.filter((d) => d.member_id === c.id).map((d) => [`${d.item_key}|${d.period}`, d.done_at]));
+    return n + buildChecklist(c, now, mine).filter((i) => i.status === "overdue").length;
+  }, 0);
+  const rows = [
+    { href: "/labs/checklist", Icon: ClipboardCheck, title: t("labsChecklist"), sub: t("labsChecklistSub"), badge: overdue ? t("labsOverdue", { n: overdue }) : null },
+    { href: "/labs/payslip", Icon: ReceiptText, title: t("labsPayslip"), sub: t("labsPayslipSub"), badge: null },
+  ];
+  return (
+    <section className="card !p-2">
+      <div className="px-3 pb-1 pt-2">
+        <LabsTag />
+      </div>
+      {rows.map(({ href, Icon, title, sub, badge }) => (
+        <Link key={href} href={href} className="flex min-h-16 items-center gap-3 rounded-2xl px-3 py-2 active:bg-sunk">
+          <span className="badge h-10 w-10 rounded-xl"><Icon size={21} /></span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-lg font-bold leading-tight">{title}</span>
+            <span className="block text-[14px] text-muted">{sub}</span>
+          </span>
+          {badge && <span className="shrink-0 rounded-full bg-bad-soft px-2.5 py-1 text-[13px] font-bold text-bad">{badge}</span>}
+          <ChevronRight size={20} className="shrink-0 text-muted" />
+        </Link>
+      ))}
+    </section>
   );
 }

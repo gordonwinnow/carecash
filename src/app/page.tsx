@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getCtx, getLang } from "@/lib/ctx";
+import { isNativeApp } from "@/lib/native";
 import { Landing } from "./landing";
 import { LANDING } from "./landing-copy";
 
@@ -23,9 +25,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-/** Signed-in people go straight to the app; everyone else sees the public landing page, in their language. */
+/**
+ * Everyone sees the public site, in their language; signed-in visitors get "open the app" instead of "sign in".
+ * Only the iPhone app, which opens on "/", goes straight into the app.
+ */
 export default async function Root() {
   const { user, me } = await getCtx();
-  if (user) redirect(me ? "/home" : "/start");
-  return <Landing lang={await getLang()} />;
+  const app = me ? "/home" : "/start";
+  if (user && isNativeApp((await headers()).get("user-agent") ?? "")) redirect(app);
+  return <Landing lang={await getLang()} appHref={user ? app : undefined} />;
 }

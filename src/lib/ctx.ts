@@ -56,6 +56,18 @@ export async function requireAdmin() {
   return c;
 }
 
+/** Whether the family has turned on Labs (experimental employer tools). */
+export function labsOn(familyId: string) {
+  return !!(db.prepare("select labs from family where id = ?").get(familyId) as { labs: number } | undefined)?.labs;
+}
+
+/** For Labs pages and actions: an employer of a family that has Labs on. */
+export async function requireLabs() {
+  const c = await requireAdmin();
+  if (!labsOn(c.me.family_id)) redirect("/settings");
+  return c;
+}
+
 export async function getLang() {
   const c = await cookies();
   return pickLang(c.get("lang")?.value, (await headers()).get("accept-language"));

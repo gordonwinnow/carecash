@@ -7,7 +7,7 @@ import type { Lang } from "@/lib/i18n";
  */
 export type LandingCopy = {
   meta: { title: string; description: string };
-  nav: { guide: string; signIn: string; partners: string; privacy: string; guideFooter: string };
+  nav: { guide: string; signIn: string; openApp: string; partners: string; privacy: string; guideFooter: string };
   hero: { badge: string; title1: string; title2: string; sub: string; cta: string; note: string };
   pains: { title: string; items: string[]; note: string };
   steps: { title: string; items: { t: string; d: string }[] };
@@ -22,7 +22,7 @@ const zh: LandingCopy = {
     title: "CareCash 家用金｜外籍看護、幫傭的家用金記帳 App（免費）",
     description: "給家裡有外籍看護或幫傭的家庭：看護、幫傭拍收據記帳、交錢雙方確認，雇主隨時看到家用金餘額。支援印尼文、越南文、菲律賓文、泰文等 10 種語言，免費、免下載。",
   },
-  nav: { guide: "指南", signIn: "登入", partners: "仲介公司合作", privacy: "隱私權政策", guideFooter: "家用金指南" },
+  nav: { guide: "指南", signIn: "登入", openApp: "開啟 App", partners: "仲介公司合作", privacy: "隱私權政策", guideFooter: "家用金指南" },
   hero: {
     badge: "給家裡有看護或幫傭的家庭",
     title1: "看護、幫傭的家用金",
@@ -80,7 +80,7 @@ const en: LandingCopy = {
     title: "CareCash | Household cash tracker for families and their caregiver (free)",
     description: "For families with a live-in caregiver in Taiwan: the caregiver logs expenses with receipt photos, both sides confirm every cash handover, and you see the balance anytime. 10 languages, free, no download.",
   },
-  nav: { guide: "Guide", signIn: "Sign in", partners: "For agencies", privacy: "Privacy", guideFooter: "Guide" },
+  nav: { guide: "Guide", signIn: "Sign in", openApp: "Open app", partners: "For agencies", privacy: "Privacy", guideFooter: "Guide" },
   hero: {
     badge: "For families with a live-in caregiver or helper",
     title1: "Household cash,",
@@ -138,7 +138,7 @@ const id: LandingCopy = {
     title: "CareCash | Catatan uang belanja untuk majikan dan perawat (gratis)",
     description: "Untuk keluarga dengan perawat di Taiwan: perawat mencatat belanja dengan foto struk, setiap serah terima uang dikonfirmasi kedua pihak, dan saldo bisa dilihat kapan saja. 10 bahasa, gratis.",
   },
-  nav: { guide: "Panduan", signIn: "Masuk", partners: "Untuk agensi", privacy: "Privasi", guideFooter: "Panduan" },
+  nav: { guide: "Panduan", signIn: "Masuk", openApp: "Buka aplikasi", partners: "Untuk agensi", privacy: "Privasi", guideFooter: "Panduan" },
   hero: {
     badge: "Untuk keluarga dengan perawat atau asisten rumah tangga",
     title1: "Uang belanja,",
@@ -196,7 +196,7 @@ const vi: LandingCopy = {
     title: "CareCash | Ghi chép tiền chợ giữa chủ nhà và người chăm sóc (miễn phí)",
     description: "Dành cho gia đình có người chăm sóc tại Đài Loan: ghi chi tiêu kèm ảnh hóa đơn, mỗi lần giao tiền đều được hai bên xác nhận, xem số dư bất cứ lúc nào. 10 ngôn ngữ, miễn phí.",
   },
-  nav: { guide: "Hướng dẫn", signIn: "Đăng nhập", partners: "Dành cho công ty môi giới", privacy: "Quyền riêng tư", guideFooter: "Hướng dẫn" },
+  nav: { guide: "Hướng dẫn", signIn: "Đăng nhập", openApp: "Mở ứng dụng", partners: "Dành cho công ty môi giới", privacy: "Quyền riêng tư", guideFooter: "Hướng dẫn" },
   hero: {
     badge: "Dành cho gia đình có người chăm sóc hoặc giúp việc",
     title1: "Tiền chợ,",
@@ -254,7 +254,7 @@ const tl: LandingCopy = {
     title: "CareCash | Talaan ng pambili para sa amo at caregiver (libre)",
     description: "Para sa mga pamilyang may caregiver sa Taiwan: itinatala ng caregiver ang bawat gastos na may litrato ng resibo, kinukumpirma ng dalawang panig ang bawat abot ng pera, at makikita ang balanse kahit kailan. 10 wika, libre.",
   },
-  nav: { guide: "Gabay", signIn: "Mag-sign in", partners: "Para sa ahensya", privacy: "Privacy", guideFooter: "Gabay" },
+  nav: { guide: "Gabay", signIn: "Mag-sign in", openApp: "Buksan ang app", partners: "Para sa ahensya", privacy: "Privacy", guideFooter: "Gabay" },
   hero: {
     badge: "Para sa pamilyang may caregiver o kasambahay",
     title1: "Pera para sa bahay,",
@@ -312,7 +312,7 @@ const th: LandingCopy = {
     title: "CareCash | บันทึกเงินค่าใช้จ่ายในบ้านระหว่างนายจ้างกับผู้ดูแล (ฟรี)",
     description: "สำหรับครอบครัวที่มีผู้ดูแลในไต้หวัน: ผู้ดูแลบันทึกค่าใช้จ่ายพร้อมรูปใบเสร็จ ทั้งสองฝ่ายยืนยันทุกครั้งที่ส่งเงิน และดูยอดคงเหลือได้ตลอดเวลา 10 ภาษา ฟรี",
   },
-  nav: { guide: "คู่มือ", signIn: "เข้าสู่ระบบ", partners: "สำหรับบริษัทจัดหางาน", privacy: "ความเป็นส่วนตัว", guideFooter: "คู่มือ" },
+  nav: { guide: "คู่มือ", signIn: "เข้าสู่ระบบ", openApp: "เปิดแอป", partners: "สำหรับบริษัทจัดหางาน", privacy: "ความเป็นส่วนตัว", guideFooter: "คู่มือ" },
   hero: {
     badge: "สำหรับครอบครัวที่มีผู้ดูแลหรือแม่บ้าน",
     title1: "เงินค่าใช้จ่ายในบ้าน",
@@ -370,7 +370,7 @@ const ja: LandingCopy = {
     title: "CareCash｜介護者との生活費を記録する無料アプリ",
     description: "住み込みの介護者がいるご家庭へ：レシート写真付きで支出を記録し、現金の受け渡しは双方で確認、残高はいつでも確認できます。10言語対応、無料。",
   },
-  nav: { guide: "ガイド", signIn: "ログイン", partners: "仲介会社の方へ", privacy: "プライバシー", guideFooter: "ガイド" },
+  nav: { guide: "ガイド", signIn: "ログイン", openApp: "アプリを開く", partners: "仲介会社の方へ", privacy: "プライバシー", guideFooter: "ガイド" },
   hero: {
     badge: "介護者や家事ヘルパーがいるご家庭へ",
     title1: "介護者に渡す生活費、",
@@ -428,7 +428,7 @@ const ko: LandingCopy = {
     title: "CareCash | 간병인과의 생활비를 기록하는 무료 앱",
     description: "입주 간병인이 있는 가정을 위해: 영수증 사진과 함께 지출을 기록하고, 현금 전달은 양쪽이 확인하며, 잔액은 언제든 확인할 수 있습니다. 10개 언어, 무료.",
   },
-  nav: { guide: "가이드", signIn: "로그인", partners: "중개업체 안내", privacy: "개인정보", guideFooter: "가이드" },
+  nav: { guide: "가이드", signIn: "로그인", openApp: "앱 열기", partners: "중개업체 안내", privacy: "개인정보", guideFooter: "가이드" },
   hero: {
     badge: "간병인이나 가사도우미가 있는 가정을 위해",
     title1: "간병인 생활비,",
@@ -486,7 +486,7 @@ const es: LandingCopy = {
     title: "CareCash | Control del dinero de la casa entre familia y cuidadora (gratis)",
     description: "Para familias con una cuidadora interna en Taiwán: ella registra cada gasto con foto del recibo, ambas partes confirman cada entrega de dinero y ves el saldo cuando quieras. 10 idiomas, gratis.",
   },
-  nav: { guide: "Guía", signIn: "Entrar", partners: "Para agencias", privacy: "Privacidad", guideFooter: "Guía" },
+  nav: { guide: "Guía", signIn: "Entrar", openApp: "Abrir la app", partners: "Para agencias", privacy: "Privacidad", guideFooter: "Guía" },
   hero: {
     badge: "Para familias con cuidadora o empleada del hogar",
     title1: "El dinero de la casa,",
@@ -544,7 +544,7 @@ const fr: LandingCopy = {
     title: "CareCash | L'argent du foyer entre la famille et l'aide à domicile (gratuit)",
     description: "Pour les familles avec une aide à domicile à Taïwan : elle note chaque dépense avec la photo du ticket, chaque remise d'argent est confirmée des deux côtés, et vous voyez le solde à tout moment. 10 langues, gratuit.",
   },
-  nav: { guide: "Guide", signIn: "Connexion", partners: "Pour les agences", privacy: "Confidentialité", guideFooter: "Guide" },
+  nav: { guide: "Guide", signIn: "Connexion", openApp: "Ouvrir l'app", partners: "Pour les agences", privacy: "Confidentialité", guideFooter: "Guide" },
   hero: {
     badge: "Pour les familles avec une aide à domicile ou une employée de maison",
     title1: "L'argent du foyer,",

@@ -9,6 +9,7 @@ The cloud session does strategy, code, drafts and deploys. **This session does w
 2. Read the open "Founder asks" list in the plan doc "CareCash Growth Plan & Weekly Log" (https://claude.ai/artifact/3ekZHXvrrgPPgo8U13WwTy) if you can open it, plus `growth/WEEKLY.md`.
 
 ## Rules
+- **Standing approval (founder, Nov 27):** every post set under `growth/content/social/` is approved by default. Schedule them without asking first. Forum or Dcard story posts that need the founder's real experience are the exception.
 - The founder approved the November post set on Nov 26 (`growth/content/social/2026-11-household-cash/`). Any new public post needs the founder's OK in this chat first.
 - Never type passwords, and never change account security settings. If a login is needed, ask the founder to log in.
 - Show the founder each post (screenshot) before you press Schedule or Share.

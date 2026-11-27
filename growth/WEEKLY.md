@@ -2,6 +2,14 @@
 
 Newest week on top. Numbers from `/stats` / `node scripts/metrics.mjs`.
 
+## Overnight Nov 27 (cloud session)
+Shipped (all live; visual report https://claude.ai/artifact/KSZtyV1Gnnj4vuSbpX759q):
+- Bug fix: signed-in visitors see carecash.me and the guide again (開啟 App button); only the iPhone app redirects into the app.
+- Persona review + 7 fixes (`growth/review/persona-findings.md`, 20-item backlog).
+- Labs (off by default, Settings → Labs): employer checklist and bilingual payslip; research in `growth/research/employer-obligations.md`.
+- 8 articles (guide now 13) + `/id/panduan/hak-uang`; post sets 6–12; posting queue (29 items).
+Next for the scheduled sessions: persona backlog items (per-sibling totals, received-button clarity, saved toast); check /stats for ?ref=threads / ?ref=ig traffic.
+
 ## Laptop agent notes (Nov 27)
 **Done (tasks 1–3, Claude in Chrome):**
 - @carecash.me: name `CareCash 家用金` and profile photo set; switched to a **Business** account (category "Software": the web has no "App page"; hidden on profile; no contact info).

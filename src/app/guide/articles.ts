@@ -3,6 +3,27 @@ export type Article = { slug: string; title: string; description: string; publis
 
 export const ARTICLES: Article[] = [
   {
+    slug: "hiring-foreign-caregiver-costs-overview",
+    title: "請外籍看護一個月要花多少？費用總覽與準備清單",
+    description:
+      "準備請外籍家庭看護，每個月要花哪些錢？整理薪資、就業安定費、健保、保險、仲介服務費、伙食住宿、家用金與健檢等費用，附官方來源、開始前的準備清單與常見問題。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "talking-about-money-with-caregiver",
+    title: "跟看護談錢不尷尬：10 句中印對照常用句",
+    description:
+      "給家用金、請看護拿收據、錢快用完要補、每週對帳、帳對不上時怎麼問、誤會了怎麼道歉：10 句中文與印尼文對照的常用句，附語氣提醒與常見問題。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "elderly-parent-living-alone-with-caregiver",
+    title: "爸媽和看護獨居、子女不同住：遠距管理家用金的方法",
+    description:
+      "爸媽和外籍看護住，子女住在外地，家用金怎麼給、錢放在誰手上、收據怎麼看、快用完怎麼知道、兄弟姊妹怎麼一起出？整理遠距管理家用金的 6 個做法、每週流程與常見問題。",
+    published: "2026-11-27",
+  },
+  {
     slug: "first-week-with-new-caregiver",
     title: "看護來了！第一週清單：家用金、家規、溝通一次講清楚",
     description:

@@ -21,6 +21,8 @@ type Row = {
   who: string;
   who_id: string;
   edited_by: string | null;
+  /** For cash: the employer who gave it */
+  giver: string | null;
 };
 
 export default async function History({ searchParams }: { searchParams: Promise<{ who?: string }> }) {
@@ -39,13 +41,15 @@ export default async function History({ searchParams }: { searchParams: Promise<
       `select * from (
         select 'cash' as type, c.id, c.amount, c.created_at as at, c.note, null as photo, null as category, c.ack_at,
                c.confirmed_at, (c.created_by = c.caretaker_id) as self_added, c.created_by, m.name as who, m.id as who_id,
-               (select em.name from audit a join member em on em.id = a.member_id where a.entity_id = c.id and a.action = 'update' order by a.at desc limit 1) as edited_by
-          from cash c join member m on m.id = c.caretaker_id
+               (select em.name from audit a join member em on em.id = a.member_id where a.entity_id = c.id and a.action = 'update' order by a.at desc limit 1) as edited_by,
+               g.name as giver
+          from cash c join member m on m.id = c.caretaker_id left join member g on g.id = c.given_by
           where c.family_id = @fid and (@who is null or c.caretaker_id = @who)
         union all
         select 'expense', e.id, e.amount, e.spent_at, e.note, e.photo, e.category, null,
                null, 0, e.member_id, m.name, m.id,
-               (select em.name from audit a join member em on em.id = a.member_id where a.entity_id = e.id and a.action = 'update' order by a.at desc limit 1)
+               (select em.name from audit a join member em on em.id = a.member_id where a.entity_id = e.id and a.action = 'update' order by a.at desc limit 1),
+               null
           from expense e join member m on m.id = e.member_id
           where e.family_id = @fid and (@who is null or e.member_id = @who)
       ) order by at desc limit 500`,
@@ -114,6 +118,9 @@ export default async function History({ searchParams }: { searchParams: Promise<
                 );
               }
               const canEdit = isAdmin || (!!r.self_added && r.created_by === me.id);
+              // Who gave the money, so siblings who chip in can see their part: "Mei → Siti", or just "Mei" for the caretaker herself
+              const from = r.giver && r.giver !== r.who ? r.giver : null;
+              const cashSub = `${from ? (showWho ? `${from} → ${r.who} · ` : `${from} · `) : showWho ? `${r.who} · ` : ""}${day(r.at, lang)}`;
               const pending = r.self_added ? !r.confirmed_at : !r.ack_at;
               return (
                 <EntryRow
@@ -121,7 +128,7 @@ export default async function History({ searchParams }: { searchParams: Promise<
                   href={canEdit ? `/cash/${r.id}` : undefined}
                   icon="cash"
                   title={<span className="inline-block first-letter:uppercase">{r.note || t("ent_cash")}</span>}
-                  sub={sub}
+                  sub={cashSub}
                   amount={money(r.amount, me.currency)}
                   income
                   pending={pending}

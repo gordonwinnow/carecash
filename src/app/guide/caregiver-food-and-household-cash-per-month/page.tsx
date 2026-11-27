@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
 import { SiteFooter, SiteHeader } from "../../landing";
 import { article } from "../articles";
+import { RelatedArticles } from "../related";
 
 const A = article("caregiver-food-and-household-cash-per-month")!;
 
@@ -125,7 +126,10 @@ export default function ArticlePage() {
             <div className="mx-auto mt-5 max-w-xs">
               <Link href="/sign-in?mode=signup&ref=guide-food" className="btn-primary">免費開始使用</Link>
             </div>
+            <Link href="/sign-in#demo" className="mt-3 inline-block text-base font-semibold text-accent-ink underline underline-offset-4">先不註冊，試用範例家庭</Link>
           </div>
+
+          <RelatedArticles current={A.slug} />
 
           <p className="mt-10 text-sm text-muted">
             本文為一般性的生活建議，不構成法律意見；薪資、伙食與住宿的約定，請以勞動契約、勞動部公告及您的仲介說明為準。

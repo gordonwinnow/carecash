@@ -58,6 +58,13 @@ Don't join or post without the founder's OK.
 ### 8. Dec 15–20: set 5, the 6 ways employers give grocery money (only after the founder approves it in the plan doc)
 - Folder: `growth/content/social/2026-12-money-methods/` (8 slides). Carousel: Thu Dec 17, 20:30. Threads: the 6 posts and times listed in `POSTS.md`.
 
+### 9–12. Sets 6–9 (approved by default; schedule per each POSTS.md)
+- `growth/content/social/2026-12-first-week/`: IG Thu Dec 24; Threads Dec 22, 23, 26
+- `growth/content/social/2026-12-halal/`: IG Wed Dec 30 (avoids New Year's Eve); Threads Dec 29, 30, Jan 2
+- `growth/content/social/2027-01-reimbursement/`: IG Thu Jan 14; Threads Jan 12, 15, 17
+- `growth/content/social/2027-01-costs/`: IG Thu Jan 21; Threads Jan 19, 20, 23
+- Before scheduling each, check that its article URL opens.
+
 ## When done
 - Tick the items in the plan doc (move them to its "Done" list), or tell the founder what was done so the cloud session can update the doc.
 - Write anything you couldn't do, and why, at the top of `growth/WEEKLY.md` under "Laptop agent notes", then commit and push.

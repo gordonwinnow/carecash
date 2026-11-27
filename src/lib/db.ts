@@ -151,6 +151,34 @@ function open() {
     updated_at integer not null
   );
   create index if not exists feedback_user on feedback(user_id);`);
+  // Labs: experimental employer tools (checklist, bilingual salary slip). Off unless an employer turns it on.
+  addColumn(d, "family", "labs", "integer not null default 0");
+  // A caretaker's key dates, set by an employer, so the checklist can work out due dates (YYYY-MM-DD)
+  addColumn(d, "member", "arrival_date", "text");
+  addColumn(d, "member", "contract_start", "text");
+  addColumn(d, "member", "arc_expiry", "text");
+  d.exec(`create table if not exists checklist_done (
+    family_id text not null,
+    member_id text not null,
+    item_key text not null,
+    period text not null,
+    done_at integer not null,
+    done_by text not null,
+    primary key (family_id, member_id, item_key, period)
+  );
+  -- Bilingual salary slips: one per caretaker per month, the lines kept as JSON
+  create table if not exists payslip (
+    id text primary key,
+    family_id text not null references family(id),
+    member_id text not null references member(id),
+    month text not null,
+    lang text not null,
+    data text not null,
+    created_by text not null,
+    created_at integer not null,
+    updated_at integer not null,
+    unique (member_id, month)
+  );`);
   // Older demo data had sample notes on household cash that read like labels
   d.prepare("update cash set note = null where note in ('Next week', 'Groceries') and family_id in (select id from family where demo = 1)").run();
   return d;

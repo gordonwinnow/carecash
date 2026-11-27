@@ -4,8 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, newId } from "@/lib/db";
 import { savePhoto } from "@/lib/photos";
-import { getLang, getUser, isOwner, requireAdmin, requireCtx, membershipsOf } from "@/lib/ctx";
-import { CATEGORIES, KINDS, dayKey, movedDate } from "@/lib/format";
+import { getLang, getUser, isOwner, requireAdmin, requireCtx, requireLabs, membershipsOf } from "@/lib/ctx";
+import { isDay, isItemKey, isMonth, isSlipLang, slipTotals, type Slip } from "@/lib/labs";
+import { CATEGORIES, KINDS, dayKey, movedDate, today } from "@/lib/format";
 import { seedDemo } from "@/lib/demo";
 import { logChange } from "@/lib/audit";
 import { deliver, watchBalance } from "@/lib/notify";
@@ -464,4 +465,81 @@ export async function reviewFeedback(id: string, fd: FormData) {
   if (!isOwner(user)) throw new Error("Not allowed");
   updateFeedback(id, String(fd.get("status") ?? ""), text(fd, "reply", 4000));
   done("/feedback/review");
+}
+
+// ---------- Labs (experimental employer tools; off unless an employer turns it on) ----------
+
+export async function setLabs(on: boolean) {
+  const { me } = await requireAdmin();
+  db.prepare("update family set labs = ? where id = ?").run(on ? 1 : 0, me.family_id);
+  done();
+}
+
+/** A caretaker of this family, or nothing. */
+function caretakerOf(memberId: string, familyId: string) {
+  return db.prepare("select id, name from member where id = ? and family_id = ? and role = 'caretaker' and active = 1").get(memberId, familyId) as
+    | { id: string; name: string }
+    | undefined;
+}
+
+export async function saveCaretakerDates(memberId: string, fd: FormData) {
+  const { me } = await requireLabs();
+  if (!caretakerOf(memberId, me.family_id)) return done("/labs/checklist");
+  const day = (k: string) => (isDay(fd.get(k)) ? String(fd.get(k)) : null);
+  db.prepare("update member set arrival_date = ?, contract_start = ?, arc_expiry = ? where id = ?").run(
+    day("arrival_date"), day("contract_start"), day("arc_expiry"), memberId,
+  );
+  done(`/labs/checklist?m=${memberId}`);
+}
+
+export async function toggleChecklist(memberId: string, itemKey: string, period: string) {
+  const { me } = await requireLabs();
+  if (!caretakerOf(memberId, me.family_id) || !isItemKey(itemKey) || !/^[0-9A-Za-z-]{4,10}$/.test(period)) return;
+  const key = [me.family_id, memberId, itemKey, period];
+  const r = db.prepare("delete from checklist_done where family_id = ? and member_id = ? and item_key = ? and period = ?").run(...key);
+  if (!r.changes) db.prepare("insert into checklist_done (family_id, member_id, item_key, period, done_at, done_by) values (?, ?, ?, ?, ?, ?)").run(...key, Date.now(), me.id);
+  done();
+}
+
+/** Saves one caretaker's salary slip for a month (one per month; saving again replaces it). */
+export async function savePayslip(fd: FormData) {
+  const { me } = await requireLabs();
+  const who = caretakerOf(String(fd.get("member") ?? ""), me.family_id);
+  const month = String(fd.get("month") ?? "");
+  const lang = String(fd.get("lang") ?? "");
+  if (!who || !isMonth(month) || !isSlipLang(lang)) throw new Error("Bad slip");
+  const num = (k: string) => {
+    const n = Math.round(Number(String(fd.get(k) ?? "").replace(/[^\d.]/g, "")) || 0);
+    return Math.min(Math.max(n, 0), 1_000_000);
+  };
+  const slip: Slip = {
+    base: num("base"),
+    overtime: num("overtime"),
+    overtimeNote: text(fd, "overtimeNote", 120) ?? "",
+    otherPay: num("otherPay"),
+    nhi: num("nhi"),
+    otherDeduct: num("otherDeduct"),
+    otherDeductNote: text(fd, "otherDeductNote", 120) ?? "",
+    paidDate: isDay(fd.get("paidDate")) ? String(fd.get("paidDate")) : today(),
+    method: fd.get("method") === "bank" ? "bank" : "cash",
+  };
+  const { net } = slipTotals(slip);
+  const now = Date.now();
+  db.transaction(() => {
+    db.prepare(
+      `insert into payslip (id, family_id, member_id, month, lang, data, created_by, created_at, updated_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       on conflict(member_id, month) do update set lang = excluded.lang, data = excluded.data, updated_at = excluded.updated_at`,
+    ).run(newId(), me.family_id, who.id, month, lang, JSON.stringify(slip), me.id, now, now);
+    db.prepare("insert or ignore into checklist_done (family_id, member_id, item_key, period, done_at, done_by) values (?, ?, 'payslip', ?, ?, ?)").run(me.family_id, who.id, month, now, me.id);
+    // Optionally the salary itself too, as a Pay & health record that she confirms (like any salary)
+    if (fd.get("record") && net > 0) {
+      const id = newId();
+      const f = { kind: "salary", caretaker_id: who.id, date: slip.paidDate, amount: net, note: `${month} 薪資單`, shared: 1 };
+      db.prepare(
+        "insert into record (id, family_id, caretaker_id, kind, amount, note, photo, date, shared, created_by, created_at) values (?, ?, ?, 'salary', ?, ?, null, ?, 1, ?, ?)",
+      ).run(id, me.family_id, who.id, net, f.note, f.date, me.id, now);
+      logChange(me.family_id, me.id, "record", id, "create", null, { ...f, photo: null }, who.id);
+    }
+  })();
+  done(`/labs/payslip?m=${who.id}&month=${month}&lang=${lang}&saved=1`);
 }

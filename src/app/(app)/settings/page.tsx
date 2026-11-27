@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Barcode as BarcodeIcon, Bell, Crown, Globe, House, MessageSquareText, Palette, Plus, UserRound } from "lucide-react";
+import { Barcode as BarcodeIcon, Bell, ClipboardCheck, Crown, FlaskConical, Globe, House, MessageSquareText, Palette, Plus, ReceiptText, UserRound } from "lucide-react";
 import { db } from "@/lib/db";
-import { getT, requireCtx } from "@/lib/ctx";
+import { getT, labsOn, requireCtx } from "@/lib/ctx";
+import { LabsSwitch } from "@/components/labs";
 import { removeMember, renameMe, switchFamily } from "../../actions";
 import { ActionButton, PageTitle, Submit } from "@/components/ui";
 import { ColorPicker, LanguagePicker, SignOutButton } from "@/components/settings";
@@ -15,6 +16,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
   const { me, memberships } = await requireCtx();
   const t = await getT();
   const isAdmin = me.role === "admin";
+  const labs = isAdmin && labsOn(me.family_id);
   const members = db
     .prepare("select id, name, role from member where family_id = ? and active = 1 order by role, created_at")
     .all(me.family_id) as { id: string; name: string; role: string }[];
@@ -87,6 +89,19 @@ export default async function Settings({ searchParams }: { searchParams: Promise
           </div>
         </form>
       </section>
+
+      {isAdmin && (
+        <section className="card space-y-3">
+          <SettingHead icon={<FlaskConical size={20} />}>{t("labs")}</SettingHead>
+          <LabsSwitch initial={labs} />
+          {labs && (
+            <div className="-mx-2">
+              <BorderlessRow href="/labs/checklist" icon={<ClipboardCheck size={20} />} title={t("labsChecklist")} />
+              <BorderlessRow href="/labs/payslip" icon={<ReceiptText size={20} />} title={t("labsPayslip")} />
+            </div>
+          )}
+        </section>
+      )}
 
       {(memberships.length > 1 || isAdmin) && (
         <section className="card space-y-3">

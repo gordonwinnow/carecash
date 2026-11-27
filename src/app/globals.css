@@ -154,3 +154,12 @@ body {
 
 /* Bottom tabs step aside while the keyboard is up (see BottomNav) */
 html[data-typing] .tabbar { transform: translateY(110%); }
+
+/* Labs salary slip: print only the slip, black on white */
+@media print {
+  .no-print, .tabbar { display: none !important; }
+  html, body { background: #fff !important; color: #000 !important; }
+  main { padding: 0 !important; max-width: none !important; }
+  .print-slip { box-shadow: none !important; background: #fff !important; color: #000 !important; }
+  .print-slip .text-muted { color: #333 !important; }
+}

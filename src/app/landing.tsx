@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BellRing, Camera, Handshake, History, Languages, ReceiptText, ScanBarcode, Users, Wallet } from "lucide-react";
 import { PurseIcon } from "@/components/logo";
 import { LanguagePicker } from "@/components/settings";
+import { getCtx } from "@/lib/ctx";
 import type { Lang } from "@/lib/i18n";
 import { LANDING, type LandingCopy } from "./landing-copy";
 
@@ -9,7 +10,8 @@ import { LANDING, type LandingCopy } from "./landing-copy";
  * Shared pieces of the public pages. The homepage (/) is in the visitor's language (the app's 10, picked like in the app);
  * /guide and /partners are written for Taiwanese families and brokers, so they stay in Traditional Chinese.
  */
-export function SiteHeader({ copy = LANDING["zh-TW"], picker = false }: { copy?: LandingCopy; picker?: boolean }) {
+export async function SiteHeader({ copy = LANDING["zh-TW"], picker = false }: { copy?: LandingCopy; picker?: boolean }) {
+  const { user, me } = await getCtx();
   return (
     <header className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-4">
       <Link href="/" className="flex shrink-0 items-center gap-2 font-extrabold">
@@ -25,7 +27,11 @@ export function SiteHeader({ copy = LANDING["zh-TW"], picker = false }: { copy?:
           </div>
         )}
         <Link href="/guide" className="hidden text-sm font-bold text-muted hover:text-ink sm:inline">{copy.nav.guide}</Link>
-        <Link href="/sign-in" className="whitespace-nowrap rounded-full bg-card px-4 py-2 text-sm font-bold [box-shadow:var(--shadow)]">{copy.nav.signIn}</Link>
+        {user ? (
+          <Link href={me ? "/home" : "/start"} className="whitespace-nowrap rounded-full bg-accent px-4 py-2 text-sm font-bold text-white [box-shadow:var(--shadow)]">{copy.nav.openApp}</Link>
+        ) : (
+          <Link href="/sign-in" className="whitespace-nowrap rounded-full bg-card px-4 py-2 text-sm font-bold [box-shadow:var(--shadow)]">{copy.nav.signIn}</Link>
+        )}
       </nav>
     </header>
   );
@@ -47,8 +53,10 @@ export function SiteFooter({ copy = LANDING["zh-TW"] }: { copy?: LandingCopy }) 
 
 const FEATURE_ICONS = [Handshake, Camera, Wallet, BellRing, Users, ScanBarcode, ReceiptText, History];
 
-export function Landing({ lang }: { lang: Lang }) {
+/** `appHref` is set for signed-in visitors: the main buttons then open the app instead of the sign-up form. */
+export function Landing({ lang, appHref }: { lang: Lang; appHref?: string }) {
   const c = LANDING[lang] ?? LANDING["zh-TW"];
+  const cta = appHref ? { href: appHref, label: c.nav.openApp } : { href: "/sign-in?mode=signup", label: c.hero.cta };
   return (
     <div className="min-h-dvh bg-bg">
       <SiteHeader copy={c} picker />
@@ -63,7 +71,7 @@ export function Landing({ lang }: { lang: Lang }) {
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted sm:text-xl">{c.hero.sub}</p>
           <div className="mx-auto mt-8 max-w-xs">
-            <Link href="/sign-in?mode=signup" className="btn-primary">{c.hero.cta}</Link>
+            <Link href={cta.href} className="btn-primary">{cta.label}</Link>
           </div>
           <p className="mt-5 text-sm text-muted">{c.hero.note}</p>
           {lang === "id" && (
@@ -151,7 +159,7 @@ export function Landing({ lang }: { lang: Lang }) {
           <h2 className="text-3xl font-extrabold">{c.final.title}</h2>
           <p className="mt-3 text-lg text-muted">{c.final.sub}</p>
           <div className="mx-auto mt-6 max-w-sm">
-            <Link href="/sign-in?mode=signup" className="btn-primary">{c.hero.cta}</Link>
+            <Link href={cta.href} className="btn-primary">{cta.label}</Link>
           </div>
         </section>
       </main>

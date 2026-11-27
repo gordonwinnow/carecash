@@ -18,7 +18,12 @@ Next for the scheduled sessions: persona backlog items (per-sibling totals, rece
 
 **Couldn't do, and why:**
 - **IG bio** didn't save ("There was a problem saving your profile", twice); **IG link** can only be edited in the phone app. Founder: add both on the phone.
-- **IG carousel not scheduled:** instagram.com has no scheduling, and Business Suite needs a Facebook Page (on hold). Draft was filled in Chrome but not shared. Founder: schedule it in the IG app (+ → Post → 6 slides → Advanced settings → Schedule). The 20:30 Fri slot passed; suggest **Sat 28 20:30**.
+- ~~IG carousel not scheduled~~ → founder said post it sooner: **shared on Instagram Fri 27 about 21:20** (web can't schedule). Its caption points to the bio link, which still needs adding on the phone.
+
+**Later on Nov 27:**
+- Threads: personal intro posted, app explainer posted and **pinned**; profile done (photo, name, bio, link to the guide with `?ref=threads-bio`).
+- 4 replies posted (generic wording, no invented details): @clairechou0708 (meal budget), @deer_545858 (does her own food come from 菜錢), @withclairelin (asked how they handle grocery money), @paopaocherry (put 家用金 in the house rules).
+- IG bio failed a third time on the web: phone only.
 - Personal intro post and replies need the founder's real details ([ ] in PLAN.md) before posting.
 
 ## Founder asks (open), smallest first

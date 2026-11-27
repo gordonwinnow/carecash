@@ -79,7 +79,10 @@ Post, then pin: ⋯ → Pin to profile.
 
 ---
 
-## 4. Replies to other people's threads (drafts, newest first)
+## 4. Replies to other people's threads: all 4 POSTED Nov 27, about 21:30
+Founder: keep personal details generic. What went out differs from the drafts below: no 「我們家是___」 numbers and no unconfirmed claims. (b) now says about NT$200 per person per day, which is the right math for 2000 a week, 5 days, 2 people. Tip: in the inline reply box, Enter sends the reply, so use Shift+Enter for line breaks.
+
+Drafts (newest first):
 
 Rule: answer the question first, share one personal detail, and mention the app only when it actually solves what they asked. Never paste the same reply twice.
 

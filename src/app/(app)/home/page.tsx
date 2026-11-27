@@ -1,13 +1,15 @@
 import Link from "next/link";
-import { Banknote, Barcode as BarcodeIcon, Camera, Check, HandCoins, Users, Wallet, HeartHandshake, Plus } from "lucide-react";
+import { Banknote, Barcode as BarcodeIcon, Camera, Check, HandCoins, Hourglass, Users, Wallet, HeartHandshake, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { balanceOf, familyPotBalance, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
-import { day, money } from "@/lib/format";
+import { day, money, monthLabel } from "@/lib/format";
+import { SITE_URL } from "@/lib/site";
 import type { T } from "@/lib/i18n";
 import { ackCash, ackRecord, confirmCash, deleteCash } from "../../actions";
 import { ActionButton } from "@/components/ui";
 import { Barcode } from "@/components/barcode";
 import { EntryRow, RowList, SectionHead, Empty } from "@/components/rows";
+import { ShareSummary } from "./share";
 
 type Cash = { id: string; amount: number; note: string | null; created_at: number; ack_at: number | null; giver: string; caretaker_id: string };
 type Expense = { id: string; amount: number; category: string; note: string | null; photo: string | null; spent_at: number; who: string; edited_by: string | null };
@@ -129,8 +131,29 @@ function CaretakerHome({ me, t, lang, carrier }: { me: Member; t: T; lang: strin
         </Link>
       </div>
 
-      <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} />
+      {recent.length === 0 ? <FirstSteps t={t} /> : <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} />}
     </>
+  );
+}
+
+/** A caretaker with no expenses yet: three short steps in her language, instead of an empty list. */
+function FirstSteps({ t }: { t: T }) {
+  const steps = [t("firstStep1"), t("firstStep2"), t("firstStep3")];
+  return (
+    <section className="card space-y-4">
+      <h2 className="text-xl font-extrabold">{t("firstTitle")}</h2>
+      <ol className="space-y-3">
+        {steps.map((s, i) => (
+          <li key={i} className="flex gap-3 text-[17px] leading-snug">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-base font-extrabold text-on-accent">{i + 1}</span>
+            <span className="pt-0.5">{s}</span>
+          </li>
+        ))}
+      </ol>
+      <Link href="/expense/new" className="btn-tint">
+        <Camera size={22} /> {t("firstCta")}
+      </Link>
+    </section>
   );
 }
 
@@ -166,11 +189,45 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
     ...(caretakers.length === 0 || potUsed ? [{ id: me.id, title: t("myCash"), caretaker: false, b: familyPotBalance(me.family_id) }] : []),
   ];
 
+  const inviteCard = caretakers.length === 0 && (
+    <section className="card space-y-4 py-6 text-center">
+      <span className="badge mx-auto h-16 w-16 rounded-3xl">
+        <HeartHandshake size={32} />
+      </span>
+      <h2 className="text-xl font-extrabold">{t("noCaretaker")}</h2>
+      <p className="text-base text-muted">{t("noCaretakerHint")}</p>
+      <Link href="/settings?invite=caretaker#invite" className="btn-primary">
+        <Plus size={24} /> {t("inviteCaretaker")}
+      </Link>
+      <Link href="/settings?invite=admin#invite" className="btn-tint">
+        <Users size={22} /> {t("inviteAdmin")}
+      </Link>
+    </section>
+  );
+
+  // This month across everyone holding cash, for the family summary and the share button
+  const month = holders.reduce((m, h) => ({ given: m.given + h.b.received, spent: m.spent + h.b.spent, left: m.left + h.b.left }), { given: 0, spent: 0, left: 0 });
+  const shareText = t("shareSummaryText", {
+    family: me.family_name,
+    month: monthLabel(Date.now(), lang),
+    given: money(month.given, me.currency),
+    spent: money(month.spent, me.currency),
+    left: money(month.left, me.currency),
+  });
+
   return (
     <>
+      {/* A new family: inviting the caretaker is the first thing to do */}
+      {inviteCard}
       {holders.map((h) => (
         <section key={h.id} className="space-y-3">
           <BalanceCard title={h.title} b={h.b} t={t} />
+          {/* Cash given but not yet confirmed by the caretaker: without this the home screen looks like nothing happened */}
+          {h.caretaker && h.b.pending > 0 && (
+            <p className="flex items-center justify-end gap-1.5 pr-[18px] text-base font-semibold text-warn">
+              <Hourglass size={16} /> {t("waitingFor", { name: h.title, amount: money(h.b.pending, me.currency) })}
+            </p>
+          )}
           {/* One row: add household cash wide; expense (and, for a caretaker, other costs) as short side buttons */}
           <div className={`grid gap-2 ${h.caretaker ? "grid-cols-[1fr_auto_auto]" : "grid-cols-[1fr_auto]"}`}>
             <Link href={`/cash/new?to=${h.id}`} className="btn-primary min-h-20 px-4 text-xl leading-tight">
@@ -197,24 +254,25 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
           </ActionButton>
         </PendingCard>
       ))}
-      {caretakers.length === 0 ? (
-        <section className="card space-y-4 py-6 text-center">
-          <span className="badge mx-auto h-16 w-16 rounded-3xl">
-            <HeartHandshake size={32} />
-          </span>
-          <h2 className="text-xl font-extrabold">{t("noCaretaker")}</h2>
-          <p className="text-base text-muted">{t("noCaretakerHint")}</p>
-          <Link href="/settings?invite=caretaker#invite" className="btn-primary">
-            <Plus size={24} /> {t("inviteCaretaker")}
+      {caretakers.length > 0 && (
+        <>
+          {/* This month for the whole family, and one tap to send it to siblings who chip in. Shown once money has moved this month */}
+          {(month.given > 0 || month.spent > 0) && <section className="card space-y-3">
+            <p className="text-base font-bold text-muted">{t("monthSummary")}</p>
+            <dl className="tabular grid grid-cols-3 gap-2 text-center">
+              {([["sumGiven", month.given], ["sumSpent", month.spent], ["sumLeft", month.left]] as const).map(([k, v]) => (
+                <div key={k}>
+                  <dt className="text-sm font-semibold text-muted">{t(k)}</dt>
+                  <dd className="text-xl font-extrabold">{money(v, me.currency)}</dd>
+                </div>
+              ))}
+            </dl>
+            <ShareSummary text={shareText} url={`${SITE_URL}/history`} label={t("shareSummary")} copied={t("copied")} />
+          </section>}
+          <Link href="/settings?invite=caretaker#invite" className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">
+            <Plus size={18} /> {t("inviteAnother")}
           </Link>
-          <Link href="/settings?invite=admin#invite" className="btn-tint">
-            <Users size={22} /> {t("inviteAdmin")}
-          </Link>
-        </section>
-      ) : (
-        <Link href="/settings?invite=caretaker#invite" className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">
-          <Plus size={18} /> {t("inviteAnother")}
-        </Link>
+        </>
       )}
       <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} showWho />
     </>

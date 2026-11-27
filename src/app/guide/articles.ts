@@ -3,6 +3,27 @@ export type Article = { slug: string; title: string; description: string; publis
 
 export const ARTICLES: Article[] = [
   {
+    slug: "first-week-with-new-caregiver",
+    title: "看護來了！第一週清單：家用金、家規、溝通一次講清楚",
+    description:
+      "外籍看護第一次到家，第一週怎麼安排？到之前要準備什麼、第 1 到 7 天每天做什麼、家規表怎麼寫、家用金怎麼開始，加上語言工具、隱私與休假，一份清單講清楚。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "caregiver-food-and-halal",
+    title: "印尼看護的飲食：清真、三餐安排與伙食費",
+    description:
+      "印尼看護不吃豬肉，三餐怎麼辦？整理清真飲食的基本原則、三種常見的煮飯安排、齋戒月要注意什麼，以及伙食費怎麼跟家用金分開給、分開記。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "caregiver-pays-first-reimbursement",
+    title: "看護先墊錢怎麼辦？先墊後報的公平做法",
+    description:
+      "看護自己先墊錢買菜、買藥，對她其實有風險。說明為什麼不該當常態、真的要墊時的上限與當天還款原則、每週對帳，以及帳上餘額變成負數時該怎麼處理。",
+    published: "2026-11-27",
+  },
+  {
     slug: "how-employers-give-grocery-money",
     title: "家庭移工買菜怎麼給錢？6 種常見方式比較",
     description:

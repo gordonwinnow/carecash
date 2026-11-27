@@ -29,6 +29,10 @@ export default function Partners() {
   // Public contact for brokers; the CONTACT_EMAIL secret overrides it
   const email = process.env.CONTACT_EMAIL || "gosomini@googlegroups.com";
   const line = process.env.CONTACT_LINE_URL;
+  // A short template, so a broker can send a useful first email in one tap
+  const mailto = `mailto:${email}?subject=${encodeURIComponent("仲介合作：CareCash 家用金")}&body=${encodeURIComponent(
+    "您好，我想了解 CareCash 家用金的仲介合作。\n\n公司名稱：\n聯絡人與電話／LINE：\n目前服務的雇主家庭數（約）：\n方便的介紹時段：\n",
+  )}`;
   return (
     <div className="min-h-dvh bg-bg">
       <SiteHeader />
@@ -39,6 +43,12 @@ export default function Partners() {
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted sm:text-xl">
             CareCash 家用金 讓每筆家用金都有收據、交錢收錢雙方確認。免費提供給您的雇主客戶，減少您處理家用金糾紛的時間。
           </p>
+          {/* Act on it right away: book the intro, or see both sides of the app in a minute without signing up */}
+          <div className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
+            <a href="#contact" className="btn-primary">預約 15 分鐘介紹</a>
+            <Link href="/sign-in#demo" className="btn-soft">1 分鐘看雇主＋看護畫面</Link>
+          </div>
+          <p className="mt-3 text-sm text-muted">免費・試用不用註冊・附多語說明單張</p>
         </section>
 
         <section className="mx-auto max-w-5xl px-4 py-8">
@@ -66,12 +76,12 @@ export default function Partners() {
           </ol>
         </section>
 
-        <section className="mx-auto max-w-3xl px-4 py-12 text-center">
+        <section id="contact" className="mx-auto max-w-3xl scroll-mt-6 px-4 py-12 text-center">
           <h2 className="text-3xl font-extrabold">預約 15 分鐘介紹</h2>
           <p className="mt-3 text-lg text-muted">或先自己試用：登入頁點「以雇主試用」或「以看護試用」，不用註冊。</p>
           <div className="mx-auto mt-6 flex max-w-md flex-col gap-3 sm:flex-row">
             {line && <a href={line} className="btn text-white" style={{ background: "#06C755" }}>LINE 聯絡我們</a>}
-            {email && <a href={`mailto:${email}?subject=${encodeURIComponent("仲介合作：CareCash 家用金")}`} className="btn-primary">Email 聯絡我們</a>}
+            {email && <a href={mailto} className="btn-primary">Email 聯絡我們</a>}
             <Link href="/sign-in#demo" className="btn-soft">先試用看看</Link>
           </div>
         </section>

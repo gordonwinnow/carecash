@@ -3,6 +3,20 @@ export type Article = { slug: string; title: string; description: string; publis
 
 export const ARTICLES: Article[] = [
   {
+    slug: "caregiver-day-off-and-household-cash",
+    title: "看護休假那天，家用金、三餐、照顧怎麼安排",
+    description:
+      "外籍看護放假那天，家用金誰拿？長輩的三餐和照顧誰接手？整理休假前要講好的事、家用金的兩種交接方式、替代照顧與 1966 喘息服務，以及為什麼休假不該扣薪。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "caregiver-replacement-handover",
+    title: "換看護、看護回國：家用金與帳目怎麼交接",
+    description:
+      "看護期滿回國、轉換雇主或換人，家用金怎麼收尾？整理離開前的最後一次對帳、現金歸還、家裡欠她的錢怎麼結清、收據歸檔，以及新看護到之後怎麼重新開始。",
+    published: "2026-11-27",
+  },
+  {
     slug: "hiring-foreign-caregiver-costs-overview",
     title: "請外籍看護一個月要花多少？費用總覽與準備清單",
     description:

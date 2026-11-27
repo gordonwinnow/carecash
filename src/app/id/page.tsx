@@ -181,6 +181,11 @@ export default function IndonesianCaregivers() {
             <p className="mt-1 text-lg font-bold">Uang belanja dari majikan: cara mencatat supaya tidak ada salah paham</p>
             <p className="mt-1 text-[15px] text-muted">Pisahkan dari gaji, hitung uang di depan majikan, simpan struk, dan cek bersama setiap minggu.</p>
           </Link>
+          <Link href="/id/panduan/hak-uang" className="card mt-3 block hover:border-accent">
+            <p className="text-sm font-bold text-accent-ink">Baca juga</p>
+            <p className="mt-1 text-lg font-bold">Hak kamu soal uang: gaji, uang belanja, dan uang talangan</p>
+            <p className="mt-1 text-[15px] text-muted">Gaji terpisah dari uang belanja, simpan struk untuk melindungi diri, dan minta uang talangan dikembalikan hari itu juga. Telepon 1955 gratis.</p>
+          </Link>
         </section>
 
         {/* Final CTA */}

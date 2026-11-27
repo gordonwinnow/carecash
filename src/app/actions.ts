@@ -271,7 +271,7 @@ export async function addExpense(fd: FormData) {
     },
     { actorId: me.id, actorName: me.name, kind: "expense", amount, category },
   );
-  done("/home");
+  done("/home?saved=1");
 }
 
 function getExpense(id: string, familyId: string) {

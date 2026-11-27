@@ -9,7 +9,23 @@ Evidence that questions work: @clairechou0708's one-line "外籍看護的餐費�
 
 ---
 
-## 1. Personal intro post (needs the founder's real details, marked [ ])
+## 1. Personal intro post: POSTED Fri Nov 27, about 21:05
+Founder's detail: 今年剛有小孩, then hired a 家庭幫傭. Posted version below; it leaves out anything the founder didn't confirm, such as her nationality.
+
+> 我今年剛有小孩，第一次請了家庭幫傭。
+> 照顧小孩的事有心理準備，沒想到最先讓我傷腦筋的是「買菜錢」：一週給多少才夠？收據要不要對？她先墊的錢怎麼還？
+>
+> 問了一圈有請看護、幫傭的朋友，大家的做法其實差很多：
+> A. 每週固定給一筆，用完再補
+> B. 每天給，當天結清
+> C. 雇主自己網購食材，錢不經她的手
+>
+> 我覺得 A 最省事，但想再加兩件事：交錢的時候她在手機上按「已收到」、每筆支出拍收據。
+> 後來乾脆把它做成一個免費的小工具，她用自己的語言，我看中文，兩個人看同一本帳。
+>
+> 你們家是用哪一種？
+
+Original draft template:
 
 > 我最近因為[老大/寶寶出生 ___]，第一次請了家庭幫傭。
 > 照顧小孩的事我有心理準備，沒想到最卡的是「買菜錢」：
@@ -27,7 +43,7 @@ Evidence that questions work: @clairechou0708's one-line "外籍看護的餐費�
 
 Suggested time: Tue Dec 1, 12:30. Post this **before** the pinned explainer, so new visitors meet the person first.
 
-## 2. Pinned explainer (facts from the landing page, no personal claims)
+## 2. Pinned explainer: POSTED and PINNED Fri Nov 27, about 21:07
 
 > 📌 CareCash 家用金是什麼？
 > 給家裡有外籍看護或幫傭的家庭，一個免費的家用金帳本：

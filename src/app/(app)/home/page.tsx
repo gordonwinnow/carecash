@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Banknote, Barcode as BarcodeIcon, Camera, Check, HandCoins, Hourglass, Users, Wallet, HeartHandshake, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { balanceOf, familyPotBalance, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
-import { day, money, monthLabel } from "@/lib/format";
+import { day, money, monthLabel, monthStart } from "@/lib/format";
 import { SITE_URL } from "@/lib/site";
 import type { T } from "@/lib/i18n";
 import { ackCash, ackRecord, confirmCash, deleteCash } from "../../actions";
@@ -14,8 +14,9 @@ import { ShareSummary } from "./share";
 type Cash = { id: string; amount: number; note: string | null; created_at: number; ack_at: number | null; giver: string; caretaker_id: string };
 type Expense = { id: string; amount: number; category: string; note: string | null; photo: string | null; spent_at: number; who: string; edited_by: string | null };
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
   const { me } = await requireCtx();
+  const { saved } = await searchParams;
   const t = await getT();
   const lang = await getLang();
   const carrier = db.prepare("select carrier, carrier_photo from family where id = ?").get(me.family_id) as { carrier: string | null; carrier_photo: string | null };
@@ -38,6 +39,12 @@ export default async function Home() {
           </Link>
         )}
       </header>
+      {/* Right after saving an expense: a clear "saved", so she doesn't have to spot the new row */}
+      {saved && (
+        <p role="status" className="flex items-center justify-center gap-2 rounded-2xl bg-accent-soft px-4 py-3 text-lg font-bold text-accent-ink">
+          <Check size={22} strokeWidth={2.6} /> {t("expenseSaved")}
+        </p>
+      )}
       {me.role === "caretaker" ? <CaretakerHome me={me} t={t} lang={lang} carrier={carrier} /> : <EmployerHome me={me} t={t} lang={lang} />}
     </div>
   );
@@ -51,7 +58,7 @@ function PendingCard({ icon, title, amount, note, at, children }: { icon: React.
       <div className="flex items-center gap-2">
         <span className="shrink-0 text-warn">{icon}</span>
         {/* Who, when and how much all in one type style; the amount sized like the list amounts */}
-        <span className="min-w-0 truncate text-[17px] font-semibold">{title} · {at}</span>
+        <span className="min-w-0 text-[17px] font-semibold leading-snug">{title} · {at}</span>
         <span className="tabular ml-auto shrink-0 text-[17px] font-bold">{amount}</span>
       </div>
       {children}
@@ -122,13 +129,16 @@ function CaretakerHome({ me, t, lang, carrier }: { me: Member; t: T; lang: strin
       )}
 
       {/* One row: the main action wide, "got money" as a short side button */}
-      <div className="grid grid-cols-[1fr_auto] gap-3">
+      {/* While money is waiting for her "I received it", the side button is hidden: two "received" buttons made double counting easy */}
+      <div className={`grid gap-3 ${pending.length ? "grid-cols-1" : "grid-cols-[1fr_auto]"}`}>
         <Link href="/expense/new" className="btn-primary min-h-20 px-4 text-xl leading-tight">
           <Camera size={26} className="shrink-0" /> {t("addExpense")}
         </Link>
-        <Link href="/cash/new" className="btn-tint min-h-20 w-auto flex-col !gap-1 px-4 text-[15px] leading-tight">
-          <Banknote size={24} /> {t("gotMoneyShort")}
-        </Link>
+        {pending.length === 0 && (
+          <Link href="/cash/new" className="btn-tint min-h-20 w-auto flex-col !gap-1 px-4 text-[15px] leading-tight">
+            <Banknote size={24} /> {t("gotMoneyShort")}
+          </Link>
+        )}
       </div>
 
       {recent.length === 0 ? <FirstSteps t={t} /> : <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} />}
@@ -207,13 +217,22 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
 
   // This month across everyone holding cash, for the family summary and the share button
   const month = holders.reduce((m, h) => ({ given: m.given + h.b.received, spent: m.spent + h.b.spent, left: m.left + h.b.left }), { given: 0, spent: 0, left: 0 });
-  const shareText = t("shareSummaryText", {
+  // Who put in how much this month: what siblings who share the cost argue about
+  const givers = db
+    .prepare(
+      `select m.name, sum(c.amount) as total from cash c join member m on m.id = c.given_by
+       where c.family_id = ? and c.ack_at >= ? and c.given_by != c.caretaker_id group by c.given_by order by total desc`,
+    )
+    .all(me.family_id, monthStart()) as { name: string; total: number }[];
+  const giversLine = givers.map((g) => `${g.name} ${money(g.total, me.currency)}`).join(" · ");
+  const shareBase = t("shareSummaryText", {
     family: me.family_name,
     month: monthLabel(Date.now(), lang),
     given: money(month.given, me.currency),
     spent: money(month.spent, me.currency),
     left: money(month.left, me.currency),
   });
+  const shareText = giversLine ? `${shareBase.replace(/[:：]\s*$/, "")}（${t("givenByLabel")} ${giversLine}）${shareBase.match(/[:：]\s*$/)?.[0] ?? ""}` : shareBase;
 
   return (
     <>
@@ -267,6 +286,11 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
                 </div>
               ))}
             </dl>
+            {givers.length > 0 && (
+              <p className="tabular text-center text-base text-muted">
+                {t("givenByLabel")}: {giversLine}
+              </p>
+            )}
             <ShareSummary text={shareText} url={`${SITE_URL}/history`} label={t("shareSummary")} copied={t("copied")} />
           </section>}
           <Link href="/settings?invite=caretaker#invite" className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">

@@ -3,6 +3,48 @@ export type Article = { slug: string; title: string; description: string; publis
 
 export const ARTICLES: Article[] = [
   {
+    slug: "hiring-foreign-caregiver-costs-overview",
+    title: "請外籍看護一個月要花多少？費用總覽與準備清單",
+    description:
+      "準備請外籍家庭看護，每個月要花哪些錢？整理薪資、就業安定費、健保、保險、仲介服務費、伙食住宿、家用金與健檢等費用，附官方來源、開始前的準備清單與常見問題。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "talking-about-money-with-caregiver",
+    title: "跟看護談錢不尷尬：10 句中印對照常用句",
+    description:
+      "給家用金、請看護拿收據、錢快用完要補、每週對帳、帳對不上時怎麼問、誤會了怎麼道歉：10 句中文與印尼文對照的常用句，附語氣提醒與常見問題。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "elderly-parent-living-alone-with-caregiver",
+    title: "爸媽和看護獨居、子女不同住：遠距管理家用金的方法",
+    description:
+      "爸媽和外籍看護住，子女住在外地，家用金怎麼給、錢放在誰手上、收據怎麼看、快用完怎麼知道、兄弟姊妹怎麼一起出？整理遠距管理家用金的 6 個做法、每週流程與常見問題。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "first-week-with-new-caregiver",
+    title: "看護來了！第一週清單：家用金、家規、溝通一次講清楚",
+    description:
+      "外籍看護第一次到家，第一週怎麼安排？到之前要準備什麼、第 1 到 7 天每天做什麼、家規表怎麼寫、家用金怎麼開始，加上語言工具、隱私與休假，一份清單講清楚。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "caregiver-food-and-halal",
+    title: "印尼看護的飲食：清真、三餐安排與伙食費",
+    description:
+      "印尼看護不吃豬肉，三餐怎麼辦？整理清真飲食的基本原則、三種常見的煮飯安排、齋戒月要注意什麼，以及伙食費怎麼跟家用金分開給、分開記。",
+    published: "2026-11-27",
+  },
+  {
+    slug: "caregiver-pays-first-reimbursement",
+    title: "看護先墊錢怎麼辦？先墊後報的公平做法",
+    description:
+      "看護自己先墊錢買菜、買藥，對她其實有風險。說明為什麼不該當常態、真的要墊時的上限與當天還款原則、每週對帳，以及帳上餘額變成負數時該怎麼處理。",
+    published: "2026-11-27",
+  },
+  {
     slug: "how-employers-give-grocery-money",
     title: "家庭移工買菜怎麼給錢？6 種常見方式比較",
     description:

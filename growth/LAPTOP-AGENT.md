@@ -9,7 +9,8 @@ The cloud session does strategy, code, drafts and deploys. **This session does w
 2. Read the open "Founder asks" list in the plan doc "CareCash Growth Plan & Weekly Log" (https://claude.ai/artifact/3ekZHXvrrgPPgo8U13WwTy) if you can open it, plus `growth/WEEKLY.md`.
 
 ## Rules
-- The founder approved the November post set on Nov 26 (`growth/content/social/2026-11-household-cash/`). Any new public post needs the founder's OK in this chat first.
+- **Standing approval (founder, Nov 27):** every post set under `growth/content/social/` is approved by default. Schedule them without asking first. Forum or Dcard story posts that need the founder's real experience are the exception.
+- Forum, Facebook-group, Dcard and PTT posts in `growth/outreach/posting-queue.md` are written as the founder: show each one and wait for "OK #N" before submitting, and never post text with an unfilled 【】 placeholder.
 - Never type passwords, and never change account security settings. If a login is needed, ask the founder to log in.
 - Show the founder each post (screenshot) before you press Schedule or Share.
 
@@ -56,6 +57,17 @@ Don't join or post without the founder's OK.
 
 ### 8. Dec 15–20: set 5, the 6 ways employers give grocery money (only after the founder approves it in the plan doc)
 - Folder: `growth/content/social/2026-12-money-methods/` (8 slides). Carousel: Thu Dec 17, 20:30. Threads: the 6 posts and times listed in `POSTS.md`.
+
+### 9–12. Sets 6–9 (approved by default; schedule per each POSTS.md)
+- `growth/content/social/2026-12-first-week/`: IG Thu Dec 24; Threads Dec 22, 23, 26
+- `growth/content/social/2026-12-halal/`: IG Wed Dec 30 (avoids New Year's Eve); Threads Dec 29, 30, Jan 2
+- `growth/content/social/2027-01-reimbursement/`: IG Thu Jan 14; Threads Jan 12, 15, 17
+- `growth/content/social/2027-01-costs/`: IG Thu Jan 21; Threads Jan 19, 20, 23
+- Before scheduling each, check that its article URL opens.
+
+### 13. Posting queue (forums, FB groups, Dcard, collab pitches)
+- File: `growth/outreach/posting-queue.md` (29 items with URLs and paste-ready text). Follow its §5 "Laptop Claude prompt".
+- At most 2 posts a day. No links or product name on PTT. Log each item in its §4 status log, then commit and push.
 
 ## When done
 - Tick the items in the plan doc (move them to its "Done" list), or tell the founder what was done so the cloud session can update the doc.

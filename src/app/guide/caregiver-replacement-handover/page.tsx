@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SITE_URL } from "@/lib/site";
 import { SiteFooter, SiteHeader } from "../../landing";
+import { RelatedArticles } from "../related";
+import { ShareArticle } from "../share";
 
 const A = {
   slug: "caregiver-replacement-handover",
@@ -175,7 +177,12 @@ export default function ArticlePage() {
             <div className="mx-auto mt-5 max-w-xs">
               <Link href="/sign-in?mode=signup&ref=guide-handover" className="btn-primary">免費開始使用</Link>
             </div>
+            <Link href="/sign-in#demo" className="mt-3 inline-block text-base font-semibold text-accent-ink underline underline-offset-4">先不註冊，試用範例家庭</Link>
           </div>
+
+          <ShareArticle url={`${SITE_URL}/guide/${A.slug}?ref=share`} title={A.title} />
+
+          <RelatedArticles current={A.slug} />
 
           <p className="mt-10 text-sm text-muted">
             本文為一般性的生活建議，不構成法律意見；薪資、工資結算、證件保管與契約終止的相關規定，請以勞動契約、勞動部規定及您的仲介說明為準，不確定時可撥 1955 專線詢問。

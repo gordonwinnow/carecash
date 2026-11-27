@@ -26,7 +26,7 @@ export async function SiteHeader({ copy = LANDING["zh-TW"], picker = false }: { 
             <LanguagePicker compact />
           </div>
         )}
-        <Link href="/guide" className="hidden text-sm font-bold text-muted hover:text-ink sm:inline">{copy.nav.guide}</Link>
+        <Link href="/guide" className={`${picker ? "hidden sm:inline" : "whitespace-nowrap"} text-sm font-bold text-muted hover:text-ink`}>{copy.nav.guide}</Link>
         {user ? (
           <Link href={me ? "/home" : "/start"} className="whitespace-nowrap rounded-full bg-accent px-4 py-2 text-sm font-bold text-white [box-shadow:var(--shadow)]">{copy.nav.openApp}</Link>
         ) : (

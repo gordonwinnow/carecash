@@ -51,6 +51,19 @@ export default function Partners() {
           <p className="mt-3 text-sm text-muted">免費・試用不用註冊・附多語說明單張</p>
         </section>
 
+        {/* What the employer and the caregiver actually see, so a broker doesn't have to imagine it */}
+        <section className="mx-auto max-w-3xl px-4 py-4">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/app-screens.jpg"
+            width={1200}
+            height={1240}
+            alt="雇主的畫面（中文，餘額與每筆支出）和看護的畫面（印尼文，記帳與確認收到）"
+            className="mx-auto w-full rounded-3xl"
+            loading="lazy"
+          />
+        </section>
+
         <section className="mx-auto max-w-5xl px-4 py-8">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {WHY.map(({ icon: Icon, t, d }) => (

@@ -4,6 +4,7 @@ import { SITE_URL } from "@/lib/site";
 import { SiteFooter, SiteHeader } from "../../landing";
 import { article } from "../articles";
 import { RelatedArticles } from "../related";
+import { ShareArticle } from "../share";
 
 const A = article("household-cash-for-caregivers")!;
 
@@ -158,6 +159,8 @@ export default function ArticlePage() {
             </div>
             <Link href="/sign-in#demo" className="mt-3 inline-block text-base font-semibold text-accent-ink underline underline-offset-4">先不註冊，試用範例家庭</Link>
           </div>
+
+          <ShareArticle url={`${SITE_URL}/guide/${A.slug}?ref=share`} title={A.title} />
 
           <RelatedArticles current={A.slug} />
 

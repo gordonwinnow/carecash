@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, Barcode as BarcodeIcon, Camera, Check, HandCoins, Hourglass, Users, Wallet, HeartHandshake, Plus } from "lucide-react";
+import { Banknote, Barcode as BarcodeIcon, Camera, Check, HandCoins, Hourglass, MessageCircle, Users, Wallet, HeartHandshake, Plus } from "lucide-react";
 import { db } from "@/lib/db";
 import { balanceOf, familyPotBalance, getLang, getT, requireCtx, type Member } from "@/lib/ctx";
 import { day, money, monthLabel, monthStart } from "@/lib/format";
@@ -141,7 +141,17 @@ function CaretakerHome({ me, t, lang, carrier }: { me: Member; t: T; lang: strin
         )}
       </div>
 
-      {recent.length === 0 ? <FirstSteps t={t} /> : <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} />}
+      {recent.length === 0 ? (
+        <FirstSteps t={t} />
+      ) : (
+        <>
+          <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} />
+          {/* Sentences she may not dare to say (money running low, paid first), shown big in Chinese */}
+          <Link href="/phrases" className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">
+            <MessageCircle size={18} /> {t("showEmployer")}
+          </Link>
+        </>
+      )}
     </>
   );
 }
@@ -162,6 +172,9 @@ function FirstSteps({ t }: { t: T }) {
       </ol>
       <Link href="/expense/new" className="btn-tint">
         <Camera size={22} /> {t("firstCta")}
+      </Link>
+      <Link href="/phrases" className="btn-tint">
+        <MessageCircle size={22} /> {t("showEmployer")}
       </Link>
     </section>
   );
@@ -195,8 +208,15 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
     )
     .get({ fid: me.family_id });
   const holders = [
-    ...caretakers.map((c) => ({ id: c.id, title: c.name, caretaker: true, b: balanceOf(c.id) })),
-    ...(caretakers.length === 0 || potUsed ? [{ id: me.id, title: t("myCash"), caretaker: false, b: familyPotBalance(me.family_id) }] : []),
+    ...caretakers.map((c) => ({
+      id: c.id,
+      title: c.name,
+      caretaker: true,
+      b: balanceOf(c.id),
+      // Fewer than two handovers so far: the first-handover phrases card is shown
+      newbie: (db.prepare("select count(*) as n from cash where caretaker_id = ? and given_by != caretaker_id").get(c.id) as { n: number }).n < 2,
+    })),
+    ...(caretakers.length === 0 || potUsed ? [{ id: me.id, title: t("myCash"), caretaker: false, b: familyPotBalance(me.family_id), newbie: false }] : []),
   ];
 
   const inviteCard = caretakers.length === 0 && (
@@ -247,6 +267,14 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
               <Hourglass size={16} /> {t("waitingFor", { name: h.title, amount: money(h.b.pending, me.currency) })}
             </p>
           )}
+          {/* The first handovers: say the rules in her language, by turning the phone around */}
+          {h.newbie && (
+            <Link href={`/phrases?for=${h.id}&first=1`} className="card flex items-center gap-3 hover:[box-shadow:var(--shadow)]">
+              <span className="badge h-11 w-11 shrink-0 rounded-2xl"><MessageCircle size={22} /></span>
+              <span className="min-w-0 flex-1 text-base font-semibold leading-snug">{t("firstHandover", { name: h.title })}</span>
+              <span className="shrink-0 rounded-full bg-accent px-3.5 py-2 text-sm font-bold text-on-accent">{t("showHer")}</span>
+            </Link>
+          )}
           {/* One row: add household cash wide; expense (and, for a caretaker, other costs) as short side buttons */}
           <div className={`grid gap-2 ${h.caretaker ? "grid-cols-[1fr_auto_auto]" : "grid-cols-[1fr_auto]"}`}>
             <Link href={`/cash/new?to=${h.id}`} className="btn-primary min-h-20 px-4 text-xl leading-tight">
@@ -293,6 +321,9 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
             )}
             <ShareSummary text={shareText} url={`${SITE_URL}/history`} label={t("shareSummary")} copied={t("copied")} />
           </section>}
+          <Link href={`/phrases?for=${caretakers[0].id}`} className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">
+            <MessageCircle size={18} /> {t("phrasesTitle")}
+          </Link>
           <Link href="/settings?invite=caretaker#invite" className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">
             <Plus size={18} /> {t("inviteAnother")}
           </Link>

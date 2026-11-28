@@ -210,9 +210,9 @@ export default function ArticlePage() {
           </P>
 
           <div className="card mt-12 p-6 text-center">
-            <p className="text-2xl font-extrabold">少說幾句，帳也一樣清楚</p>
+            <p className="text-2xl font-extrabold">這些句子，App 裡都有</p>
             <p className="mt-3 text-lg text-muted">
-              CareCash 家用金：看護用印尼文、越南文等母語拍收據記帳，給錢、補錢雙方確認，餘額自動算好，兄弟姊妹也能一起看。
+              交家用金時，在 CareCash 家用金點一句，就會用她的語言（印尼文、越南文、菲律賓文、泰文）放大顯示，手機轉過去給她看就好。她也能把「錢快用完了」「我先墊了」用中文顯示給你看。給錢雙方確認、收據拍照、餘額自動算好。
             </p>
             <div className="mx-auto mt-5 max-w-xs">
               <Link href="/sign-in?mode=signup&ref=guide-phrases" className="btn-primary">免費開始使用</Link>

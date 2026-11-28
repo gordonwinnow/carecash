@@ -32,6 +32,19 @@ Employers record salary, healthcare and other costs, with an optional photo. Eac
 - Owners (accounts whose email is in the `OWNER_EMAILS` secret) review and reply at `/feedback/review`, and get a push for each new one.
 - From a terminal, or for Claude to triage and fix: `FEEDBACK_TOKEN=… node scripts/feedback.mjs list open`, `… reply <id> <status> "<text>"`, `… photo <name>`. This calls `/api/feedback`, which is off unless the `FEEDBACK_TOKEN` secret is set.
 
+**Plans (built, off until `BILLING_PROVIDER` is set):** one plan per family, paid by an employer; caretakers never see a price.
+- 30-day free trial from when the family is made. Families made before billing was turned on count from `BILLING_START` (YYYY-MM-DD, the day it goes on).
+- After the trial: 30 new entries a month free (cash, expenses and Pay & health records together). History stays visible. The add pages show a notice instead of the form once they're used up, and employers get an **Upgrade** link.
+- Paid: NT$990 a year, no limit. Settings → 方案 (`/plan`) shows the status; employers pay and cancel there. The guest demo is never limited.
+- The iPhone app shows the status only, no price or payment link (Apple doesn't allow paying outside the app there). A plan paid on the web works in the app too.
+- Code: `src/lib/billing.ts` (rules), `src/app/api/billing/*` (checkout and notifications).
+
+Two payment providers are built; `BILLING_PROVIDER` picks one:
+- **`ecpay`** (綠界, for the Taiwan business): yearly card billing (信用卡定期定額) and an automatic 統一發票 for every payment, saved to the family's 載具 when it has one, else emailed. Until `ECPAY_ENV=prod` it uses ECPay's public test merchants, so the whole flow can be tried without keys (test card 4311-9522-2222-2222). For real: `ECPAY_ENV=prod`, `ECPAY_MERCHANT_ID`, `ECPAY_HASH_KEY`, `ECPAY_HASH_IV`, `ECPAY_INVOICE_MERCHANT_ID`, `ECPAY_INVOICE_HASH_KEY`, `ECPAY_INVOICE_HASH_IV`. ECPay calls `https://carecash.me/api/billing/ecpay/notify` (set nothing in ECPay's back office for it; it's sent with each order). Yearly plans stop after 9 years (ECPay's limit).
+- **`stripe`**: Stripe Checkout in TWD, managed in Stripe's customer portal. `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET`; add a webhook endpoint `https://carecash.me/api/billing/stripe` for `checkout.session.completed`, `invoice.paid`, `customer.subscription.updated`, `customer.subscription.deleted`, and turn on the customer portal. No 統一發票 on this path.
+
+Payments are kept in the `payment` table with their e-invoice number (or `invoice_error` if one failed, to issue by hand in ECPay's back office).
+
 **Guest demo:** on the sign-in page, **Try as Employer** / **Try as Caretaker** signs in a throwaway guest with two months of sample data. Invites are off in the demo, and demo families are deleted after 3 days.
 
 **Settings:** 10 languages (繁體中文, English, Bahasa Indonesia, Tiếng Việt, Tagalog, ภาษาไทย, 日本語, 한국어, Español, Français), light/dark/auto, and 6 main colors. All are stored per device.

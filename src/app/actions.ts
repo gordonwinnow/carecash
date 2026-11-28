@@ -12,6 +12,10 @@ import { logChange } from "@/lib/audit";
 import { deliver, watchBalance } from "@/lib/notify";
 import { normalizeCarrier } from "@/lib/carrier";
 import { ownerUserIds, updateFeedback } from "@/lib/feedback";
+import { canAdd, markCanceled } from "@/lib/billing";
+import { cancelYearly } from "@/lib/ecpay";
+import { portal } from "@/lib/stripe";
+import { SITE_URL } from "@/lib/site";
 
 const COOKIE = { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" as const };
 
@@ -23,6 +27,10 @@ function amountOf(fd: FormData) {
 function text(fd: FormData, key: string, max = 200) {
   const v = String(fd.get(key) ?? "").trim();
   return v ? v.slice(0, max) : null;
+}
+/** After the free trial, an unpaid family can add a set number of entries a month; past that, the plan page explains. */
+function needRoom(familyId: string) {
+  if (!canAdd(familyId)) redirect("/plan?full=1");
 }
 function done(to?: string) {
   revalidatePath("/", "layout");
@@ -135,6 +143,7 @@ export async function removeMember(memberId: string) {
  */
 export async function giveCash(fd: FormData) {
   const { me } = await requireCtx();
+  needRoom(me.family_id);
   // The chosen day (today keeps the current moment)
   const now = movedDate(fd.get("date"), Date.now());
   const other = String(fd.get("who") ?? "");
@@ -253,6 +262,7 @@ function payerOf(fd: FormData, me: { id: string; role: string; family_id: string
 
 export async function addExpense(fd: FormData) {
   const { me } = await requireCtx();
+  needRoom(me.family_id);
   const payer = payerOf(fd, me);
   const category = categoryOf(fd);
   const amount = amountOf(fd);
@@ -326,6 +336,7 @@ const needsAck = (r: { kind: string; caretaker_id: string | null }) => r.kind ==
 
 export async function addRecord(fd: FormData) {
   const { me } = await requireAdmin();
+  needRoom(me.family_id);
   const f = recordFields(fd, me.family_id);
   const photo = await savePhoto(fd);
   const id = newId();
@@ -542,4 +553,19 @@ export async function savePayslip(fd: FormData) {
     }
   })();
   done(`/labs/payslip?m=${who.id}&month=${month}&lang=${lang}&saved=1`);
+}
+
+// ---------- Plan ----------
+
+/** Stops the yearly renewal. ECPay: cancelled here. Stripe: its own page, where the card can also be changed. */
+export async function managePlan() {
+  const { me } = await requireAdmin();
+  const f = db.prepare("select plan_provider, plan_ref, plan_customer from family where id = ?").get(me.family_id) as {
+    plan_provider: string | null;
+    plan_ref: string | null;
+    plan_customer: string | null;
+  };
+  if (f.plan_provider === "stripe" && f.plan_customer) redirect(await portal(f.plan_customer, SITE_URL));
+  if (f.plan_provider === "ecpay" && f.plan_ref && (await cancelYearly(f.plan_ref))) markCanceled(me.family_id);
+  done("/plan");
 }

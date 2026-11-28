@@ -179,6 +179,35 @@ function open() {
     updated_at integer not null,
     unique (member_id, month)
   );`);
+  // The family's paid plan (see src/lib/billing.ts): paid through paid_until, renewing while plan_status = 'active'.
+  // plan_ref is the provider's subscription (ECPay MerchantTradeNo or Stripe subscription id); plan_customer is Stripe's customer.
+  addColumn(d, "family", "paid_until", "integer");
+  addColumn(d, "family", "plan_provider", "text");
+  addColumn(d, "family", "plan_status", "text");
+  addColumn(d, "family", "plan_ref", "text");
+  addColumn(d, "family", "plan_customer", "text");
+  // Every payment received, once each (ref = the provider's id for that charge), with its e-invoice number when one was issued
+  d.exec(`create table if not exists payment (
+    id text primary key,
+    family_id text not null,
+    provider text not null,
+    ref text not null unique,
+    amount integer not null,
+    currency text not null,
+    period_end integer not null,
+    invoice_no text,
+    invoice_error text,
+    created_at integer not null
+  );
+  create index if not exists payment_family on payment(family_id);
+  -- A checkout an employer started: who it was and where the e-invoice goes, looked up when the payment comes in
+  create table if not exists checkout (
+    ref text primary key,
+    family_id text not null,
+    member_id text not null,
+    email text,
+    created_at integer not null
+  );`);
   // Older demo data had sample notes on household cash that read like labels
   d.prepare("update cash set note = null where note in ('Next week', 'Groceries') and family_id in (select id from family where demo = 1)").run();
   return d;

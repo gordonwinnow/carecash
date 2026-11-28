@@ -10,6 +10,7 @@ import { InvitePanel } from "./invite";
 import { NotifySettings } from "@/components/notify";
 import { InstallLink } from "@/components/install";
 import { BorderlessRow } from "./row";
+import { planOf } from "@/lib/billing";
 
 export default async function Settings({ searchParams }: { searchParams: Promise<{ invite?: string }> }) {
   const { invite } = await searchParams;
@@ -28,6 +29,10 @@ export default async function Settings({ searchParams }: { searchParams: Promise
     notify_cash: number;
   };
   const carrier = db.prepare("select carrier, carrier_photo from family where id = ?").get(me.family_id) as { carrier: string | null; carrier_photo: string | null };
+  // The family's plan, once billing is on: trial days left, free entries used, or paid
+  const plan = planOf(me.family_id);
+  const planLine =
+    plan.kind === "trial" ? t("planTrial", { n: plan.daysLeft }) : plan.kind === "free" ? `${plan.used}/${plan.limit}` : plan.kind === "paid" ? "✓" : "";
   const notify = { notify_low: !!n.notify_low, low_threshold: n.low_threshold, notify_expense: !!n.notify_expense, notify_cash: !!n.notify_cash };
 
   return (
@@ -38,6 +43,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <section className="card !p-2">
         <BorderlessRow href="/carrier" icon={<BarcodeIcon size={20} />} title={t("carrier")} value={carrier.carrier ?? (carrier.carrier_photo ? "✓" : isAdmin ? t("carrierAdd") : "—")} />
         <BorderlessRow href="/feedback" icon={<MessageSquareText size={20} />} title={t("feedback")} />
+        {plan.kind !== "off" && <BorderlessRow href="/plan" icon={<Crown size={20} />} title={t("plan")} value={planLine} />}
       </section>
 
       <section className="card space-y-3">

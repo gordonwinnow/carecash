@@ -43,7 +43,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
       <section className="card !p-2">
         <BorderlessRow href="/carrier" icon={<BarcodeIcon size={20} />} title={t("carrier")} value={carrier.carrier ?? (carrier.carrier_photo ? "✓" : isAdmin ? t("carrierAdd") : "—")} />
         <BorderlessRow href="/feedback" icon={<MessageSquareText size={20} />} title={t("feedback")} />
-        {plan.kind !== "off" && <BorderlessRow href="/plan" icon={<Crown size={20} />} title={t("plan")} value={planLine} />}
+        {isAdmin && plan.kind !== "off" && <BorderlessRow href="/plan" icon={<Crown size={20} />} title={t("plan")} value={planLine} />}
       </section>
 
       <section className="card space-y-3">

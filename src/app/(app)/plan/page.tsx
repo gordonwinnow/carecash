@@ -11,15 +11,15 @@ import { managePlan } from "../../actions";
 import { ActionButton, BackHeader } from "@/components/ui";
 
 /**
- * The family's plan. Employers on the web see the price and pay here; caretakers see the status and,
- * when the free entries run out, who to ask. The iPhone app shows the status only (Apple doesn't allow
+ * The family's plan, for employers only. On the web they see the price and pay here. The iPhone app shows the status only (Apple doesn't allow
  * pointing to payment outside the app).
  */
 export default async function PlanPage({ searchParams }: { searchParams: Promise<{ paid?: string; failed?: string; over?: string; next?: string }> }) {
   const { user, me } = await requireCtx();
   const sp = await searchParams;
   const provider = billingProvider();
-  if (!provider) redirect("/settings");
+  // Employers only: caretakers never see plans or prices
+  if (!provider || me.role !== "admin") redirect(me.role === "admin" ? "/settings" : "/home");
   const t = await getT();
   const lang = await getLang();
   const plan = planOf(me.family_id);

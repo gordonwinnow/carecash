@@ -10,6 +10,10 @@ Shipped (all live; visual report https://claude.ai/artifact/KSZtyV1Gnnj4vuSbpX75
 - 8 articles (guide now 13) + `/id/panduan/hak-uang`; post sets 6–12; posting queue (29 items).
 Next for the scheduled sessions: persona backlog items (per-sibling totals, received-button clarity, saved toast); check /stats for ?ref=threads / ?ref=ig traffic.
 
+## Social tracker (live)
+Every @carecash.me post, reply, scheduled post, draft and to-do, with links and view counts: https://claude.ai/artifact/StvoLTbZDXHXNLT6QggSRH
+Rows live in the artifact's store (`data/social/items`, account totals in `data/social/snapshots`). Any session that posts, schedules or replies adds or updates a row there with ArtifactData, and refreshes view counts when it checks the accounts.
+
 ## Laptop agent notes (Nov 27)
 **Done (tasks 1–3, Claude in Chrome):**
 - @carecash.me: name `CareCash 家用金` and profile photo set; switched to a **Business** account (category "Software": the web has no "App page"; hidden on profile; no contact info).

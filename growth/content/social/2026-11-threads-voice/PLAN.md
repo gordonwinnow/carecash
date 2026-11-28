@@ -3,6 +3,8 @@
 Founder feedback: @carecash.me should sound like a person, not a brand. The pattern:
 **my situation → the problem I hit → what friends told me (ABC) → how the app helps (甲乙丙)**, plus open questions to the field, plus a pinned "what this app does" post. Replying in other people's threads counts as much as our own posts.
 
+Live tracker of everything posted, with links: https://claude.ai/artifact/StvoLTbZDXHXNLT6QggSRH (add a row there for every new post or reply).
+
 Already scheduled (old brand-voice set, kept as is): Fri 27 21:30, Sat 28 12:30, Sun 29 21:00.
 
 Evidence that questions work: @clairechou0708's one-line "外籍看護的餐費一天平均多少" got 35.5K views and 23 replies; @deer_545858's 菜錢 question got 16.9K views and 30 replies.

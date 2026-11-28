@@ -81,6 +81,8 @@ function CaretakerHome({ me, t, lang, carrier }: { me: Member; t: T; lang: strin
     )
     .all(me.id) as { id: string; amount: number; date: string; payer: string | null }[];
   const b = balanceOf(me.id);
+  // Her own low-balance line (default NT$1,000): the moment she may not dare to ask for more
+  const low = (db.prepare("select low_threshold from member where id = ?").get(me.id) as { low_threshold: number }).low_threshold;
   const recent = db
     .prepare("select e.*, '' as who, (select em.name from audit a join member em on em.id = a.member_id where a.entity_id = e.id and a.action = 'update' order by a.at desc limit 1) as edited_by from expense e where member_id = ? order by spent_at desc limit 5")
     .all(me.id) as Expense[];
@@ -145,6 +147,13 @@ function CaretakerHome({ me, t, lang, carrier }: { me: Member; t: T; lang: strin
         <FirstSteps t={t} />
       ) : (
         <>
+          {/* Running low: one tap opens 「錢快用完了，可以再補一點嗎？」 big in Chinese for the employer */}
+          {b.left < low && pending.length === 0 && (
+            <Link href="/phrases?p=running-low" className="flex items-center gap-3 rounded-3xl bg-warn-soft px-[18px] py-4 text-base font-bold">
+              <MessageCircle size={22} className="shrink-0 text-warn" />
+              <span className="min-w-0 flex-1">{t("lowShowEmployer")}</span>
+            </Link>
+          )}
           <ExpenseList title={t("recent")} rows={recent} t={t} lang={lang} currency={me.currency} />
           {/* Sentences she may not dare to say (money running low, paid first), shown big in Chinese */}
           <Link href="/phrases" className="flex items-center justify-center gap-2 py-1 text-base font-semibold text-accent">

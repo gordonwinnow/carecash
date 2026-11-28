@@ -16,7 +16,7 @@ function guessLang(c: Member | undefined): PhraseLang {
  * Money phrases for the moment cash changes hands.
  * Employer: her language big, Chinese small, with a language switch. Caregiver: Chinese big for the employer, her language small.
  */
-export default async function Phrases({ searchParams }: { searchParams: Promise<{ for?: string; l?: string; first?: string }> }) {
+export default async function Phrases({ searchParams }: { searchParams: Promise<{ for?: string; l?: string; first?: string; p?: string }> }) {
   const { me } = await requireCtx();
   const t = await getT();
   const lang = await getLang();
@@ -27,7 +27,7 @@ export default async function Phrases({ searchParams }: { searchParams: Promise<
     return (
       <div className="space-y-5">
         <Header title={t("showEmployer")} hint={t("showEmployerHint")} />
-        <PhraseList bigLang="zh-TW" close={t("tapToClose")} lines={CARETAKER_PHRASES.map((p) => ({ key: p.key, big: p.zh, small: p[mine] }))} />
+        <PhraseList bigLang="zh-TW" close={t("tapToClose")} initial={sp.p} lines={CARETAKER_PHRASES.map((p) => ({ key: p.key, big: p.zh, small: p[mine] }))} />
       </div>
     );
   }
@@ -57,7 +57,7 @@ export default async function Phrases({ searchParams }: { searchParams: Promise<
           </Link>
         ))}
       </div>
-      <PhraseList bigLang={target} close={t("tapToClose")} lines={phrases.map((p) => ({ key: p.key, big: p[target], small: p.zh }))} />
+      <PhraseList bigLang={target} close={t("tapToClose")} initial={sp.p} lines={phrases.map((p) => ({ key: p.key, big: p[target], small: p.zh }))} />
       {sp.first && (
         <Link href={q(target, false)} className="block text-center text-base font-semibold text-accent">
           {t("allPhrases")}

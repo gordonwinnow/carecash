@@ -1,5 +1,5 @@
 "use server";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db, newId } from "@/lib/db";
@@ -12,10 +12,11 @@ import { logChange } from "@/lib/audit";
 import { deliver, watchBalance } from "@/lib/notify";
 import { normalizeCarrier } from "@/lib/carrier";
 import { ownerUserIds, updateFeedback } from "@/lib/feedback";
-import { canAdd, markCanceled } from "@/lib/billing";
+import { markCanceled, planOf } from "@/lib/billing";
 import { cancelYearly } from "@/lib/ecpay";
 import { portal } from "@/lib/stripe";
 import { SITE_URL } from "@/lib/site";
+import { isNativeApp } from "@/lib/native";
 
 const COOKIE = { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" as const };
 
@@ -28,9 +29,21 @@ function text(fd: FormData, key: string, max = 200) {
   const v = String(fd.get(key) ?? "").trim();
   return v ? v.slice(0, max) : null;
 }
-/** After the free trial, an unpaid family can add a set number of entries a month; past that, the plan page explains. */
-function needRoom(familyId: string) {
-  if (!canAdd(familyId)) redirect("/plan?full=1");
+/**
+ * Entries are never blocked. Once an unpaid family is past its free entries this month, an employer who adds one
+ * lands on the plan page afterwards (at most once a day), with a button to carry on. Caretakers never see it,
+ * and neither does the iPhone app (Apple doesn't allow pointing to payment outside the app).
+ */
+async function afterAdd(me: { role: string; family_id: string }, to: string) {
+  const p = planOf(me.family_id);
+  const jar = await cookies();
+  const day = today();
+  const native = isNativeApp((await headers()).get("user-agent") ?? "");
+  if (me.role === "admin" && !native && p.kind === "free" && p.used > p.limit && jar.get("cc_plan_seen")?.value !== day) {
+    jar.set("cc_plan_seen", day, { path: "/", maxAge: 2 * 86_400, sameSite: "lax" });
+    done(`/plan?over=1&next=${encodeURIComponent(to)}`);
+  }
+  done(to);
 }
 function done(to?: string) {
   revalidatePath("/", "layout");
@@ -143,7 +156,6 @@ export async function removeMember(memberId: string) {
  */
 export async function giveCash(fd: FormData) {
   const { me } = await requireCtx();
-  needRoom(me.family_id);
   // The chosen day (today keeps the current moment)
   const now = movedDate(fd.get("date"), Date.now());
   const other = String(fd.get("who") ?? "");
@@ -167,7 +179,7 @@ export async function giveCash(fd: FormData) {
     },
     { actorId: me.id, actorName: me.name, kind: "cash", amount },
   );
-  done("/home");
+  await afterAdd(me, "/home");
 }
 
 function getCash(id: string, familyId: string) {
@@ -262,7 +274,6 @@ function payerOf(fd: FormData, me: { id: string; role: string; family_id: string
 
 export async function addExpense(fd: FormData) {
   const { me } = await requireCtx();
-  needRoom(me.family_id);
   const payer = payerOf(fd, me);
   const category = categoryOf(fd);
   const amount = amountOf(fd);
@@ -281,7 +292,7 @@ export async function addExpense(fd: FormData) {
     },
     { actorId: me.id, actorName: me.name, kind: "expense", amount, category },
   );
-  done("/home?saved=1");
+  await afterAdd(me, "/home?saved=1");
 }
 
 function getExpense(id: string, familyId: string) {
@@ -336,7 +347,6 @@ const needsAck = (r: { kind: string; caretaker_id: string | null }) => r.kind ==
 
 export async function addRecord(fd: FormData) {
   const { me } = await requireAdmin();
-  needRoom(me.family_id);
   const f = recordFields(fd, me.family_id);
   const photo = await savePhoto(fd);
   const id = newId();
@@ -344,7 +354,7 @@ export async function addRecord(fd: FormData) {
     "insert into record (id, family_id, caretaker_id, kind, amount, note, photo, date, shared, created_by, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
   ).run(id, me.family_id, f.caretaker_id, f.kind, f.amount, f.note, photo, f.date, f.shared, me.id, Date.now());
   logChange(me.family_id, me.id, "record", id, "create", null, { ...f, photo }, needsAck(f) ? f.caretaker_id : null);
-  done("/more");
+  await afterAdd(me, "/more");
 }
 
 function getRecord(id: string, familyId: string) {

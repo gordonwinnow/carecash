@@ -34,8 +34,8 @@ Employers record salary, healthcare and other costs, with an optional photo. Eac
 
 **Plans (built, off until `BILLING_PROVIDER` is set):** one plan per family, paid by an employer; caretakers never see a price.
 - 30-day free trial from when the family is made. Families made before billing was turned on count from `BILLING_START` (YYYY-MM-DD, the day it goes on).
-- After the trial: 30 new entries a month free (cash, expenses and Pay & health records together). History stays visible. The add pages show a notice instead of the form once they're used up, and employers get an **Upgrade** link.
-- Paid: NT$990 a year, no limit. Settings → 方案 (`/plan`) shows the status; employers pay and cancel there. The guest demo is never limited.
+- After the trial, the free plan: 30 new entries a month (cash, expenses and Pay & health records together). Nothing is ever blocked and there are no advance warnings: once a family is past 30 in a month, an employer who adds an entry gets the plan page afterwards (at most once a day), with **先繼續使用** to carry on. Caretakers never see it.
+- Paid: NT$990 a year, unlimited, no reminders. Settings → 方案 (`/plan`) shows the status; employers pay and cancel there. The guest demo is never limited.
 - The iPhone app shows the status only, no price or payment link (Apple doesn't allow paying outside the app there). A plan paid on the web works in the app too.
 - Code: `src/lib/billing.ts` (rules), `src/app/api/billing/*` (checkout and notifications).
 

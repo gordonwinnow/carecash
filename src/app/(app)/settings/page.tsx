@@ -32,7 +32,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
   // The family's plan, once billing is on: trial days left, free entries used, or paid
   const plan = planOf(me.family_id);
   const planLine =
-    plan.kind === "trial" ? t("planTrial", { n: plan.daysLeft }) : plan.kind === "free" ? `${plan.used}/${plan.limit}` : plan.kind === "paid" ? "✓" : "";
+    plan.kind === "trial" ? t("planTrial", { n: plan.daysLeft }) : plan.kind === "free" ? t("planFree") : plan.kind === "paid" ? "✓" : "";
   const notify = { notify_low: !!n.notify_low, low_threshold: n.low_threshold, notify_expense: !!n.notify_expense, notify_cash: !!n.notify_cash };
 
   return (

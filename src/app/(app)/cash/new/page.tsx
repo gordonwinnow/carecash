@@ -2,8 +2,6 @@ import { Check, Crown, UserRound } from "lucide-react";
 import { db } from "@/lib/db";
 import { getT, requireCtx } from "@/lib/ctx";
 import { today } from "@/lib/format";
-import { canAdd } from "@/lib/billing";
-import { LimitNotice } from "@/components/plan";
 import { giveCash } from "../../../actions";
 import { AmountInput, BackHeader, ChipGroup, Submit } from "@/components/ui";
 
@@ -20,7 +18,6 @@ export default async function NewCash({ searchParams }: { searchParams: Promise<
   if (isAdmin) others.push({ id: me.id, name: t("myself") });
   const title = isAdmin ? t("giveCash") : t("iGotMoney");
   const PersonIcon = isAdmin ? UserRound : Crown;
-  if (!canAdd(me.family_id)) return <div className="space-y-6"><BackHeader title={title} /><LimitNotice familyId={me.family_id} role={me.role} t={t} /></div>;
   return (
     <form action={giveCash} className="space-y-6">
       <BackHeader title={title} />

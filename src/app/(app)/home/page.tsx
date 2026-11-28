@@ -10,7 +10,6 @@ import { ActionButton } from "@/components/ui";
 import { Barcode } from "@/components/barcode";
 import { EntryRow, RowList, SectionHead, Empty } from "@/components/rows";
 import { ShareSummary } from "./share";
-import { PlanBanner } from "@/components/plan";
 
 type Cash = { id: string; amount: number; note: string | null; created_at: number; ack_at: number | null; giver: string; caretaker_id: string };
 type Expense = { id: string; amount: number; category: string; note: string | null; photo: string | null; spent_at: number; who: string; edited_by: string | null };
@@ -239,7 +238,6 @@ function EmployerHome({ me, t, lang }: { me: Member; t: T; lang: string }) {
     <>
       {/* A new family: inviting the caretaker is the first thing to do */}
       {inviteCard}
-      <PlanBanner familyId={me.family_id} t={t} />
       {holders.map((h) => (
         <section key={h.id} className="space-y-3">
           <BalanceCard title={h.title} b={h.b} t={t} />

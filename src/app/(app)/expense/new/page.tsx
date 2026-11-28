@@ -1,7 +1,5 @@
 import { db } from "@/lib/db";
 import { getT, requireCtx } from "@/lib/ctx";
-import { canAdd } from "@/lib/billing";
-import { LimitNotice } from "@/components/plan";
 import { addExpense } from "../../../actions";
 import { BackHeader } from "@/components/ui";
 import { ExpenseFields } from "../form";
@@ -19,7 +17,6 @@ export default async function NewExpense({ searchParams }: { searchParams: Promi
     me.role === "admin"
       ? { me: me.id, caretakers, initial: sp.for === me.id ? me.id : (caretakers.find((c) => c.id === sp.for)?.id ?? caretakers[0]?.id ?? me.id) }
       : undefined;
-  if (!canAdd(me.family_id)) return <div className="space-y-6"><BackHeader title={t("addExpense")} /><LimitNotice familyId={me.family_id} role={me.role} t={t} /></div>;
   return (
     <form action={addExpense} className="space-y-6">
       <BackHeader title={t("addExpense")} />

@@ -5,8 +5,9 @@ import { monthStart } from "./format";
 /**
  * Plans, one per family (the employer pays; caretakers never see a price):
  * - a 30-day free trial from when the family was made (families that already existed count from BILLING_START);
- * - after it, FREE_PER_MONTH new entries a month (cash, expenses and Pay & health records together). History stays visible;
- * - a paid plan has no limit.
+ * - after it, the free plan: FREE_PER_MONTH new entries a month (cash, expenses and Pay & health records together).
+ *   Nothing is ever blocked: past that, employers are shown the plan page after adding (see afterAdd in actions.ts);
+ * - a paid plan: unlimited, no reminders.
  *
  * All of this is off until BILLING_PROVIDER is set ("ecpay" or "stripe"), so the code can ship before payments do.
  */
@@ -61,12 +62,6 @@ export function planOf(familyId: string, now = Date.now()): Plan {
   if (now < ends) return { kind: "trial", ends, daysLeft: Math.ceil((ends - now) / DAY) };
   const used = entriesThisMonth(familyId);
   return { kind: "free", used, limit: FREE_PER_MONTH, left: Math.max(0, FREE_PER_MONTH - used) };
-}
-
-/** Whether the family may add one more entry now. */
-export function canAdd(familyId: string) {
-  const p = planOf(familyId);
-  return p.kind !== "free" || p.left > 0;
 }
 
 /**

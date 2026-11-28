@@ -1,9 +1,10 @@
+import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Check, CircleAlert, Crown } from "lucide-react";
 import { db } from "@/lib/db";
 import { getLang, getT, requireCtx } from "@/lib/ctx";
-import { FREE_PER_MONTH, PRICE_YEAR, billingProvider, planOf } from "@/lib/billing";
+import { PRICE_YEAR, billingProvider, planOf } from "@/lib/billing";
 import { isNativeApp } from "@/lib/native";
 import { TZ } from "@/lib/format";
 import { managePlan } from "../../actions";
@@ -14,7 +15,7 @@ import { ActionButton, BackHeader } from "@/components/ui";
  * when the free entries run out, who to ask. The iPhone app shows the status only (Apple doesn't allow
  * pointing to payment outside the app).
  */
-export default async function PlanPage({ searchParams }: { searchParams: Promise<{ paid?: string; failed?: string; full?: string }> }) {
+export default async function PlanPage({ searchParams }: { searchParams: Promise<{ paid?: string; failed?: string; over?: string; next?: string }> }) {
   const { user, me } = await requireCtx();
   const sp = await searchParams;
   const provider = billingProvider();
@@ -27,6 +28,8 @@ export default async function PlanPage({ searchParams }: { searchParams: Promise
   const canPay = isAdmin && !native && !me.demo && plan.kind !== "paid";
   const date = (ms: number) => new Date(ms).toLocaleDateString(lang, { timeZone: TZ, year: "numeric", month: "long", day: "numeric" });
   const fam = db.prepare("select carrier from family where id = ?").get(me.family_id) as { carrier: string | null };
+  // Where "Continue for now" goes: back to where the entry was added (a path on this site only)
+  const next = sp.next?.startsWith("/") && !sp.next.startsWith("//") ? sp.next : "/home";
   const realEmail = user.email && !user.email.endsWith(".carecash.local") ? user.email : "";
 
   const status =
@@ -35,7 +38,7 @@ export default async function PlanPage({ searchParams }: { searchParams: Promise
       : plan.kind === "trial"
         ? t("planTrial", { n: plan.daysLeft })
         : plan.kind === "free"
-          ? t("planFree", { used: plan.used, limit: plan.limit })
+          ? t("planFree")
           : "";
 
   return (
@@ -52,11 +55,9 @@ export default async function PlanPage({ searchParams }: { searchParams: Promise
         </section>
       )}
 
-      {/* Out of free entries: the employer gets the upgrade below; a caretaker is told who can do it */}
-      {plan.kind === "free" && plan.left === 0 && (
-        <p className="rounded-2xl bg-warn-soft p-4 text-base font-semibold">
-          {t("planFull", { limit: plan.limit })} {!isAdmin && t("planAskEmployer")}
-        </p>
+      {/* An employer past the free entries, sent here after adding one (it was saved): why, and a way to carry on */}
+      {isAdmin && plan.kind === "free" && plan.used > plan.limit && (
+        <p className="rounded-2xl bg-accent-soft p-4 text-base font-semibold">{t("planOver", { used: plan.used, limit: plan.limit })}</p>
       )}
 
       {canPay && (
@@ -82,8 +83,13 @@ export default async function PlanPage({ searchParams }: { searchParams: Promise
               ))}
             <button className="btn-primary">{t("planPay")}</button>
           </form>
-          {plan.kind !== "free" && <p className="text-sm text-muted">{t("planAfterTrial", { limit: FREE_PER_MONTH })}</p>}
         </section>
+      )}
+
+      {sp.over && (
+        <Link href={next} className="flex w-full items-center justify-center py-1 text-base font-semibold text-muted">
+          {t("planContinue")}
+        </Link>
       )}
 
       {/* ECPay: stop renewing here. Stripe: its own page (change card, cancel, or resume a cancelled plan) */}

@@ -9,7 +9,7 @@ Last checked: **Sat Nov 28, 11:40** (Taipei).
 |---|---|---|
 | To do | Instagram | Add the bio and link in the phone app (web refused 3×). Link: `carecash.me/guide/household-cash-for-caregivers?ref=ig-bio` |
 | Sat 28 Nov 12:30 | Threads | Day 2: 讓她按一下「已收到」 (scheduled) |
-| Sun 29 Nov 21:00 | Threads | Day 3: 兄弟姊妹一起分攤看護費 (scheduled). Says 「我們家現在共用一本電子帳」: not a confirmed fact |
+| Sun 29 Nov 21:00 | Threads | Day 3: 兄弟姊妹一起分攤看護費 (scheduled). Wording kept as is (founder, Nov 28) |
 
 ## Our posts
 | When | Where | Post | Status | Views | Likes | Replies |

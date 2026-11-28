@@ -8,8 +8,9 @@ type Line = { key: string; big: string; small: string };
  * A list of sentences; tapping one fills the screen with it in large type, so the phone can simply be turned around.
  * `bigLang` is the language of the large text (her language, or Chinese for the employer).
  */
-export function PhraseList({ lines, bigLang, close }: { lines: Line[]; bigLang: string; close: string }) {
-  const [open, setOpen] = useState<Line | null>(null);
+export function PhraseList({ lines, bigLang, close, initial }: { lines: Line[]; bigLang: string; close: string; initial?: string }) {
+  // `initial` opens one sentence straight away, for links from the moment it is needed (money running low, a question about an expense)
+  const [open, setOpen] = useState<Line | null>(() => lines.find((l) => l.key === initial) ?? null);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(null);
